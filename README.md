@@ -2,6 +2,10 @@
 
 Sistema di gestione attività giornaliere e apparecchiature mediche.
 
+## Status
+
+🚀 Deployed on Cloudflare Pages
+
 ## Stack Tecnologico
 
 - **Frontend**: Next.js 15 con App Router
