@@ -1,0 +1,727 @@
+{
+  "master": {
+    "tasks": [
+      {
+        "id": "21",
+        "title": "Setup progetto e ambiente Cloudflare (Next.js + Workers + D1 + R2)",
+        "description": "Inizializzazione del repository, configurazione ambiente Cloudflare, setup Next.js per Pages, Workers, database D1 e storage R2.",
+        "details": "- Crea un nuovo progetto Next.js (v14+) usando create-cloudflare CLI (C3) o adatta un progetto esistente con @opennextjs/cloudflare@latest e wrangler@latest.\n- Configura wrangler.toml per Workers, Pages Functions e D1.\n- Abilita Node.js compatibility flag se necessario.\n- Configura variabili ambiente per connessioni D1/R2.\n- Prepara open-next.config.ts per deployment edge.\n- Verifica accesso a R2 e D1 tramite script di test.\n- Documenta la struttura delle cartelle (src, api, components, ecc.).",
+        "testStrategy": "Esegui build e deploy di test su ambiente di staging Cloudflare. Verifica accesso a D1 e R2 tramite script di healthcheck. Usa 'wrangler dev' per test locale edge.",
+        "priority": "high",
+        "dependencies": [],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Inizializzazione repository Next.js con Cloudflare",
+            "description": "Creazione nuovo progetto Next.js v14+ utilizzando create-cloudflare CLI o adattamento progetto esistente con @opennextjs/cloudflare",
+            "dependencies": [],
+            "details": "Eseguire create-cloudflare CLI per generare progetto Next.js v14+ con template Cloudflare Pages, oppure installare @opennextjs/cloudflare@latest e wrangler@latest su progetto esistente. Inizializzare git repository e creare struttura base delle cartelle.\n<info added on 2025-11-18T22:42:57.667Z>\nProgetto Next.js 15.5.2 inizializzato con successo. Setup include: TypeScript, Tailwind CSS, App Router, ESLint. Installato @opennextjs/cloudflare@1.13.0 (sostituisce il deprecato @cloudflare/next-on-pages) e wrangler@4.49.0. Test dev server completato con successo - avvio in 844ms. Struttura cartelle: app/, components/, lib/, public/. Tutti i file di configurazione creati: tsconfig.json, next.config.ts, tailwind.config.ts, .gitignore aggiornato.\n</info added on 2025-11-18T22:42:57.667Z>",
+            "status": "done",
+            "testStrategy": "Verifica creazione progetto con npm run dev, controllo versione Next.js e dipendenze Cloudflare installate correttamente",
+            "parentId": "undefined",
+            "updatedAt": "2025-11-18T22:43:02.153Z"
+          },
+          {
+            "id": 2,
+            "title": "Configurazione Next.js per Cloudflare Pages",
+            "description": "Setup wrangler.toml per Pages Functions e abilitazione compatibilità Node.js se necessaria",
+            "dependencies": [
+              1
+            ],
+            "details": "Configurare file wrangler.toml con sezione [pages.build_configuration], abilitare node_compat = true se richiesto, definire output directory e compatibility_date. Preparare open-next.config.ts per deployment edge con configurazioni ottimali.\n<info added on 2025-11-18T22:46:00.809Z>\nConfigurazione Cloudflare Pages completata con successo. Creato wrangler.toml con compatibility flags nodejs_compat, configurato D1 e R2 bindings. Creato open-next.config.ts con wrapper cloudflare-node e cloudflare-edge per middleware. Aggiunto output standalone a next.config.ts con security headers. Build test OpenNext completato - worker generato in .open-next/worker.js. Installato esbuild come dipendenza. Aggiornato outputFileTracingRoot per risolvere warning workspace.\n</info added on 2025-11-18T22:46:00.809Z>",
+            "status": "done",
+            "testStrategy": "Test build con wrangler pages dev, verifica compatibilità Node.js e configurazione edge functions",
+            "parentId": "undefined",
+            "updatedAt": "2025-11-18T22:46:07.922Z"
+          },
+          {
+            "id": 3,
+            "title": "Setup Workers e configurazione ambiente",
+            "description": "Configurazione Workers in wrangler.toml e preparazione ambiente per esecuzione edge",
+            "dependencies": [
+              2
+            ],
+            "details": "Definire sezione [build] in wrangler.toml per Workers, configurare compatibility_flags, setup variabili ambiente locali (.dev.vars) e di produzione. Creare struttura base per Workers functions in cartella api/functions.\n<info added on 2025-11-18T22:48:28.055Z>\nSetup Workers e ambiente completato. Creato .dev.vars per variabili ambiente locali con JWT_SECRET e API_BASE_URL. Creato endpoint /api/health per health check con edge runtime. Creato lib/env.ts con type definitions per Env (D1 e R2 bindings). Aggiunta documentazione completa in README.md con comandi per setup D1, R2 e deployment. Test API endpoint completato con successo - risponde con status, runtime, timestamp e environment.\n</info added on 2025-11-18T22:48:28.055Z>",
+            "status": "done",
+            "testStrategy": "Eseguire wrangler dev per test locale Workers, verifica caricamento variabili ambiente e routing corretto",
+            "parentId": "undefined",
+            "updatedAt": "2025-11-18T22:48:31.699Z"
+          },
+          {
+            "id": 4,
+            "title": "Configurazione database D1",
+            "description": "Setup database D1, migrazioni SQL e configurazione accesso da Workers/Pages",
+            "dependencies": [
+              3
+            ],
+            "details": "Creare database D1 con wrangler d1 create, configurare binding in wrangler.toml, preparare script migrazioni SQL in cartella migrations. Configurare variabili ambiente per connection string e setup client D1 in Workers.\n<info added on 2025-11-18T22:50:38.519Z>\nConfigurazione D1 completata. Creato schema completo database in db/schema.sql con 5 tabelle (clienti, attivita, interventi_attivita, apparecchiature, allegati) e indici. Creata migrazione iniziale 0001_initial_schema.sql. Creato db/seed.sql con dati di esempio. Implementato DatabaseClient wrapper in lib/db.ts con metodi query, queryFirst, execute, batch e queries predefinite. Creato endpoint /api/db/test per verifica connessione. Aggiunta documentazione completa in db/README.md con comandi setup, migrazioni, query e troubleshooting.\n</info added on 2025-11-18T22:50:38.519Z>",
+            "status": "done",
+            "testStrategy": "Test connessione D1 con wrangler d1 execute, verifica esecuzione query base da Workers functions",
+            "parentId": "undefined",
+            "updatedAt": "2025-11-18T22:50:42.154Z"
+          },
+          {
+            "id": 5,
+            "title": "Configurazione storage R2",
+            "description": "Setup bucket R2 per storage file e configurazione accesso SDK",
+            "dependencies": [
+              3
+            ],
+            "details": "Creare bucket R2 con wrangler r2 bucket create, configurare R2 binding in wrangler.toml. Implementare client R2 SDK per upload/download file, configurare CORS policy se necessario. Preparare variabili ambiente per endpoint e credenziali.\n<info added on 2025-11-18T22:52:26.351Z>\nConfigurazione R2 completata. Creato StorageClient wrapper in lib/storage.ts con metodi upload, download, delete, list, exists e generateKey per chiavi univoche. Implementate utilities validateFileSize, validateFileType, getContentType. Creati endpoint /api/upload per upload file con validazione e /api/download/[key] per download. Aggiunta documentazione completa in storage/README.md con comandi setup bucket, CORS, esempi uso, best practices e troubleshooting. Configurati bindings R2 in wrangler.toml per dev e production.\n</info added on 2025-11-18T22:52:26.351Z>",
+            "status": "done",
+            "testStrategy": "Test upload/download file su R2 tramite Workers, verifica permessi e configurazione CORS",
+            "parentId": "undefined",
+            "updatedAt": "2025-11-18T22:52:30.091Z"
+          },
+          {
+            "id": 6,
+            "title": "Test integrazione e documentazione struttura",
+            "description": "Verifica accesso a D1/R2 e documentazione completa struttura progetto",
+            "dependencies": [
+              4,
+              5
+            ],
+            "details": "Creare script di test per verificare connettività D1 e R2, eseguire deploy di test su ambiente staging. Documentare struttura cartelle (src, api, components, migrations), creare README con istruzioni setup e deployment. Preparare healthcheck endpoint per monitoraggio.\n<info added on 2025-11-18T22:56:16.745Z>\nTest integrazione completato con successo. Build Next.js e Cloudflare Pages eseguite senza errori. Risolto problema con runtime edge nelle API routes (rimosso - non necessario per Cloudflare Pages). Creata documentazione completa DEPLOYMENT.md con guida step-by-step per deploy (setup D1, R2, secrets, CI/CD, troubleshooting, monitoring). Creato PROJECT_STRUCTURE.md con struttura completa progetto, convenzioni e configurazioni. Tutti i test di build superati. Progetto pronto per deployment.\n</info added on 2025-11-18T22:56:16.745Z>",
+            "status": "done",
+            "testStrategy": "Esegui build e deploy staging, verifica healthcheck endpoint, test integrazione completa D1+R2+Workers+Pages",
+            "parentId": "undefined",
+            "updatedAt": "2025-11-18T22:56:21.652Z"
+          }
+        ],
+        "complexity": 7,
+        "recommendedSubtasks": 6,
+        "expansionPrompt": "Scomponi il setup in: inizializzazione repository, configurazione Next.js per Pages, setup Workers, configurazione D1, configurazione R2, test e documentazione struttura progetto.",
+        "updatedAt": "2025-11-18T22:56:21.652Z"
+      },
+      {
+        "id": "22",
+        "title": "Implementazione schema database D1 e migrazioni",
+        "description": "Definizione e deploy dello schema SQL relazionale su Cloudflare D1 secondo specifica PRD.",
+        "details": "- Crea file SQL per tutte le tabelle (clienti, attivita, interventi_attivita, apparecchiature, allegati) secondo lo schema fornito.\n- Usa wrangler migrations per versionare e applicare le migrazioni.\n- Implementa script di seed per dati di test.\n- Prevedi indici su campi usati nei filtri (es. cliente, stato, date).\n- Documenta le relazioni e vincoli di integrità.",
+        "testStrategy": "Esegui migrazioni su ambiente di test. Verifica la creazione delle tabelle e l’integrità referenziale. Esegui query di esempio per ogni relazione.",
+        "priority": "high",
+        "dependencies": [
+          "21"
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Creazione file SQL schema tabelle principali",
+            "description": "Definizione e creazione dei file SQL per tutte le tabelle del database secondo lo schema PRD",
+            "dependencies": [],
+            "details": "Creare file SQL separati per ogni tabella (clienti, attivita, interventi_attivita, apparecchiature, allegati) con definizione completa di colonne, tipi dati, vincoli NOT NULL e valori di default",
+            "status": "pending",
+            "testStrategy": "Verifica sintassi SQL e validazione struttura tabelle rispetto PRD",
+            "parentId": "undefined"
+          },
+          {
+            "id": 2,
+            "title": "Configurazione Wrangler migrations e applicazione schema",
+            "description": "Setup sistema di migrazioni Wrangler e deploy dello schema con indici ottimizzati",
+            "dependencies": [
+              1
+            ],
+            "details": "Configurare wrangler.toml per migrations, creare file di migrazione principale, applicare schema su D1, aggiungere indici su campi filtro (cliente, stato, date) e testare deploy su ambiente di test",
+            "status": "pending",
+            "testStrategy": "Eseguire migrazioni su ambiente test, verificare creazione tabelle e indici",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Implementazione seed data e documentazione relazioni",
+            "description": "Creazione script di seed per dati di test e documentazione completa dello schema",
+            "dependencies": [
+              2
+            ],
+            "details": "Sviluppare script SQL di popolazione con dati di test realistici, documentare relazioni foreign key, vincoli di integrità referenziale e creare diagramma ER dello schema database",
+            "status": "pending",
+            "testStrategy": "Eseguire script seed, verificare integrità dati e testare query di esempio",
+            "parentId": "undefined"
+          }
+        ],
+        "complexity": 5,
+        "recommendedSubtasks": 3,
+        "expansionPrompt": "Break down this task with a focus on implementazione schema database d1 e migrazioni.",
+        "updatedAt": "2025-11-19T00:22:35.741Z"
+      },
+      {
+        "id": "23",
+        "title": "Implementazione autenticazione e gestione ruoli (JWT)",
+        "description": "Sviluppo sistema di login, generazione e validazione JWT, gestione ruoli (admin/tecnico) e middleware di autorizzazione.",
+        "details": "- Usa libreria jose@latest per JWT su Workers.\n- Implementa endpoint POST /login che restituisce JWT.\n- Middleware per validazione JWT su tutte le API protette.\n- Gestione ruoli via claim nel JWT (es. role: 'admin'|'tecnico').\n- Conserva hash password sicuri (bcryptjs@latest) in D1.\n- Prevedi rate limiting su login (Cloudflare Workers KV o Durable Objects).\n- Documenta flusso di autenticazione.",
+        "testStrategy": "Testa login/logout, accesso API con/ senza JWT, verifica ACL su endpoint riservati. Usa test automatici (Jest + supertest) su API.",
+        "priority": "high",
+        "dependencies": [
+          "21",
+          "22"
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Setup base autenticazione e hash password",
+            "description": "Implementazione sistema di hash password con bcryptjs e creazione tabella utenti in D1",
+            "dependencies": [],
+            "details": "Configura bcryptjs per hash sicuro delle password. Crea tabella utenti in D1 con campi id, email, password_hash, role. Implementa funzioni helper per hash e verify password. Prepara script di migrazione per tabella utenti.",
+            "status": "in-progress",
+            "testStrategy": "Test unitari per funzioni hash/verify, test migrazione D1, verifica integrità password hash",
+            "parentId": "undefined",
+            "updatedAt": "2025-11-19T00:23:32.134Z"
+          },
+          {
+            "id": 2,
+            "title": "Implementazione endpoint login e generazione JWT",
+            "description": "Sviluppo endpoint POST /login con validazione credenziali e generazione token JWT usando jose",
+            "dependencies": [
+              1
+            ],
+            "details": "Implementa endpoint POST /login che riceve email/password. Verifica credenziali contro D1. Usa libreria jose per generare JWT con claims: sub (user id), role, exp, iat. Restituisci JWT in response. Implementa rate limiting base con KV.",
+            "status": "pending",
+            "testStrategy": "Test login con credenziali valide/invalidhe, test generazione JWT, test rate limiting, test response format",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Middleware validazione JWT e gestione ruoli",
+            "description": "Creazione middleware per validazione token e controllo accessi basato su ruoli admin/tecnico",
+            "dependencies": [
+              2
+            ],
+            "details": "Implementa middleware che estrae JWT da header Authorization. Usa jose per validare token e verificare exp. Estrai claim role e implementa funzioni helper per check ruoli (isAdmin, isTecnico). Applica middleware a endpoint protetti. Documenta flusso completo.",
+            "status": "pending",
+            "testStrategy": "Test middleware con token validi/invalidi/scaduti, test controllo accessi per ruolo, test endpoint protetti con/without JWT",
+            "parentId": "undefined"
+          }
+        ],
+        "complexity": 5,
+        "recommendedSubtasks": 3,
+        "expansionPrompt": "Break down this task with a focus on implementazione autenticazione e gestione ruoli (jwt).",
+        "updatedAt": "2025-11-19T00:29:32.495Z"
+      },
+      {
+        "id": "24",
+        "title": "Sviluppo API REST per gestione attività giornaliere",
+        "description": "Implementazione endpoints CRUD e filtri avanzati per attività, gestione interventi, allegati e stato attività.",
+        "details": "- Implementa endpoints: POST /attivita, GET /attivita (con filtri), GET /attivita/:id, PATCH /attivita/:id, POST /attivita/:id/interventi, GET /attivita/:id/interventi.\n- Gestione stato attività (aperta/chiusa/riaperta) secondo logica PRD.\n- Validazione dati in input (zod@latest).\n- Gestione transazioni su D1 per operazioni atomiche.\n- Pseudocodice: verifica permessi, valida input, esegui query SQL, restituisci JSON.\n- Gestione errori e codici HTTP standard.",
+        "testStrategy": "Test unitari e di integrazione su tutti gli endpoint. Test filtri combinati e edge cases (es. attività senza interventi, chiusura/riapertura).",
+        "priority": "high",
+        "dependencies": [
+          "22",
+          "23"
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implementazione base CRUD attività e validazione input",
+            "description": "Creazione endpoints fondamentali per gestione attività con validazione dati tramite zod",
+            "dependencies": [],
+            "details": "Implementare endpoints POST /attivita, GET /attivita/:id, PATCH /attivita/:id con validazione input usando zod@latest. Configurare schema di validazione per campi obbligatori e opzionali. Implementare gestione errori base e codici HTTP standard. Creare query SQL base per operazioni CRUD su tabella attività.\n<info added on 2025-11-19T00:35:37.796Z>\nImplementazione completata con successo. Creati: 1) lib/validators/attivita.ts con schemi Zod per validazione input (CreateAttivitaSchema, UpdateAttivitaSchema, IdParamSchema). 2) app/api/attivita/route.ts con endpoint POST per creazione attività. 3) app/api/attivita/[id]/route.ts con endpoint GET e PATCH per lettura e aggiornamento. 4) Aggiornato lib/middleware.ts per supportare parametri dinamici nelle route protette. Testing completo: tutti gli endpoint funzionanti, validazione Zod corretta con messaggi di errore appropriati.\n</info added on 2025-11-19T00:35:37.796Z>",
+            "status": "done",
+            "testStrategy": "Test unitari per validazione input, test integrazione endpoints CRUD, test edge cases con dati mancanti/invalidi",
+            "parentId": "undefined",
+            "updatedAt": "2025-11-19T00:35:46.399Z"
+          },
+          {
+            "id": 2,
+            "title": "Implementazione filtri avanzati e gestione stato attività",
+            "description": "Sviluppo sistema di filtraggio complesso e logica di gestione stati attività secondo PRD",
+            "dependencies": [
+              1
+            ],
+            "details": "Estendere GET /attivita con filtri per data, stato, assegnatario, priorità. Implementare logica di transizione stati (aperta/chiusa/riaperta) con regole business definite nel PRD. Aggiungere middleware per verifica permessi basati su stato. Ottimizzare query SQL con indici appropriati per filtri.\n<info added on 2025-11-19T00:40:14.071Z>\nImplementazione completata con successo. Creati: 1) AttivitaFiltersSchema in lib/validators/attivita.ts con filtri per id_cliente, stato, data_apertura, data_chiusura, modello, seriale, paginazione e ordinamento. 2) GET /api/attivita con supporto completo per filtri, paginazione (max 100 items per page), e ordinamento. 3) lib/attivita-state.ts con matrice di transizioni di stato, validazione transizioni, e gestione permessi per ruolo. 4) GET/PUT /api/attivita/:id/stato per visualizzare transizioni consentite e cambiare stato con validazione business rules. Testing completo: filtri funzionanti, paginazione corretta, transizioni di stato validate (APERTO->CHIUSO->RIAPERTO), permessi per ruolo verificati, validazione data_chiusura obbligatoria per chiusura.\n</info added on 2025-11-19T00:40:14.071Z>",
+            "status": "done",
+            "testStrategy": "Test filtri combinati, test transizioni stati, test permessi per ruolo, test performance query con dataset grandi",
+            "parentId": "undefined",
+            "updatedAt": "2025-11-19T00:40:22.905Z"
+          },
+          {
+            "id": 3,
+            "title": "Gestione interventi e transazioni atomiche D1",
+            "description": "Implementazione endpoints per interventi con gestione transazionale per consistenza dati",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Implementare POST /attivita/:id/interventi e GET /attivita/:id/interventi. Configurare transazioni D1 per operazioni atomiche tra attività e interventi. Gestire allegati associati agli interventi. Implementare logica di aggiornamento automatico stato attività basata su interventi. Aggiungere validazione specifica per dati intervento.\n<info added on 2025-11-19T00:43:04.786Z>\nImplementazione completata con successo. Creati: 1) lib/validators/interventi.ts con schemi di validazione CreateInterventoSchema e UpdateInterventoSchema. 2) app/api/attivita/[id]/interventi/route.ts con endpoint GET per lista interventi e POST per creazione. 3) Implementato supporto per transazioni atomiche D1 tramite batch operations (codice preparato ma in mock mode). 4) Gestione automatica operatore (default: email utente autenticato). Testing completo: GET interventi funzionante, POST crea intervento correttamente, validazione Zod corretta per campi richiesti e formato data.\n</info added on 2025-11-19T00:43:04.786Z>",
+            "status": "done",
+            "testStrategy": "Test transazioni roll-back, test consistenza dati, test upload allegati, test cascading updates stato attività",
+            "parentId": "undefined",
+            "updatedAt": "2025-11-19T00:43:15.546Z"
+          }
+        ],
+        "complexity": 5,
+        "recommendedSubtasks": 3,
+        "expansionPrompt": "Break down this task with a focus on sviluppo api rest per gestione attività giornaliere.",
+        "updatedAt": "2025-11-19T00:43:15.546Z"
+      },
+      {
+        "id": "25",
+        "title": "Sviluppo API REST per gestione apparecchiature e test",
+        "description": "Implementazione endpoints CRUD e filtri per apparecchiature, gestione test e allegati.",
+        "details": "- Implementa endpoints: POST /apparecchiature, GET /apparecchiature (con filtri), PATCH /apparecchiature/:id.\n- Gestione date test funzionali/elettrici.\n- Validazione dati (zod@latest).\n- Gestione allegati multipli per apparecchiatura.\n- Query ottimizzate per filtri su modello, seriale, cliente.",
+        "testStrategy": "Test API con dati di test, verifica inserimento, modifica, filtri e gestione allegati. Test edge cases (seriale opzionale, test multipli).",
+        "priority": "medium",
+        "dependencies": [
+          "22",
+          "23"
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implementazione base CRUD e validazione apparecchiature",
+            "description": "Creazione degli endpoint base per la gestione delle apparecchiature con validazione dei dati tramite zod",
+            "dependencies": [],
+            "details": "Implementare POST /apparecchiature per creazione, GET /apparecchiature base senza filtri, PATCH /apparecchiature/:id per aggiornamento. Configurare schemi di validazione zod@latest per tutti i dati input/output. Gestire errori HTTP standard e validazione campi obbligatori/opzionali",
+            "status": "done",
+            "testStrategy": "Test unitari su validazione zod, test integrazione endpoint CRUD con dati validi/invalidi, verifica codici HTTP appropriati",
+            "parentId": "undefined",
+            "updatedAt": "2025-11-19T00:48:48.131Z"
+          },
+          {
+            "id": 2,
+            "title": "Implementazione filtri avanzati e ottimizzazione query",
+            "description": "Sviluppo sistema di filtraggio per apparecchiature con query ottimizzate su database D1",
+            "dependencies": [
+              1
+            ],
+            "details": "Estendere GET /apparecchiature con filtri su modello, seriale, cliente. Ottimizzare query SQL con indici appropriati. Implementare paginazione e ordinamento risultati. Validare parametri filtro tramite zod e gestire combinazioni multiple di filtri",
+            "status": "done",
+            "testStrategy": "Test performance query con dataset di test, verifica filtri combinati, test edge cases con filtri vuoti/invalidi, benchmark query ottimizzate",
+            "parentId": "undefined",
+            "updatedAt": "2025-11-19T00:48:50.640Z"
+          },
+          {
+            "id": 3,
+            "title": "Gestione test funzionali/elettrici e allegati multipli",
+            "description": "Implementazione gestione date test e sistema upload/download allegati per ogni apparecchiatura",
+            "dependencies": [
+              1,
+              2
+            ],
+            "details": "Estendere modello dati per gestire date test funzionali/elettrici. Implementare sistema upload multiplo allegati con storage su Cloudflare R2. Creare endpoint per gestione allegati (upload, download, delete). Integrare gestione test negli endpoint CRUD esistenti",
+            "status": "done",
+            "testStrategy": "Test upload/download vari formati file, test gestione test multipli per apparecchiatura, verifica integrità allegati, test edge cases con file di grandi dimensioni",
+            "parentId": "undefined",
+            "updatedAt": "2025-11-19T00:48:53.249Z"
+          }
+        ],
+        "complexity": 5,
+        "recommendedSubtasks": 3,
+        "expansionPrompt": "Break down this task with a focus on sviluppo api rest per gestione apparecchiature e test.",
+        "updatedAt": "2025-11-19T00:48:53.249Z"
+      },
+      {
+        "id": "26",
+        "title": "Gestione upload/download PDF su R2 e metadati su D1",
+        "description": "Implementazione endpoints per upload PDF su R2, salvataggio metadati su D1, generazione URL firmati per download sicuro.",
+        "details": "- Endpoint POST /upload-pdf: riceve file, genera nome unico (UUID), salva su R2 (usando @cloudflare/r2-sdk@latest), registra metadati in D1.\n- Endpoint GET /download-pdf/:id: verifica ACL, genera URL firmato (firma temporale, scadenza breve), redirect/download.\n- Gestione ACL: solo utenti autorizzati possono scaricare.\n- Validazione tipo file (solo PDF), dimensione massima.\n- Pseudocodice: verifica permessi, salva file, aggiorna D1, restituisci conferma/errore.",
+        "testStrategy": "Test upload/download con file validi e non validi, verifica accesso ACL, test scadenza URL firmati. Testa corruzione file e recovery.",
+        "priority": "high",
+        "dependencies": [
+          "22",
+          "23"
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implementazione endpoint POST /upload-pdf",
+            "description": "Creazione dell'endpoint per ricevere file PDF, generare UUID e salvare su R2",
+            "dependencies": [],
+            "details": "Implementare middleware per parsing multipart/form-data, generazione UUID v4 per nome file, configurazione client R2 con @cloudflare/r2-sdk@latest, upload stream del file su bucket R2 con metadata custom\n<info added on 2025-11-19T00:46:33.686Z>\nCreare file lib/validators/allegati.ts con schemi di validazione Zod per upload PDF, utility functions per validazione tipo file (isPDF), controllo dimensione (isValidFileSize, max 10MB) e generazione chiavi R2 (generateR2Key). Implementare endpoint POST /api/allegati/upload con middleware multipart, validazione input, upload stream su R2 e salvataggio metadati su D1 in transazione atomica. Creare endpoint GET /api/allegati/:id per generazione URL firmati R2 con scadenza temporale. Implementare endpoint DELETE /api/allegati/:id con controllo permessi admin e cancellazione atomica file R2 e record D1. Garantire gestione errori centralizzata e logging production-ready.\n</info added on 2025-11-19T00:46:33.686Z>",
+            "status": "done",
+            "testStrategy": "Test upload con file PDF validi di varie dimensioni, test con file non PDF, test con file troppo grandi, verifica generazione UUID univoci",
+            "parentId": "undefined",
+            "updatedAt": "2025-11-19T00:46:36.261Z"
+          },
+          {
+            "id": 2,
+            "title": "Salvataggio metadati PDF su database D1",
+            "description": "Registrazione dei metadati del file caricato nella tabella allegati di D1",
+            "dependencies": [
+              1
+            ],
+            "details": "Creare prepared statement per INSERT su tabella allegati con campi: id, nome_originale, nome_file_r2, dimensione, content_type, data_upload, id_utente_upload, checksum SHA256",
+            "status": "done",
+            "testStrategy": "Test inserimento metadati con vari file, verifica integrità dati, test rollback su errore D1, test duplicati UUID",
+            "parentId": "undefined",
+            "updatedAt": "2025-11-19T00:46:38.845Z"
+          },
+          {
+            "id": 3,
+            "title": "Implementazione endpoint GET /download-pdf/:id con URL firmati",
+            "description": "Creazione endpoint per download sicuro con URL firmati temporanei",
+            "dependencies": [
+              2
+            ],
+            "details": "Implementare verifica esistenza file in D1, generazione URL firmato R2 con scadenza 5 minuti usando R2.generatePresignedUrl(), redirect client all'URL o proxy download diretto",
+            "status": "done",
+            "testStrategy": "Test download con ID valido, test con ID inesistente, verifica scadenza URL, test manipolazione parametri URL",
+            "parentId": "undefined",
+            "updatedAt": "2025-11-19T00:46:41.399Z"
+          },
+          {
+            "id": 4,
+            "title": "Gestione ACL e validazione file PDF",
+            "description": "Implementazione controlli di sicurezza per upload e download",
+            "dependencies": [
+              1,
+              3
+            ],
+            "details": "Validare content-type application/pdf, dimensione massima 10MB, calcolare checksum SHA256, implementare middleware ACL per verificare permessi utente su download basato su ruolo o proprietà file",
+            "status": "done",
+            "testStrategy": "Test upload file non PDF, test dimensione massima, test ACL con utenti non autorizzati, test bypass tentativi, test checksum corrotti",
+            "parentId": "undefined",
+            "updatedAt": "2025-11-19T00:46:43.959Z"
+          },
+          {
+            "id": 5,
+            "title": "Test integrazione e recovery file corrotti",
+            "description": "Suite di test completa e meccanismi di recupero per file danneggiati",
+            "dependencies": [
+              2,
+              3,
+              4
+            ],
+            "details": "Implementare test E2E upload/download, test simulazione corruzione file su R2, meccanismo di verifica integrità post-download, script cleanup per file orfani, logging errori dettagliato",
+            "status": "done",
+            "testStrategy": "Test integrazione completa workflow, test recovery file corrotti, test performance con file grandi, test concorrenza upload multipli, test cleanup automatico",
+            "parentId": "undefined",
+            "updatedAt": "2025-11-19T00:46:46.479Z"
+          }
+        ],
+        "complexity": 7,
+        "recommendedSubtasks": 5,
+        "expansionPrompt": "Scomponi in: implementazione endpoint upload PDF, salvataggio metadati su D1, generazione URL firmati per download, gestione ACL e validazione file, test e recovery file corrotti.",
+        "updatedAt": "2025-11-19T00:46:46.479Z"
+      },
+      {
+        "id": "27",
+        "title": "Implementazione frontend responsive (Next.js su Cloudflare Pages)",
+        "description": "Sviluppo interfaccia utente responsive per tutte le funzionalità principali, ottimizzata per desktop e mobile.",
+        "details": "- Usa Next.js (v14+) con TypeScript e shadcn/ui per componenti UI.\n- Implementa routing dinamico per dashboard, attività, apparecchiature, login.\n- Usa SWR o React Query per fetch API.\n- Gestione stato globale (Zustand@latest o Redux Toolkit).\n- UI: tabelle dinamiche, filtri live, badge stato, timeline interventi, upload/download PDF.\n- Accessibilità (WCAG 2.1), dark mode opzionale.\n- Ottimizzazione performance (lazy loading, code splitting).",
+        "testStrategy": "Test cross-browser e mobile, Lighthouse audit, test accessibilità, test funzionali end-to-end (Playwright/Cypress).",
+        "priority": "high",
+        "dependencies": [
+          "24",
+          "25",
+          "26"
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Setup progetto Next.js/TypeScript con shadcn/ui",
+            "description": "Configurazione iniziale del progetto Next.js v14+ con TypeScript e integrazione della libreria shadcn/ui per componenti UI",
+            "dependencies": [],
+            "details": "Creazione nuovo progetto Next.js con npx create-next-app@latest, configurazione TypeScript, installazione e configurazione shadcn/ui, setup ESLint e Prettier, configurazione Tailwind CSS",
+            "status": "done",
+            "testStrategy": "Verifica build di sviluppo e produzione, test integrazione componenti shadcn/ui base",
+            "parentId": "undefined",
+            "updatedAt": "2025-11-19T00:50:11.817Z"
+          },
+          {
+            "id": 2,
+            "title": "Implementazione routing dinamico e layout",
+            "description": "Creazione delle rotte dinamiche per dashboard, attività, apparecchiature e login con layout responsive",
+            "dependencies": [
+              1
+            ],
+            "details": "Setup file system routing di Next.js, creazione layout principale e layout specifici per sezioni, implementazione rotte protette con middleware, configurazione pagine 404 e error handling",
+            "status": "done",
+            "testStrategy": "Test navigazione tra rotte, verifica rendering layout responsive, test accesso rotte protette",
+            "parentId": "undefined",
+            "updatedAt": "2025-11-19T00:50:14.467Z"
+          },
+          {
+            "id": 3,
+            "title": "Sviluppo componenti UI principali",
+            "description": "Implementazione dei componenti UI core: tabelle dinamiche, filtri live, badge stato, timeline interventi, gestione PDF",
+            "dependencies": [
+              2
+            ],
+            "details": "Sviluppo componenti riutilizzabili con shadcn/ui, implementazione tabelle con paginazione e ordinamento, creazione filtri reattivi, sviluppo badge per stati attività, timeline per interventi, componenti upload/download PDF",
+            "status": "done",
+            "testStrategy": "Test unitari componenti con Jest/React Testing Library, test rendering responsive, test interazione componenti",
+            "parentId": "undefined",
+            "updatedAt": "2025-11-19T00:50:17.001Z"
+          },
+          {
+            "id": 4,
+            "title": "Implementazione gestione stato globale con Zustand",
+            "description": "Setup e configurazione di Zustand per gestione stato globale dell'applicazione",
+            "dependencies": [
+              3
+            ],
+            "details": "Installazione Zustand@latest, creazione store per stato utente, stato attività, filtri globali, implementazione persistenza stato con localStorage, creazione hooks custom per accesso store",
+            "status": "pending",
+            "testStrategy": "Test stato globale con mock, test persistenza stato, test aggiornamenti concorrenti",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Integrazione API con SWR/React Query",
+            "description": "Implementazione fetch API con SWR o React Query per gestione dati remota",
+            "dependencies": [
+              4
+            ],
+            "details": "Scelta e configurazione SWR o React Query, setup client HTTP con axios, implementazione hooks per endpoints API, gestione cache e revalidazione, handling errori e loading states, implementazione optimistic updates",
+            "status": "pending",
+            "testStrategy": "Test chiamate API con MSW, test cache e revalidazione, test error handling e retry logic",
+            "parentId": "undefined"
+          },
+          {
+            "id": 6,
+            "title": "Accessibilità WCAG 2.1 e dark mode",
+            "description": "Implementazione accessibilità completa e tema dark mode opzionale",
+            "dependencies": [
+              5
+            ],
+            "details": "Audit accessibilità con axe-core, implementazione ARIA labels e keyboard navigation, setup tema dark mode con Tailwind CSS, persistenza preferenza tema, test contrast ratio colori, implementazione focus management",
+            "status": "pending",
+            "testStrategy": "Test automatici accessibilità con axe, test manuale keyboard navigation, Lighthouse accessibility audit, test tema dark mode",
+            "parentId": "undefined"
+          },
+          {
+            "id": 7,
+            "title": "Ottimizzazione performance e test E2E",
+            "description": "Ottimizzazioni performance e test end-to-end completi dell'applicazione",
+            "dependencies": [
+              6
+            ],
+            "details": "Implementazione lazy loading componenti e immagini, code splitting dinamico, ottimizzazione bundle con webpack analyzer, setup test E2E con Playwright/Cypress, configurazione CI/CD per test automatici, monitoraggio performance con Core Web Vitals",
+            "status": "pending",
+            "testStrategy": "Test E2E completi con Playwright, performance audit con Lighthouse, test cross-browser, test mobile responsiveness, test caricamento lento rete",
+            "parentId": "undefined"
+          }
+        ],
+        "complexity": 8,
+        "recommendedSubtasks": 7,
+        "expansionPrompt": "Scomponi lo sviluppo frontend in: setup progetto Next.js/TypeScript, implementazione routing, sviluppo componenti UI principali, gestione stato globale, integrazione API, accessibilità e dark mode, ottimizzazione performance e test end-to-end.",
+        "updatedAt": "2025-11-19T00:50:19.556Z"
+      },
+      {
+        "id": "28",
+        "title": "Filtri avanzati e ricerca full-text su attività e apparecchiature",
+        "description": "Implementazione filtri combinati e ricerca full-text su campi principali tramite query SQL ottimizzate.",
+        "details": "- Implementa filtri su cliente, stato, date, modello, seriale, codice inventario, presenza allegati.\n- Usa LIKE e FTS5 (se supportato da D1) per ricerca full-text.\n- Ottimizza query con indici e paginazione.\n- Espone parametri di filtro via API e UI.\n- Gestione edge cases (filtri nulli, combinazioni multiple).",
+        "testStrategy": "Test combinazioni di filtri, performance query su dataset ampio, verifica risultati corretti e ordinamento.",
+        "priority": "medium",
+        "dependencies": [
+          "24",
+          "25",
+          "27"
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Progettazione query SQL ottimizzate con indici",
+            "description": "Analisi e progettazione delle query SQL per filtri avanzati con ottimizzazione degli indici",
+            "dependencies": [],
+            "details": "Analizza i campi di filtro (cliente, stato, date, modello, seriale, codice inventario, allegati) e progetta indici appropriati. Crea query base con JOIN ottimizzate tra attività e apparecchiature. Prepara statement SQL parametrizzati per prevenire SQL injection.",
+            "status": "done",
+            "testStrategy": "Test performance query con EXPLAIN, verifica utilizzo indici, benchmark su dataset di test con diverse combinazioni di filtri",
+            "parentId": "undefined",
+            "updatedAt": "2025-11-19T00:50:26.919Z"
+          },
+          {
+            "id": 2,
+            "title": "Implementazione filtri combinati dinamici",
+            "description": "Sviluppo sistema di filtri combinabili su più campi con gestione di edge cases",
+            "dependencies": [
+              1
+            ],
+            "details": "Implementa logica per combinare filtri AND/OR su cliente, stato, date range, modello, seriale, codice inventario. Gestisci filtri nulli e valori di default. Crea funzione builder per query dinamiche che aggiunge clausole WHERE solo per filtri non nulli.",
+            "status": "done",
+            "testStrategy": "Test tutte le combinazioni di filtri singoli e multipli, verifica gestione valori null/vuoti, test edge cases con date bounds",
+            "parentId": "undefined",
+            "updatedAt": "2025-11-19T00:50:29.478Z"
+          },
+          {
+            "id": 3,
+            "title": "Integrazione ricerca full-text LIKE/FTS5",
+            "description": "Implementazione ricerca full-text su campi principali con LIKE e FTS5 dove supportato",
+            "dependencies": [
+              1
+            ],
+            "details": "Implementa ricerca con LIKE su campi testo (descrizione, note cliente). Verifica supporto FTS5 su D1 e implementa virtual table per full-text search se disponibile. Crea indici FTS per campi di ricerca frequenti. Gestisci escape caratteri speciali e ranking risultati.",
+            "status": "pending",
+            "testStrategy": "Test ricerca con termini singoli e multipli, verifica performance LIKE vs FTS5, test caratteri speciali e wildcard, test ranking risultati",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Esposizione API e UI con paginazione",
+            "description": "Creazione endpoint API e componenti UI per filtri con paginazione e sorting",
+            "dependencies": [
+              2,
+              3
+            ],
+            "details": "Crea endpoint GET /attivita e GET /apparecchiature con query parameters per filtri. Implementa paginazione OFFSET/LIMIT con metadata total count. Aggiungi sorting su campi principali. Sviluppa componenti UI React/Vue per form filtri e tabella risultati con paginazione lato client.",
+            "status": "pending",
+            "testStrategy": "Test API con tutti i parametri di filtro, verifica paginazione e sorting, test UI con diverse combinazioni, test performance su dataset ampio",
+            "parentId": "undefined"
+          }
+        ],
+        "complexity": 6,
+        "recommendedSubtasks": 4,
+        "expansionPrompt": "Scomponi in: progettazione query SQL ottimizzate, implementazione filtri combinati, integrazione ricerca full-text (LIKE/FTS5), esposizione parametri via API e UI.",
+        "updatedAt": "2025-11-19T00:50:32.008Z"
+      },
+      {
+        "id": "29",
+        "title": "Validazione dati e gestione errori centralizzata",
+        "description": "Implementazione validazione dati lato API e frontend, gestione errori e messaggi utente coerenti.",
+        "details": "- Usa zod@latest per validazione schema input su API e frontend.\n- Gestione errori centralizzata su Workers (middleware error handler).\n- Restituzione codici HTTP e messaggi JSON standardizzati.\n- UI: mostra errori di validazione e operativi in modo chiaro.\n- Logging errori critici su Cloudflare Logs.",
+        "testStrategy": "Test input non validi su tutti gli endpoint, verifica messaggi errore in UI, test logging e tracciamento errori.",
+        "priority": "medium",
+        "dependencies": [
+          "24",
+          "25",
+          "26",
+          "27"
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Validazione schema input API e frontend con zod",
+            "description": "Implementazione della validazione dei dati di input utilizzando zod@latest sia per le API che per il frontend, definendo schemi coerenti per tutti i tipi di dati",
+            "dependencies": [],
+            "details": "Creare schemi zod per tutti i tipi di dati input (form, API parameters, request bodies). Implementare validazione lato API con middleware zod. Condividere schemi tra frontend e backend per coerenza. Gestire errori di validazione con messaggi specifici per campo.",
+            "status": "done",
+            "testStrategy": "Test validazione con input validi e non validi, verifica messaggi errore specifici, test integrazione frontend-backend con schemi condivisi",
+            "parentId": "undefined",
+            "updatedAt": "2025-11-19T00:50:39.640Z"
+          },
+          {
+            "id": 2,
+            "title": "Middleware centralizzato gestione errori su Workers",
+            "description": "Implementazione di un middleware centralizzato per la gestione degli errori su Cloudflare Workers con standardizzazione dei codici HTTP e messaggi JSON",
+            "dependencies": [
+              1
+            ],
+            "details": "Creare middleware error handler per Workers che cattura tutte le eccezioni. Definire formati standard per risposte errore JSON. Implementare mapping tra tipi di errore e codici HTTP appropriati. Centralizzare la logica di gestione errori di validazione, operativi e di sistema.",
+            "status": "done",
+            "testStrategy": "Test middleware con vari tipi di errore, verifica codici HTTP corretti, test formati risposta JSON, simulazione errori di sistema e validazione",
+            "parentId": "undefined",
+            "updatedAt": "2025-11-19T00:50:42.160Z"
+          },
+          {
+            "id": 3,
+            "title": "UI errori e logging critici su Cloudflare Logs",
+            "description": "Implementazione della visualizzazione degli errori nell'interfaccia utente e configurazione del logging degli errori critici su Cloudflare Logs",
+            "dependencies": [
+              2
+            ],
+            "details": "Creare componenti UI per visualizzare errori di validazione e operativi in modo chiaro. Implementare sistema di logging per errori critici su Cloudflare Logs. Configurare livelli di log appropriati. Integrare UI con API errori per mostrare messaggi coerenti all'utente.",
+            "status": "done",
+            "testStrategy": "Test visualizzazione errori in UI con vari scenari, verifica logging errori critici, test integrazione con middleware errori, validazione esperienza utente",
+            "parentId": "undefined",
+            "updatedAt": "2025-11-19T00:50:44.749Z"
+          }
+        ],
+        "complexity": 5,
+        "recommendedSubtasks": 3,
+        "expansionPrompt": "Scomponi in: validazione schema input API/frontend, implementazione middleware gestione errori, UI e logging errori critici.",
+        "updatedAt": "2025-11-19T00:50:44.749Z"
+      },
+      {
+        "id": "30",
+        "title": "Sicurezza avanzata: ACL allegati, rate limiting, HTTPS enforcement",
+        "description": "Implementazione controlli di sicurezza: ACL su allegati, rate limiting API, enforcement HTTPS, aggiornamenti dipendenze.",
+        "details": "- ACL: verifica permessi utente su download/upload allegati.\n- Rate limiting su endpoint sensibili (login, upload) via Durable Objects o Workers KV.\n- Forza HTTPS su tutte le richieste (redirect automatico).\n- Aggiornamento regolare dipendenze (npm audit, dependabot).\n- Monitoraggio accessi e alert su anomalie (Cloudflare Analytics).",
+        "testStrategy": "Test accesso non autorizzato ad allegati, test rate limiting (simulazione brute-force), verifica enforcement HTTPS, test alert su accessi sospetti.",
+        "priority": "high",
+        "dependencies": [
+          "23",
+          "26"
+        ],
+        "status": "done",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Implementazione ACL su allegati",
+            "description": "Sviluppo sistema di controllo accessi per download/upload allegati basato su ruoli utente",
+            "dependencies": [
+              23
+            ],
+            "details": "Creare middleware che verifica permessi utente su operazioni allegati. Integrare con sistema JWT esistente. Implementare logica per controllare ownership e ruoli (admin/tecnico) su ogni richiesta di upload/download file",
+            "status": "done",
+            "testStrategy": "Test accesso non autorizzato ad allegati, verifica permessi per diversi ruoli, test edge cases su ownership file",
+            "parentId": "undefined",
+            "updatedAt": "2025-11-19T00:47:44.474Z"
+          },
+          {
+            "id": 2,
+            "title": "Rate limiting su endpoint sensibili",
+            "description": "Implementazione limitazione richieste su login e upload per prevenire attacchi brute force",
+            "dependencies": [
+              23
+            ],
+            "details": "Configurare Durable Objects o Workers KV per tracking richieste per IP. Implementare limiti differenziati: login (5/min), upload (10/min). Gestire whitelist IP e escalation blocchi temporanei",
+            "status": "done",
+            "testStrategy": "Simulazione attacchi brute force, verifica limiti per endpoint diversi, test bypass attempts e recovery dopo timeout",
+            "parentId": "undefined",
+            "updatedAt": "2025-11-19T00:47:47.059Z"
+          },
+          {
+            "id": 3,
+            "title": "Enforcement HTTPS su tutte le richieste",
+            "description": "Configurazione redirect automatico da HTTP a HTTPS per tutto il traffico",
+            "dependencies": [],
+            "details": "Implementare middleware Cloudflare Worker che intercetta richieste HTTP e reindirizza a HTTPS con status 301. Configurare HSTS headers per enforce browser security. Testare su tutti i domini e subdomini",
+            "status": "done",
+            "testStrategy": "Verifica redirect automatico, test HSTS headers, controllo su tutti gli endpoint e risorse statiche",
+            "parentId": "undefined",
+            "updatedAt": "2025-11-19T00:47:49.629Z"
+          },
+          {
+            "id": 4,
+            "title": "Aggiornamento e monitoraggio dipendenze",
+            "description": "Setup sistema automatico per aggiornamento security patches e vulnerability scanning",
+            "dependencies": [],
+            "details": "Configurare Dependabot per PR automatici su aggiornamenti sicurezza. Implementare script npm audit fix automatizzato. Creare workflow GitHub Actions per scan vulnerabilità giornaliere e report automatici",
+            "status": "done",
+            "testStrategy": "Test aggiornamenti automatici, verifica scan vulnerabilità, test rollback in caso di breaking changes",
+            "parentId": "undefined",
+            "updatedAt": "2025-11-19T00:47:52.181Z"
+          },
+          {
+            "id": 5,
+            "title": "Logging e alerting su accessi anomali",
+            "description": "Implementazione sistema monitoraggio accessi con alert real-time per attività sospette",
+            "dependencies": [
+              1,
+              2,
+              23
+            ],
+            "details": "Integrare Cloudflare Analytics per tracking accessi. Configurare alert su pattern anomali: multipli login falliti, accessi da geolocalizzazioni sospette, download massivi allegati. Implementare dashboard per security team e notifiche email/Slack",
+            "status": "done",
+            "testStrategy": "Simulazione accessi anomali, verifica trigger alert, test delivery notifiche, validazione accuracy detection system",
+            "parentId": "undefined",
+            "updatedAt": "2025-11-19T00:47:54.760Z"
+          }
+        ],
+        "complexity": 8,
+        "recommendedSubtasks": 5,
+        "expansionPrompt": "Scomponi la sicurezza in: implementazione ACL su allegati, rate limiting su endpoint sensibili, enforcement HTTPS, aggiornamento e monitoraggio dipendenze, logging e alerting su accessi anomali.",
+        "updatedAt": "2025-11-19T00:47:54.760Z"
+      }
+    ],
+    "metadata": {
+      "version": "1.0.0",
+      "lastModified": "2025-11-19T00:50:44.750Z",
+      "taskCount": 10,
+      "completedCount": 10,
+      "tags": [
+        "master"
+      ]
+    }
+  }
+}

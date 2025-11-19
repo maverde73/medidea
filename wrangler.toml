@@ -1,0 +1,45 @@
+# Cloudflare Workers configuration for Medidea
+name = "medidea"
+main = ".open-next/worker.js"
+compatibility_date = "2024-12-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Environment variables
+# NOTE: Sensitive values should be set in the Cloudflare dashboard or via wrangler secret
+
+# D1 Database binding
+[[d1_databases]]
+binding = "DB"
+database_name = "medidea-db"
+database_id = "a1de6fa4-c485-4b6d-bb9a-8f9bf34c3482"
+
+# R2 Storage binding
+[[r2_buckets]]
+binding = "STORAGE"
+bucket_name = "medidea-storage"
+
+# Preview settings (for PR previews and testing)
+[env.preview]
+name = "medidea-preview"
+
+[[env.preview.d1_databases]]
+binding = "DB"
+database_name = "medidea-db-dev"
+database_id = "TBD"
+
+[[env.preview.r2_buckets]]
+binding = "STORAGE"
+bucket_name = "medidea-storage-dev"
+
+# Production settings
+[env.production]
+name = "medidea"
+
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "medidea-db"
+database_id = "a1de6fa4-c485-4b6d-bb9a-8f9bf34c3482"
+
+[[env.production.r2_buckets]]
+binding = "STORAGE"
+bucket_name = "medidea-storage"

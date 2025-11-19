@@ -1,0 +1,93 @@
+{
+	"meta": {
+		"generatedAt": "2025-11-18T22:30:35.848Z",
+		"tasksAnalyzed": 10,
+		"totalTasks": 10,
+		"analysisCount": 10,
+		"thresholdScore": 5,
+		"projectName": "Taskmaster",
+		"usedResearch": true
+	},
+	"complexityAnalysis": [
+		{
+			"taskId": 21,
+			"taskTitle": "Setup progetto e ambiente Cloudflare (Next.js + Workers + D1 + R2)",
+			"complexityScore": 7,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Scomponi il setup in: inizializzazione repository, configurazione Next.js per Pages, setup Workers, configurazione D1, configurazione R2, test e documentazione struttura progetto.",
+			"reasoning": "Il setup di un ambiente moderno su Cloudflare con Next.js, Workers, D1 e R2 richiede la conoscenza di diversi strumenti e la loro integrazione. Bisogna gestire la compatibilità edge, configurare wrangler, variabili ambiente, testare l’accesso a storage e database, e documentare la struttura. Ogni componente ha proprie best practice e rischi di configurazione errata, ma la documentazione Cloudflare e le CLI moderne riducono la complessità rispetto a soluzioni legacy. Testing e documentazione sono fondamentali per evitare errori futuri e facilitare la collaborazione.[1][2][3][4]"
+		},
+		{
+			"taskId": 27,
+			"taskTitle": "Implementazione frontend responsive (Next.js su Cloudflare Pages)",
+			"complexityScore": 8,
+			"recommendedSubtasks": 7,
+			"expansionPrompt": "Scomponi lo sviluppo frontend in: setup progetto Next.js/TypeScript, implementazione routing, sviluppo componenti UI principali, gestione stato globale, integrazione API, accessibilità e dark mode, ottimizzazione performance e test end-to-end.",
+			"reasoning": "La realizzazione di un frontend responsive e accessibile, integrato con API e ottimizzato per performance, richiede competenze avanzate su Next.js, TypeScript, gestione stato, UI libraries e testing. L’integrazione con backend, la copertura di casi d’uso mobile/desktop, l’accessibilità (WCAG), e la necessità di test end-to-end aumentano la complessità. L’uso di strumenti moderni (shadcn/ui, SWR, Zustand) aiuta, ma la copertura funzionale e qualitativa è ampia e richiede suddivisione in sottocompiti specializzati."
+		},
+		{
+			"taskId": 30,
+			"taskTitle": "Sicurezza avanzata: ACL allegati, rate limiting, HTTPS enforcement",
+			"complexityScore": 8,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Scomponi la sicurezza in: implementazione ACL su allegati, rate limiting su endpoint sensibili, enforcement HTTPS, aggiornamento e monitoraggio dipendenze, logging e alerting su accessi anomali.",
+			"reasoning": "La sicurezza avanzata richiede conoscenza approfondita di ACL, rate limiting distribuito (Workers KV/Durable Objects), enforcement HTTPS e gestione delle dipendenze. Ogni controllo deve essere testato contro scenari di attacco (es. brute-force, accesso non autorizzato). Il monitoraggio e l’alerting richiedono integrazione con strumenti Cloudflare. La complessità è elevata per la necessità di coprire casi limite e garantire la compliance alle best practice di sicurezza."
+		},
+		{
+			"taskId": 28,
+			"taskTitle": "Filtri avanzati e ricerca full-text su attività e apparecchiature",
+			"complexityScore": 6,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Scomponi in: progettazione query SQL ottimizzate, implementazione filtri combinati, integrazione ricerca full-text (LIKE/FTS5), esposizione parametri via API e UI.",
+			"reasoning": "L’implementazione di filtri avanzati e ricerca full-text richiede una buona progettazione delle query SQL, ottimizzazione degli indici e gestione di edge cases. L’integrazione con API e UI aggiunge complessità, ma l’uso di pattern consolidati (paginazione, FTS5) e strumenti di validazione riduce i rischi. La complessità è media, ma va suddivisa per garantire performance e correttezza dei risultati."
+		},
+		{
+			"taskId": 29,
+			"taskTitle": "Validazione dati e gestione errori centralizzata",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Scomponi in: validazione schema input API/frontend, implementazione middleware gestione errori, UI e logging errori critici.",
+			"reasoning": "La validazione dati e la gestione errori sono fondamentali ma seguono pattern consolidati (zod, middleware error handler). La complessità è contenuta, ma serve attenzione per garantire coerenza tra backend e frontend e per la gestione dei messaggi utente e logging. L’espansione in sottocompiti aiuta a coprire tutti i livelli dell’applicazione."
+		},
+		{
+			"taskId": 26,
+			"taskTitle": "Gestione upload/download PDF su R2 e metadati su D1",
+			"complexityScore": 7,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Scomponi in: implementazione endpoint upload PDF, salvataggio metadati su D1, generazione URL firmati per download, gestione ACL e validazione file, test e recovery file corrotti.",
+			"reasoning": "La gestione di upload/download file con storage esterno (R2), ACL, validazione file e generazione di URL firmati richiede attenzione a sicurezza, performance e integrità dati. L’integrazione tra storage e database, la gestione degli errori e la copertura di edge cases (file corrotti, permessi) aumentano la complessità. Best practice Cloudflare e SDK moderni aiutano, ma la suddivisione in sottocompiti è necessaria per coprire tutti gli aspetti."
+		},
+		{
+			"taskId": 22,
+			"taskTitle": "Implementazione schema database D1 e migrazioni",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implementazione schema database d1 e migrazioni.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 23,
+			"taskTitle": "Implementazione autenticazione e gestione ruoli (JWT)",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on implementazione autenticazione e gestione ruoli (jwt).",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 24,
+			"taskTitle": "Sviluppo API REST per gestione attività giornaliere",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on sviluppo api rest per gestione attività giornaliere.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		},
+		{
+			"taskId": 25,
+			"taskTitle": "Sviluppo API REST per gestione apparecchiature e test",
+			"complexityScore": 5,
+			"recommendedSubtasks": 3,
+			"expansionPrompt": "Break down this task with a focus on sviluppo api rest per gestione apparecchiature e test.",
+			"reasoning": "Automatically added due to missing analysis in AI response."
+		}
+	]
+}
