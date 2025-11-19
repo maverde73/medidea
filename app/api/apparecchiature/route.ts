@@ -1,72 +1,44 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withAuth } from "@/lib/middleware";
-import {
-  CreateApparecchiaturaSchema,
-  ApparecchiaturaFiltersSchema,
-} from "@/lib/validators/apparecchiature";
-import { ZodError } from "zod";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { createDatabaseClient } from "@/lib/db";
 
+/**
+ * GET /api/apparecchiature
+ * List all apparecchiature with optional filters
+ * Requires authentication
+ */
 export const GET = withAuth(async (request, { user }) => {
   try {
     const { searchParams } = new URL(request.url);
-    const params = Object.fromEntries(searchParams.entries());
-    const filters = ApparecchiaturaFiltersSchema.parse(params);
+    const id_cliente = searchParams.get("id_cliente");
+    const modello = searchParams.get("modello");
 
-    if (process.env.NODE_ENV === "development") {
-      const mockData = [
-        {
-          id: 1,
-          id_cliente: 1,
-          modello: "Stampante HP LaserJet Pro",
-          seriale: "SN123456",
-          data_test_funzionali: "2025-01-10T10:00:00Z",
-          data_test_elettrici: "2025-01-10T11:00:00Z",
-          note: "Apparecchiatura testata e funzionante",
-          created_at: "2025-01-10T10:00:00Z",
-          updated_at: "2025-01-10T10:00:00Z",
-        },
-      ];
+    const { env } = getCloudflareContext();
+    const db = createDatabaseClient(env);
 
-      let filtered = mockData;
-      if (filters.id_cliente) {
-        filtered = filtered.filter((a) => a.id_cliente === filters.id_cliente);
-      }
-      if (filters.modello) {
-        filtered = filtered.filter((a) =>
-          a.modello.toLowerCase().includes(filters.modello!.toLowerCase())
-        );
-      }
+    let query = "SELECT * FROM apparecchiature WHERE 1=1";
+    const params: any[] = [];
 
-      return NextResponse.json({
-        success: true,
-        data: filtered,
-        pagination: {
-          page: filters.page,
-          limit: filters.limit,
-          total: filtered.length,
-          total_pages: Math.ceil(filtered.length / filters.limit),
-        },
-      });
+    if (id_cliente) {
+      query += " AND id_cliente = ?";
+      params.push(parseInt(id_cliente));
     }
 
-    return NextResponse.json(
-      { error: "Endpoint not fully implemented" },
-      { status: 501 }
-    );
+    if (modello) {
+      query += " AND modello LIKE ?";
+      params.push(`%${modello}%`);
+    }
+
+    query += " ORDER BY modello ASC";
+
+    const apparecchiature = await db.query(query, params);
+
+    return NextResponse.json({
+      success: true,
+      data: apparecchiature,
+    });
   } catch (error) {
-    if (error instanceof ZodError) {
-      return NextResponse.json(
-        {
-          error: "Filtri non validi",
-          details: error.issues.map((e) => ({
-            field: e.path.join("."),
-            message: e.message,
-          })),
-        },
-        { status: 400 }
-      );
-    }
-
     console.error("Error listing apparecchiature:", error);
     return NextResponse.json(
       {
@@ -78,47 +50,73 @@ export const GET = withAuth(async (request, { user }) => {
   }
 });
 
+/**
+ * POST /api/apparecchiature
+ * Create a new apparecchiatura
+ * Requires authentication
+ */
 export const POST = withAuth(async (request, { user }) => {
   try {
-    const body = await request.json();
-    const validatedData = CreateApparecchiaturaSchema.parse(body);
+    const body = await request.json() as {
+      id_cliente?: number;
+      modello?: string;
+      seriale?: string;
+      data_test_funzionali?: string;
+      data_test_elettrici?: string;
+      note?: string;
+    };
 
-    if (process.env.NODE_ENV === "development") {
-      const mockApparecchiatura = {
-        id: Math.floor(Math.random() * 1000) + 1,
-        ...validatedData,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      };
-
+    if (!body.id_cliente || !body.modello || body.modello.trim() === "") {
       return NextResponse.json(
-        {
-          success: true,
-          data: mockApparecchiatura,
-          message: "Apparecchiatura creata con successo (mock)",
-        },
-        { status: 201 }
-      );
-    }
-
-    return NextResponse.json(
-      { error: "Endpoint not fully implemented" },
-      { status: 501 }
-    );
-  } catch (error) {
-    if (error instanceof ZodError) {
-      return NextResponse.json(
-        {
-          error: "Dati non validi",
-          details: error.issues.map((e) => ({
-            field: e.path.join("."),
-            message: e.message,
-          })),
-        },
+        { error: "ID cliente e modello sono obbligatori" },
         { status: 400 }
       );
     }
 
+    const { env } = getCloudflareContext();
+    const db = createDatabaseClient(env);
+
+    // Check if cliente exists
+    const cliente = await db.queryFirst(
+      "SELECT id FROM clienti WHERE id = ?",
+      [body.id_cliente]
+    );
+
+    if (!cliente) {
+      return NextResponse.json(
+        { error: "Cliente non trovato" },
+        { status: 404 }
+      );
+    }
+
+    const result = await db.execute(
+      `INSERT INTO apparecchiature
+      (id_cliente, modello, seriale, data_test_funzionali, data_test_elettrici, note, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+      [
+        body.id_cliente,
+        body.modello,
+        body.seriale || null,
+        body.data_test_funzionali || null,
+        body.data_test_elettrici || null,
+        body.note || null
+      ]
+    );
+
+    const apparecchiatura = await db.queryFirst(
+      "SELECT * FROM apparecchiature WHERE id = ?",
+      [result.lastInsertRowid]
+    );
+
+    return NextResponse.json(
+      {
+        success: true,
+        data: apparecchiatura,
+        message: "Apparecchiatura creata con successo",
+      },
+      { status: 201 }
+    );
+  } catch (error) {
     console.error("Error creating apparecchiatura:", error);
     return NextResponse.json(
       {
