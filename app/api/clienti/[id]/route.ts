@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withAuth } from "@/lib/middleware";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { createDatabaseClient } from "@/lib/db";
 
 /**
  * GET /api/clienti/:id
@@ -19,28 +21,25 @@ export const GET = withAuth<{ params: Promise<{ id: string }> }>(
         );
       }
 
-      // In development mode, return mock response
-      if (process.env.NODE_ENV === "development") {
-        const mockCliente = {
-          id: clienteId,
-          nome: `Cliente ${clienteId}`,
-          indirizzo: "Via Roma 123, Milano",
-          contatti: "email: test@example.com\ntel: 02-1234567",
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        };
+      const { env } = getCloudflareContext();
+      const db = createDatabaseClient(env);
 
-        return NextResponse.json({
-          success: true,
-          data: mockCliente,
-        });
+      const cliente = await db.queryFirst(
+        "SELECT * FROM clienti WHERE id = ?",
+        [clienteId]
+      );
+
+      if (!cliente) {
+        return NextResponse.json(
+          { error: "Cliente non trovato" },
+          { status: 404 }
+        );
       }
 
-      // Production code would query database here
-      return NextResponse.json(
-        { error: "Endpoint not fully implemented" },
-        { status: 501 }
-      );
+      return NextResponse.json({
+        success: true,
+        data: cliente,
+      });
     } catch (error) {
       console.error("Error fetching cliente:", error);
       return NextResponse.json(
@@ -85,29 +84,39 @@ export const PUT = withAuth<{ params: Promise<{ id: string }> }>(
         );
       }
 
-      // In development mode, return mock response
-      if (process.env.NODE_ENV === "development") {
-        const mockCliente = {
-          id: clienteId,
-          nome: body.nome,
-          indirizzo: body.indirizzo || null,
-          contatti: body.contatti || null,
-          created_at: new Date(Date.now() - 86400000).toISOString(),
-          updated_at: new Date().toISOString(),
-        };
+      const { env } = getCloudflareContext();
+      const db = createDatabaseClient(env);
 
-        return NextResponse.json({
-          success: true,
-          data: mockCliente,
-          message: "Cliente aggiornato con successo",
-        });
+      // Check if cliente exists
+      const exists = await db.queryFirst(
+        "SELECT id FROM clienti WHERE id = ?",
+        [clienteId]
+      );
+
+      if (!exists) {
+        return NextResponse.json(
+          { error: "Cliente non trovato" },
+          { status: 404 }
+        );
       }
 
-      // Production code would query database here
-      return NextResponse.json(
-        { error: "Endpoint not fully implemented" },
-        { status: 501 }
+      // Update cliente
+      await db.execute(
+        "UPDATE clienti SET nome = ?, indirizzo = ?, contatti = ?, updated_at = datetime('now') WHERE id = ?",
+        [body.nome, body.indirizzo || null, body.contatti || null, clienteId]
       );
+
+      // Retrieve updated cliente
+      const cliente = await db.queryFirst(
+        "SELECT * FROM clienti WHERE id = ?",
+        [clienteId]
+      );
+
+      return NextResponse.json({
+        success: true,
+        data: cliente,
+        message: "Cliente aggiornato con successo",
+      });
     } catch (error) {
       console.error("Error updating cliente:", error);
       return NextResponse.json(
@@ -125,6 +134,7 @@ export const PUT = withAuth<{ params: Promise<{ id: string }> }>(
  * DELETE /api/clienti/:id
  * Delete a cliente
  * Requires authentication
+ * Check for foreign key constraints (attivita, apparecchiature)
  */
 export const DELETE = withAuth<{ params: Promise<{ id: string }> }>(
   async (request, { user, params }) => {
@@ -139,19 +149,53 @@ export const DELETE = withAuth<{ params: Promise<{ id: string }> }>(
         );
       }
 
-      // In development mode, return mock response
-      if (process.env.NODE_ENV === "development") {
-        return NextResponse.json({
-          success: true,
-          message: "Cliente eliminato con successo",
-        });
+      const { env } = getCloudflareContext();
+      const db = createDatabaseClient(env);
+
+      // Check if cliente exists
+      const cliente = await db.queryFirst(
+        "SELECT id FROM clienti WHERE id = ?",
+        [clienteId]
+      );
+
+      if (!cliente) {
+        return NextResponse.json(
+          { error: "Cliente non trovato" },
+          { status: 404 }
+        );
       }
 
-      // Production code would query database here
-      return NextResponse.json(
-        { error: "Endpoint not fully implemented" },
-        { status: 501 }
+      // Check for foreign key constraints
+      const attivitaCount = await db.queryFirst<{ count: number }>(
+        "SELECT COUNT(*) as count FROM attivita WHERE id_cliente = ?",
+        [clienteId]
       );
+
+      const apparecchiaturaCount = await db.queryFirst<{ count: number }>(
+        "SELECT COUNT(*) as count FROM apparecchiature WHERE id_cliente = ?",
+        [clienteId]
+      );
+
+      if ((attivitaCount?.count || 0) > 0 || (apparecchiaturaCount?.count || 0) > 0) {
+        return NextResponse.json(
+          {
+            error: "Impossibile eliminare il cliente",
+            message: "Il cliente ha attività o apparecchiature associate"
+          },
+          { status: 409 }
+        );
+      }
+
+      // Delete cliente
+      await db.execute(
+        "DELETE FROM clienti WHERE id = ?",
+        [clienteId]
+      );
+
+      return NextResponse.json({
+        success: true,
+        message: "Cliente eliminato con successo",
+      });
     } catch (error) {
       console.error("Error deleting cliente:", error);
       return NextResponse.json(

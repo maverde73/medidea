@@ -1,5 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyPassword, generateToken, isValidEmail } from "@/lib/auth";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { createDatabaseClient } from "@/lib/db";
+
+interface User {
+  id: number;
+  email: string;
+  password_hash: string;
+  nome: string;
+  cognome: string;
+  role: string;
+  active: number;
+}
 
 /**
  * Login endpoint
@@ -53,53 +65,53 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Production code would query database here
-    // const db = createDatabaseClient(env);
-    // const user = await db.queryFirst<User>(
-    //   "SELECT * FROM users WHERE email = ? AND active = 1",
-    //   [email]
-    // );
-    //
-    // if (!user) {
-    //   return NextResponse.json(
-    //     { error: "Invalid credentials" },
-    //     { status: 401 }
-    //   );
-    // }
-    //
-    // const isValidPassword = await verifyPassword(password, user.password_hash);
-    //
-    // if (!isValidPassword) {
-    //   return NextResponse.json(
-    //     { error: "Invalid credentials" },
-    //     { status: 401 }
-    //   );
-    // }
-    //
-    // // Update last_login
-    // await db.execute(
-    //   "UPDATE users SET last_login = datetime('now') WHERE id = ?",
-    //   [user.id]
-    // );
-    //
-    // const token = await generateToken(user, env.JWT_SECRET);
-    //
-    // return NextResponse.json({
-    //   success: true,
-    //   token,
-    //   user: {
-    //     id: user.id,
-    //     email: user.email,
-    //     nome: user.nome,
-    //     cognome: user.cognome,
-    //     role: user.role,
-    //   },
-    // });
+    // Production: query database
+    const { env } = getCloudflareContext();
+    const db = createDatabaseClient(env);
 
-    return NextResponse.json(
-      { error: "Login not fully implemented" },
-      { status: 501 }
+    const user = await db.queryFirst<User>(
+      "SELECT * FROM utenti WHERE email = ? AND active = 1",
+      [email]
     );
+
+    if (!user) {
+      return NextResponse.json(
+        { error: "Invalid credentials" },
+        { status: 401 }
+      );
+    }
+
+    const isValidPassword = await verifyPassword(password, user.password_hash);
+
+    if (!isValidPassword) {
+      return NextResponse.json(
+        { error: "Invalid credentials" },
+        { status: 401 }
+      );
+    }
+
+    // Update last_login
+    await db.execute(
+      "UPDATE utenti SET last_login = datetime('now') WHERE id = ?",
+      [user.id]
+    );
+
+    const token = await generateToken(
+      { id: user.id, email: user.email, role: user.role },
+      jwtSecret
+    );
+
+    return NextResponse.json({
+      success: true,
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        nome: user.nome,
+        cognome: user.cognome,
+        role: user.role,
+      },
+    });
   } catch (error) {
     console.error("Login error:", error);
     return NextResponse.json(

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withAuth } from "@/lib/middleware";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { createDatabaseClient } from "@/lib/db";
 
 /**
  * GET /api/clienti
@@ -8,38 +10,17 @@ import { withAuth } from "@/lib/middleware";
  */
 export const GET = withAuth(async (request, { user }) => {
   try {
-    // In development mode, return mock response
-    if (process.env.NODE_ENV === "development") {
-      const mockClienti = [
-        {
-          id: 1,
-          nome: "Cliente Test 1",
-          indirizzo: "Via Roma 123, Milano",
-          contatti: "email: test1@example.com\ntel: 02-1234567",
-          created_at: "2025-01-10T10:00:00Z",
-          updated_at: "2025-01-10T10:00:00Z",
-        },
-        {
-          id: 2,
-          nome: "Cliente Test 2",
-          indirizzo: "Corso Italia 45, Torino",
-          contatti: "email: test2@example.com",
-          created_at: "2025-01-12T14:30:00Z",
-          updated_at: "2025-01-12T14:30:00Z",
-        },
-      ];
+    const { env } = getCloudflareContext();
+    const db = createDatabaseClient(env);
 
-      return NextResponse.json({
-        success: true,
-        data: mockClienti,
-      });
-    }
-
-    // Production code would query database here
-    return NextResponse.json(
-      { error: "Endpoint not fully implemented" },
-      { status: 501 }
+    const clienti = await db.query(
+      "SELECT * FROM clienti ORDER BY nome ASC"
     );
+
+    return NextResponse.json({
+      success: true,
+      data: clienti,
+    });
   } catch (error) {
     console.error("Error listing clienti:", error);
     return NextResponse.json(
@@ -72,31 +53,27 @@ export const POST = withAuth(async (request, { user }) => {
       );
     }
 
-    // In development mode, return mock response
-    if (process.env.NODE_ENV === "development") {
-      const mockCliente = {
-        id: Math.floor(Math.random() * 1000) + 3,
-        nome: body.nome,
-        indirizzo: body.indirizzo || null,
-        contatti: body.contatti || null,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      };
+    const { env } = getCloudflareContext();
+    const db = createDatabaseClient(env);
 
-      return NextResponse.json(
-        {
-          success: true,
-          data: mockCliente,
-          message: "Cliente creato con successo",
-        },
-        { status: 201 }
-      );
-    }
+    const result = await db.execute(
+      "INSERT INTO clienti (nome, indirizzo, contatti, created_at, updated_at) VALUES (?, ?, ?, datetime('now'), datetime('now'))",
+      [body.nome, body.indirizzo || null, body.contatti || null]
+    );
 
-    // Production code would query database here
+    // Retrieve the created cliente
+    const cliente = await db.queryFirst(
+      "SELECT * FROM clienti WHERE id = ?",
+      [result.lastInsertRowid]
+    );
+
     return NextResponse.json(
-      { error: "Endpoint not fully implemented" },
-      { status: 501 }
+      {
+        success: true,
+        data: cliente,
+        message: "Cliente creato con successo",
+      },
+      { status: 201 }
     );
   } catch (error) {
     console.error("Error creating cliente:", error);
