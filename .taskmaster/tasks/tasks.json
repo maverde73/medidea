@@ -165,10 +165,10 @@
             "description": "Implementazione sistema di hash password con bcryptjs e creazione tabella utenti in D1",
             "dependencies": [],
             "details": "Configura bcryptjs per hash sicuro delle password. Crea tabella utenti in D1 con campi id, email, password_hash, role. Implementa funzioni helper per hash e verify password. Prepara script di migrazione per tabella utenti.",
-            "status": "in-progress",
+            "status": "done",
             "testStrategy": "Test unitari per funzioni hash/verify, test migrazione D1, verifica integrità password hash",
             "parentId": "undefined",
-            "updatedAt": "2025-11-19T00:23:32.134Z"
+            "updatedAt": "2025-11-19T09:18:49.653Z"
           },
           {
             "id": 2,
@@ -178,9 +178,10 @@
               1
             ],
             "details": "Implementa endpoint POST /login che riceve email/password. Verifica credenziali contro D1. Usa libreria jose per generare JWT con claims: sub (user id), role, exp, iat. Restituisci JWT in response. Implementa rate limiting base con KV.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": "Test login con credenziali valide/invalidhe, test generazione JWT, test rate limiting, test response format",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-11-19T09:18:46.241Z"
           },
           {
             "id": 3,
@@ -190,15 +191,16 @@
               2
             ],
             "details": "Implementa middleware che estrae JWT da header Authorization. Usa jose per validare token e verificare exp. Estrai claim role e implementa funzioni helper per check ruoli (isAdmin, isTecnico). Applica middleware a endpoint protetti. Documenta flusso completo.",
-            "status": "pending",
+            "status": "cancelled",
             "testStrategy": "Test middleware con token validi/invalidi/scaduti, test controllo accessi per ruolo, test endpoint protetti con/without JWT",
-            "parentId": "undefined"
+            "parentId": "undefined",
+            "updatedAt": "2025-11-19T10:11:15.017Z"
           }
         ],
         "complexity": 5,
         "recommendedSubtasks": 3,
         "expansionPrompt": "Break down this task with a focus on implementazione autenticazione e gestione ruoli (jwt).",
-        "updatedAt": "2025-11-19T00:29:32.495Z"
+        "updatedAt": "2025-11-19T10:11:18.959Z"
       },
       {
         "id": "24",
@@ -712,13 +714,369 @@
         "recommendedSubtasks": 5,
         "expansionPrompt": "Scomponi la sicurezza in: implementazione ACL su allegati, rate limiting su endpoint sensibili, enforcement HTTPS, aggiornamento e monitoraggio dipendenze, logging e alerting su accessi anomali.",
         "updatedAt": "2025-11-19T00:47:54.760Z"
+      },
+      {
+        "id": "31",
+        "title": "Implementazione Componenti UI Riutilizzabili Base",
+        "description": "Creazione dei componenti UI fondamentali riutilizzabili per tutta l'applicazione",
+        "status": "done",
+        "dependencies": [],
+        "priority": "high",
+        "details": "Implementare i componenti base descritti nella sezione 9 del PRD: FileUploader con drag & drop e validazione PDF (max 10MB), FileList per visualizzazione allegati con download/elimina, AttivitaStatusBadge con colori per stati (APERTO verde, CHIUSO grigio, RIAPERTO giallo), DateRangePicker con quick filters, ClientSelector con autocomplete, LoadingSpinner, ErrorAlert. Utilizzare React con TypeScript, Tailwind CSS per styling, react-dropzone per upload file, date-fns per gestione date. I componenti devono essere fully typed e accessibili (ARIA labels).",
+        "testStrategy": "Unit tests con Jest/React Testing Library per ogni componente. Testare rendering, props, interazioni utente, accessibilità. Testare validazione file upload, drag & drop, stati loading/error. Verificare ARIA compliance con axe-core.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Progettazione e sviluppo FileUploader con drag & drop e validazione PDF",
+            "description": "Progetta e implementa il componente FileUploader con supporto drag & drop, validazione PDF (max 10MB), tipizzazione TypeScript, accessibilità ARIA e styling Tailwind.",
+            "dependencies": [],
+            "details": "Definisci le API dei props (onUpload, acceptedTypes, maxSize, ecc.), implementa la logica di validazione PDF e dimensione, integra react-dropzone, aggiungi ARIA labels, scrivi test unitari (inclusi test accessibilità con axe-core), documenta l’uso con esempi.\n<info added on 2025-11-19T10:14:07.096Z>\nCompletato FileUploader component con drag & drop usando react-dropzone. Implementate props: accept (default PDF), maxSize (default 10MB), multiple, onUploadComplete, onError, uploadContext. Features: dropzone con validazione, preview file selezionati, progress bar upload, gestione errori, ARIA labels per accessibilità. Installate dipendenze react-dropzone e date-fns. File creato: components/ui/FileUploader.tsx\n</info added on 2025-11-19T10:14:07.096Z>",
+            "status": "done",
+            "testStrategy": "Testa upload drag & drop, validazione file, rendering, props, accessibilità ARIA, errori e casi limite con Jest/React Testing Library e axe-core.",
+            "parentId": "undefined",
+            "updatedAt": "2025-11-19T10:14:19.221Z"
+          },
+          {
+            "id": 2,
+            "title": "Progettazione e sviluppo FileList per visualizzazione allegati con download/elimina",
+            "description": "Crea il componente FileList per mostrare allegati caricati, con azioni di download ed eliminazione, tipizzazione completa e accessibilità.",
+            "dependencies": [
+              1
+            ],
+            "details": "Definisci props (files, onDownload, onDelete), implementa la UI con Tailwind, gestisci eventi download/elimina, aggiungi ARIA labels, scrivi test unitari e accessibilità, documenta l’uso e i casi d’integrazione con FileUploader.",
+            "status": "done",
+            "testStrategy": "Testa rendering lista, azioni download/elimina, props, accessibilità ARIA, casi limite (lista vuota, errori) con Jest/React Testing Library e axe-core.",
+            "parentId": "undefined",
+            "updatedAt": "2025-11-19T10:44:48.798Z"
+          },
+          {
+            "id": 3,
+            "title": "Progettazione e sviluppo AttivitaStatusBadge con colori per stati",
+            "description": "Implementa il componente AttivitaStatusBadge che mostra lo stato attività (APERTO, CHIUSO, RIAPERTO) con colori distintivi e accessibilità.",
+            "dependencies": [],
+            "details": "Definisci props (status), implementa la logica di mapping stato-colore (verde, grigio, giallo), aggiungi ARIA labels, scrivi test unitari e accessibilità, documenta l’uso e i possibili stati.",
+            "status": "done",
+            "testStrategy": "Testa rendering badge per ogni stato, props, colori corretti, accessibilità ARIA, casi limite con Jest/React Testing Library e axe-core.",
+            "parentId": "undefined",
+            "updatedAt": "2025-11-19T10:44:59.223Z"
+          },
+          {
+            "id": 4,
+            "title": "Progettazione e sviluppo DateRangePicker con quick filters",
+            "description": "Crea il componente DateRangePicker con selezione intervallo date, quick filters (es. oggi, settimana, mese), tipizzazione e accessibilità.",
+            "dependencies": [],
+            "details": "Definisci props (value, onChange, quickFilters), usa date-fns per gestione date, implementa UI con Tailwind, aggiungi ARIA labels, scrivi test unitari e accessibilità, documenta l’uso e i quick filters disponibili.",
+            "status": "done",
+            "testStrategy": "Testa selezione date, quick filters, props, accessibilità ARIA, casi limite (date non valide) con Jest/React Testing Library e axe-core.",
+            "parentId": "undefined",
+            "updatedAt": "2025-11-19T10:46:43.685Z"
+          },
+          {
+            "id": 5,
+            "title": "Progettazione e sviluppo ClientSelector con autocomplete",
+            "description": "Sviluppa il componente ClientSelector con funzionalità di autocomplete, tipizzazione completa e accessibilità.",
+            "dependencies": [],
+            "details": "Definisci props (options, value, onChange), implementa autocomplete, gestisci stato input, aggiungi ARIA labels, scrivi test unitari e accessibilità, documenta l’uso e i casi d’integrazione.",
+            "status": "done",
+            "testStrategy": "Testa ricerca/autocomplete, selezione, props, accessibilità ARIA, casi limite (nessun risultato) con Jest/React Testing Library e axe-core.",
+            "parentId": "undefined",
+            "updatedAt": "2025-11-19T10:47:08.183Z"
+          },
+          {
+            "id": 6,
+            "title": "Progettazione e sviluppo LoadingSpinner",
+            "description": "Implementa il componente LoadingSpinner per indicare lo stato di caricamento, con tipizzazione e accessibilità.",
+            "dependencies": [],
+            "details": "Definisci props (size, ariaLabel), implementa animazione con Tailwind, aggiungi ARIA labels, scrivi test unitari e accessibilità, documenta l’uso e le varianti di dimensione.",
+            "status": "done",
+            "testStrategy": "Testa rendering, props, animazione, accessibilità ARIA con Jest/React Testing Library e axe-core.",
+            "parentId": "undefined",
+            "updatedAt": "2025-11-19T10:45:11.066Z"
+          },
+          {
+            "id": 7,
+            "title": "Progettazione e sviluppo ErrorAlert",
+            "description": "Crea il componente ErrorAlert per mostrare messaggi di errore, con tipizzazione, accessibilità e chiusura opzionale.",
+            "dependencies": [],
+            "details": "Definisci props (message, onClose, visible), implementa UI con Tailwind, aggiungi ARIA labels, scrivi test unitari e accessibilità, documenta l’uso e i casi di errore gestiti.",
+            "status": "done",
+            "testStrategy": "Testa rendering messaggio, props, chiusura, accessibilità ARIA, casi limite (messaggio vuoto) con Jest/React Testing Library e axe-core.",
+            "parentId": "undefined",
+            "updatedAt": "2025-11-19T10:45:44.804Z"
+          }
+        ],
+        "complexity": 8,
+        "recommendedSubtasks": 7,
+        "expansionPrompt": "Scomponi la task in sottotask per ciascun componente UI richiesto (FileUploader, FileList, AttivitaStatusBadge, DateRangePicker, ClientSelector, LoadingSpinner, ErrorAlert). Per ogni sottotask, includi: progettazione API dei props, implementazione, test unitari (inclusa accessibilità), e documentazione d’uso.",
+        "updatedAt": "2025-11-19T10:47:08.183Z"
+      },
+      {
+        "id": "32",
+        "title": "Form Creazione Attività Completo",
+        "description": "Implementazione pagina form per inserimento nuove attività giornaliere con tutti i campi richiesti",
+        "status": "in-progress",
+        "dependencies": [
+          "31"
+        ],
+        "priority": "high",
+        "details": "Creare pagina /attivita/new con form completo: sezione dati cliente (dropdown con ricerca + link nuovo cliente modal), dati apparecchiatura (modello obbligatorio, seriale, codice inventario), apertura richiesta (modalità + data obbligatoria), preventivo (numero, data, upload PDF), accettazione (numero, data, upload PDF), note textarea. Utilizzare React Hook Form per gestione stato e validazione. Implementare validazioni: cliente obbligatorio, modello obbligatorio, data apertura obbligatoria, formato date, PDF max 10MB. Loading state durante submit, messaggi successo/errore, redirect a dettaglio dopo creazione. API integration: POST /api/attivita, POST /api/allegati/upload, GET /api/clienti.",
+        "testStrategy": "Integration tests per form submission completo. Testare validazione campi obbligatori, upload file, chiamate API. Testare stati loading/success/error. E2E test con Cypress per flusso completo creazione attività con allegati.",
+        "subtasks": [
+          {
+            "id": 1,
+            "title": "Setup pagina /attivita/new e routing",
+            "description": "Configurare la pagina di creazione attività e il routing dedicato.",
+            "dependencies": [],
+            "details": "Creare la route '/attivita/new' nel router principale. Assicurarsi che la pagina sia accessibile solo agli utenti autorizzati e che utilizzi i layout standard dell'applicazione.",
+            "status": "done",
+            "testStrategy": "Verificare che la pagina sia raggiungibile tramite URL e che il routing funzioni correttamente anche da link interni.",
+            "parentId": "undefined",
+            "updatedAt": "2025-11-19T11:06:11.646Z"
+          },
+          {
+            "id": 2,
+            "title": "Implementazione sezione dati cliente con ricerca e modale nuovo cliente",
+            "description": "Realizzare la sezione per selezione cliente con dropdown di ricerca e modale per inserimento nuovo cliente.",
+            "dependencies": [
+              1
+            ],
+            "details": "Utilizzare il componente ClientSelector per la ricerca clienti tramite API GET /api/clienti. Integrare una modale per la creazione di un nuovo cliente, con aggiornamento della lista clienti al salvataggio.",
+            "status": "pending",
+            "testStrategy": "Testare selezione cliente esistente, apertura e salvataggio nuovo cliente da modale, validazione obbligatorietà campo.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 3,
+            "title": "Implementazione sezione dati apparecchiatura",
+            "description": "Aggiungere i campi modello (obbligatorio), seriale e codice inventario.",
+            "dependencies": [
+              1
+            ],
+            "details": "Utilizzare React Hook Form per gestire stato e validazione. Il campo modello deve essere obbligatorio, seriale e codice inventario opzionali. Validare la presenza del modello.",
+            "status": "pending",
+            "testStrategy": "Verificare che il campo modello sia obbligatorio e che la validazione blocchi il submit se assente.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 4,
+            "title": "Gestione apertura richiesta con validazione",
+            "description": "Implementare i campi modalità e data apertura richiesta con validazione.",
+            "dependencies": [
+              1
+            ],
+            "details": "Aggiungere selettore modalità e campo data apertura (obbligatorio). Validare che la data sia presente e in formato corretto. Utilizzare DateRangePicker se necessario.",
+            "status": "pending",
+            "testStrategy": "Testare che la data sia obbligatoria e che il formato sia accettato solo se valido.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 5,
+            "title": "Gestione preventivo e upload PDF",
+            "description": "Aggiungere campi numero, data e upload PDF per il preventivo.",
+            "dependencies": [
+              1
+            ],
+            "details": "Utilizzare FileUploader per upload PDF (max 10MB). Validare formato e dimensione file. Collegare i campi numero e data. Integrare chiamata POST /api/allegati/upload.",
+            "status": "pending",
+            "testStrategy": "Testare upload PDF valido, blocco per file non PDF o >10MB, validazione campi numero/data.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 6,
+            "title": "Gestione accettazione e upload PDF",
+            "description": "Aggiungere campi numero, data e upload PDF per accettazione.",
+            "dependencies": [
+              5
+            ],
+            "details": "Analogamente al preventivo, gestire upload PDF (max 10MB) e validazione. Collegare i campi numero e data. Utilizzare FileUploader e POST /api/allegati/upload.",
+            "status": "pending",
+            "testStrategy": "Testare upload PDF valido, blocco per file non PDF o >10MB, validazione campi numero/data.",
+            "parentId": "undefined"
+          },
+          {
+            "id": 7,
+            "title": "Gestione note, validazioni globali, stati loading/success/error e integrazione API",
+            "description": "Aggiungere campo note, implementare tutte le validazioni, gestire loading/success/error e integrazione API.",
+            "dependencies": [
+              2,
+              3,
+              4,
+              5,
+              6
+            ],
+            "details": "Aggiungere textarea note. Implementare tutte le validazioni richieste (cliente, modello, data apertura, formato date, PDF max 10MB). Gestire submit asincrono con POST /api/attivita, mostrare loading spinner, messaggi di successo/errore e redirect a dettaglio attività dopo creazione.",
+            "status": "pending",
+            "testStrategy": "Testare flusso completo: validazioni, submit, gestione loading, messaggi feedback, redirect e chiamate API. Eseguire test di integrazione ed E2E per tutti i casi principali e edge case.",
+            "parentId": "undefined"
+          }
+        ],
+        "complexity": 8,
+        "recommendedSubtasks": 7,
+        "expansionPrompt": "Scomponi la realizzazione del form di creazione attività in sottotask granulari, considerando: 1) setup pagina e routing, 2) sezione dati cliente con ricerca e modale nuovo cliente, 3) sezione dati apparecchiatura, 4) apertura richiesta con validazione, 5) gestione preventivo e upload PDF, 6) gestione accettazione e upload PDF, 7) note e validazioni, 8) integrazione API, 9) gestione stati loading/success/error, 10) test di integrazione ed E2E.",
+        "updatedAt": "2025-11-19T11:06:11.646Z"
+      },
+      {
+        "id": "33",
+        "title": "Pagina Dettaglio Attività con Interventi",
+        "description": "Implementazione pagina /attivita/[id] per visualizzazione e gestione completa attività",
+        "status": "pending",
+        "dependencies": [
+          "31",
+          "32"
+        ],
+        "priority": "high",
+        "details": "Creare pagina dettaglio con: header con badge stato e pulsanti azioni (modifica, chiudi/riapri, elimina), scheda riepilogativa dati read-only/edit mode, sezione interventi con timeline verticale e form aggiungi intervento (data, operatore default utente corrente, descrizione obbligatorio), sezione allegati PDF con FileList e upload. Logiche business: stato CHIUSO mostra pulsante Riapri, stato APERTO/RIAPERTO mostra Chiudi con data obbligatoria, blocca modifica se CHIUSA. API integration: GET /api/attivita/:id, PATCH /api/attivita/:id, PUT /api/attivita/:id/stato, GET/POST /api/attivita/:id/interventi. Utilizzare SWR per data fetching con optimistic updates.",
+        "testStrategy": "Integration tests per caricamento dati, modifica stato, gestione interventi. Testare logiche business per stati attività. E2E tests per flusso completo: visualizza dettaglio, aggiungi intervento, cambia stato, upload allegato.",
+        "subtasks": []
+      },
+      {
+        "id": "34",
+        "title": "Sistema Upload/Download PDF con Gestione Allegati",
+        "description": "Implementazione completa del sistema di gestione file PDF per attività e apparecchiature",
+        "status": "pending",
+        "dependencies": [
+          "31"
+        ],
+        "priority": "high",
+        "details": "Implementare sistema completo per upload/download PDF: integrazione con FileUploader component per upload multiplo/single file, progress bar durante upload, validazione tipo file e dimensione (max 10MB), preview nome file, note allegato opzionali. Download sicuro tramite GET /api/download/[key]. Eliminazione con conferma modal. Gestione errori upload (retry automatico). API integration: POST /api/allegati/upload, GET /api/download/[key], DELETE /api/allegati/:id. Utilizzare axios per upload con progress tracking, implementare retry logic con exponential backoff. Cache management per download recenti.",
+        "testStrategy": "Unit tests per componenti upload/download. Integration tests per API calls. Testare scenari: upload successo, upload fallito, retry, download file, eliminazione con conferma. Testare validazione file type/size. E2E tests per flusso completo upload->download->delete.",
+        "subtasks": []
+      },
+      {
+        "id": "35",
+        "title": "Form Creazione Apparecchiature con Test",
+        "description": "Implementazione form per inserimento nuove apparecchiature con gestione test elettrici/funzionali",
+        "status": "pending",
+        "dependencies": [
+          "31",
+          "34"
+        ],
+        "priority": "high",
+        "details": "Creare pagina /apparecchiature/new con form: dati base (cliente dropdown obbligatorio, modello obbligatorio, seriale opzionale), test (data test funzionali, data test elettrici), allegati multiplo PDF per certificazioni, note textarea. Utilizzare React Hook Form con validazione cliente/modello obbligatori, formato date. Upload multiplo PDF con FileUploader component. API integration: POST /api/apparecchiature, POST /api/allegati/upload. Implementare salvataggio bozza, loading states, redirect a dettaglio dopo creazione. Utilizzare ClientSelector component per selezione cliente.",
+        "testStrategy": "Integration tests per form submission con upload multiplo. Testare validazione campi, upload files, chiamate API. E2E test per flusso completo creazione apparecchiatura con certificazioni PDF.",
+        "subtasks": []
+      },
+      {
+        "id": "36",
+        "title": "Sistema Gestione Clienti Completo",
+        "description": "Implementazione CRUD completo per gestione clienti con liste, form e dettagli",
+        "status": "pending",
+        "dependencies": [
+          "31"
+        ],
+        "priority": "high",
+        "details": "Implementare sezione clienti: pagina /clienti con tabella (nome, indirizzo, contatti), ricerca per nome, pulsante nuovo cliente. Form creazione/modifica con campi nome(obbligatorio), indirizzo, contatti(email, telefono). Pagina dettaglio /clienti/[id] con dati cliente, lista attività collegate, lista apparecchiature collegate, pulsanti modifica/elimina(con validazione se ha attività). API integration: GET /api/clienti, POST /api/clienti, GET /api/clienti/:id, PATCH /api/clienti/:id, DELETE /api/clienti/:id. Utilizzare SWR per data fetching, implementare lazy loading per liste lunghe, ricerca real-time con debounce.",
+        "testStrategy": "Integration tests per CRUD operations clienti. Testare ricerca, validazione eliminazione con attività collegate. E2E tests per flusso completo: crea cliente, crea attività collegata, verifica dettaglio cliente.",
+        "subtasks": []
+      },
+      {
+        "id": "37",
+        "title": "Filtri Avanzati per Liste Attività e Apparecchiature",
+        "description": "Implementazione sistema filtri avanzati con ricerca, date range e filtri custom",
+        "status": "pending",
+        "dependencies": [
+          "31",
+          "36"
+        ],
+        "priority": "medium",
+        "details": "Implementare filtri avanzati per attività: cliente dropdown con ricerca, intervallo date apertura con quick filters(ultima settimana/mese/anno), seriale ricerca parziale, codice inventario ricerca parziale, presenza allegati checkbox, data chiusura range. UI con panel filtri collapsabile, badge numero filtri attivi, pulsante resetta/applica, indicatore risultati. Per apparecchiature: cliente, modello, seriale, test scaduti, presenza allegati. Utilizzare DateRangePicker component, ClientSelector component. Implementare URL state management per filtri persistenti. API integration con query params. Debounce per search inputs.",
+        "testStrategy": "Unit tests per componenti filtri. Integration tests per applicazione filtri e aggiornamento risultati. Testare URL state persistence, quick filters, ricerca parziale. E2E tests per combinazioni filtri complesse.",
+        "subtasks": []
+      },
+      {
+        "id": "38",
+        "title": "Dashboard con KPI e Indicatori",
+        "description": "Implementazione dashboard homepage con indicatori, attività recenti e quick actions",
+        "status": "pending",
+        "dependencies": [
+          "31",
+          "32",
+          "33"
+        ],
+        "priority": "medium",
+        "details": "Migliorare homepage con sezione KPI cards: attività(totale, aperte, chiuse ultimo mese, riaperte), apparecchiature(totale, test in scadenza 30gg, senza test), documenti(totale allegati, spazio R2, upload recenti). Sezione attività recenti: ultimi 5 interventi con data/attività/link/operatore/descrizione snippet, ultime 5 attività modificate. Quick actions: Nuova Attività(CTA primario), Nuova Apparecchiatura, Cerca Attività con search bar. API integration: GET /api/stats/dashboard (da creare backend), GET /api/interventi?limit=5&sort=desc, GET /api/attivita?limit=5&sort=updated_desc. Utilizzare SWR con refresh interval per dati real-time. Implementare skeleton loading per KPI cards.",
+        "testStrategy": "Integration tests per caricamento KPI, attività recenti. Testare refresh automatico dati. Testare quick actions navigation. E2E tests per flusso dashboard: visualizza KPI, clicca attività recente, naviga quick action.",
+        "subtasks": []
+      },
+      {
+        "id": "39",
+        "title": "Pagina Dettaglio Apparecchiature con Test Management",
+        "description": "Implementazione pagina /apparecchiature/[id] per gestione completa apparecchiature e test",
+        "status": "pending",
+        "dependencies": [
+          "31",
+          "34",
+          "35"
+        ],
+        "priority": "medium",
+        "details": "Creare pagina dettaglio apparecchiature con: sezione dati apparecchiatura(card cliente/modello/seriale/note con pulsante modifica), sezione test elettrici/funzionali con data ultimo test e pulsante registra nuovo test(modal con tipo test dropdown, data, upload certificato PDF, note), sezione allegati con FileList e upload. API integration: GET /api/apparecchiature/:id, PATCH /api/apparecchiature/:id, POST /api/allegati/upload, GET /api/download/[key], DELETE /api/allegati/:id. Implementare logica test scaduti (alert se > 365gg), stato test con color coding. Utilizzare SWR per data fetching, implementare optimistic updates per modifiche.",
+        "testStrategy": "Integration tests per caricamento dati, modifica apparecchiatura, registrazione test. Testare logica test scaduti, upload certificati. E2E tests per flusso completo: visualizza dettaglio, registra nuovo test con certificato, modifica dati.",
+        "subtasks": []
+      },
+      {
+        "id": "40",
+        "title": "Navigazione Persistente e Layout Responsive",
+        "description": "Implementazione navigation bar, breadcrumbs e layout responsive mobile-first",
+        "status": "pending",
+        "dependencies": [
+          "31"
+        ],
+        "priority": "medium",
+        "details": "Implementare navigation bar persistente con logo/nome app, link principali(Dashboard, Attività, Apparecchiature, Clienti), user menu dropdown(nome/ruolo/logout). Breadcrumbs navigation cliccabili(Home > Attività > Dettaglio #123). Layout responsive mobile-first: burger menu mobile, filtri in drawer/modal mobile, tabelle scrollabili orizzontalmente. Utilizzare Next.js app router con layout.tsx per struttura persistente. Implementare active state per navigation items, mobile menu con slide-in animation. CSS con Tailwind responsive utilities, JavaScript per menu toggle. Accessibility: keyboard navigation, ARIA labels, focus management.",
+        "testStrategy": "Unit tests per componenti navigation. Integration tests per routing e breadcrumbs. Testare responsive design su diversi viewport. E2E tests per navigazione completa desktop/mobile. Accessibility tests con axe-core.",
+        "subtasks": []
+      },
+      {
+        "id": "41",
+        "title": "Stati Loading, Empty States e Feedback UX",
+        "description": "Implementazione completa stati loading, empty states, error handling e success feedback",
+        "status": "pending",
+        "dependencies": [
+          "31",
+          "32",
+          "33",
+          "34",
+          "35",
+          "36",
+          "37",
+          "38",
+          "39",
+          "40"
+        ],
+        "priority": "medium",
+        "details": "Implementare loading states per: caricamento liste(skeleton cards), submit form(disabled button + spinner), upload file(progress bar), download file(indicatore). Empty states custom con messaggi e CTA buttons('Nessuna attività trovata. Crea la tua prima attività!'). Error states: errori API con retry button, errori validazione form con field highlighting, errori upload file con messaggi specifici, 404 pages personalizzate. Success feedback: toast notifications per creazione/modifica/upload/eliminazione. Utilizzare react-hot-toast o similar per notifications. Implementare global error boundary per errori non gestiti. Retry logic con exponential backoff per API calls fallite.",
+        "testStrategy": "Unit tests per componenti loading/error states. Integration tests per scenari errore/riuscita. Testare retry logic, toast notifications, empty states rendering. E2E tests per flussi con error handling e recovery.",
+        "subtasks": []
+      },
+      {
+        "id": "42",
+        "title": "Ottimizzazioni Performance e Data Fetching Avanzate",
+        "description": "Implementazione caching, lazy loading e ottimizzazioni performance per migliorare UX",
+        "status": "pending",
+        "dependencies": [
+          "31",
+          "32",
+          "33",
+          "34",
+          "35",
+          "36",
+          "37",
+          "38",
+          "39",
+          "40",
+          "41"
+        ],
+        "priority": "low",
+        "details": "Implementare data fetching ottimizzato con SWR/React Query: caching automatico, revalidazione background, optimistic updates per UX migliore, stale-while-revalidate strategy. Lazy loading: code splitting per route con Next.js dynamic imports, lazy load componenti pesanti(modals, charts), infinite scroll per liste lunghe. Performance optimizations: memoization con React.memo, useMemo, useCallback dove appropriato, virtual scrolling per liste molto lunghe, image optimization con Next.js Image component, bundle analysis con webpack-bundle-analyzer. Implementare service worker per caching static assets. Monitorare performance con Web Vitals.",
+        "testStrategy": "Performance tests con Lighthouse per metriche Core Web Vitals. Testare caching behavior, lazy loading trigger, infinite scroll performance. Bundle size analysis. Memory leak tests per componenti con cleanup. E2E tests per performance su connessioni lente.",
+        "subtasks": []
       }
     ],
     "metadata": {
       "version": "1.0.0",
-      "lastModified": "2025-11-19T00:50:44.750Z",
-      "taskCount": 10,
-      "completedCount": 10,
+      "lastModified": "2025-11-19T11:06:11.647Z",
+      "taskCount": 22,
+      "completedCount": 11,
       "tags": [
         "master"
       ]

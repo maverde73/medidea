@@ -89,3 +89,22 @@ CREATE TABLE IF NOT EXISTS allegati (
 -- Indici per allegati
 CREATE INDEX IF NOT EXISTS idx_allegati_riferimento ON allegati(tipo_riferimento, id_riferimento);
 CREATE INDEX IF NOT EXISTS idx_allegati_chiave_r2 ON allegati(chiave_r2);
+
+-- Tabella utenti
+CREATE TABLE IF NOT EXISTS utenti (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  email TEXT NOT NULL UNIQUE,
+  password_hash TEXT NOT NULL,
+  nome TEXT NOT NULL,
+  cognome TEXT NOT NULL,
+  role TEXT NOT NULL DEFAULT 'user', -- 'admin', 'user', 'tecnico'
+  active INTEGER NOT NULL DEFAULT 1, -- 0 = inactive, 1 = active
+  last_login TEXT,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- Indici per utenti
+CREATE INDEX IF NOT EXISTS idx_utenti_email ON utenti(email);
+CREATE INDEX IF NOT EXISTS idx_utenti_role ON utenti(role);
+CREATE INDEX IF NOT EXISTS idx_utenti_active ON utenti(active);

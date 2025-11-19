@@ -46,3 +46,9 @@ wrangler.toml.backup
 *.swp
 *.swo
 *~
+
+# E2E Testing - Results only (keep test files in git)
+/test-results/
+/playwright-report/
+/playwright/.cache/
+.env

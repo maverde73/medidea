@@ -25,8 +25,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // In development mode, return mock response
-    if (process.env.NODE_ENV === "development") {
+    // Get JWT secret
+    const jwtSecret = process.env.JWT_SECRET || "dev-secret-change-in-production";
+
+    // In development mode (or when using dev secret), return mock response
+    const isDevelopment = process.env.NODE_ENV !== "production" ||
+                          jwtSecret === "dev-secret-change-in-production";
+
+    if (isDevelopment) {
       // Mock user for testing
       const mockUser = {
         id: 1,
@@ -34,10 +40,7 @@ export async function POST(request: NextRequest) {
         role: "admin" as const,
       };
 
-      const mockToken = await generateToken(
-        mockUser,
-        process.env.JWT_SECRET || "dev-secret-change-in-production"
-      );
+      const mockToken = await generateToken(mockUser, jwtSecret);
 
       return NextResponse.json({
         success: true,

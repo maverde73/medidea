@@ -2,34 +2,34 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Monitor, Search, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { Plus, UserCircle, Search, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 
-interface Apparecchiatura {
+interface Utente {
   id: number;
-  id_cliente: number;
-  modello: string;
-  seriale: string | null;
-  data_test_funzionali: string | null;
-  data_test_elettrici: string | null;
-  note: string | null;
+  email: string;
+  nome: string;
+  cognome: string;
+  role: string;
+  active: boolean;
+  created_at: string;
 }
 
-type SortField = 'modello' | 'seriale' | 'data_test_funzionali' | 'data_test_elettrici' | 'id';
+type SortField = 'nome' | 'cognome' | 'email' | 'role' | 'created_at' | 'id';
 type SortDirection = 'asc' | 'desc';
 
-export default function ApparecchiaturePage() {
-  const [apparecchiature, setApparecchiature] = useState<Apparecchiatura[]>([]);
+export default function UtentiPage() {
+  const [utenti, setUtenti] = useState<Utente[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortField, setSortField] = useState<SortField>('modello');
+  const [sortField, setSortField] = useState<SortField>('nome');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
   const router = useRouter();
 
   useEffect(() => {
-    fetchApparecchiature();
+    fetchUtenti();
   }, []);
 
-  const fetchApparecchiature = async () => {
+  const fetchUtenti = async () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
@@ -37,34 +37,34 @@ export default function ApparecchiaturePage() {
         return;
       }
 
-      const response = await fetch("/api/apparecchiature", {
+      const response = await fetch("/api/utenti", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       if (response.ok) {
-        const data = await response.json() as { data?: Apparecchiatura[] };
-        setApparecchiature(data.data || []);
+        const data = await response.json() as { data?: Utente[] };
+        setUtenti(data.data || []);
       }
     } catch (error) {
-      console.error("Error fetching apparecchiature:", error);
+      console.error("Error fetching utenti:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  const filteredApparecchiature = apparecchiature.filter((item) =>
-    item.modello.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.seriale?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.note?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredUtenti = utenti.filter((utente) =>
+    utente.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    utente.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    utente.cognome.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const sortedApparecchiature = [...filteredApparecchiature].sort((a, b) => {
+  const sortedUtenti = [...filteredUtenti].sort((a, b) => {
     let aVal: any = a[sortField];
     let bVal: any = b[sortField];
 
-    // Handle null values
-    if (aVal === null) return sortDirection === 'asc' ? 1 : -1;
-    if (bVal === null) return sortDirection === 'asc' ? -1 : 1;
+    // Handle boolean values (for active field if added to sort)
+    if (typeof aVal === 'boolean') aVal = aVal ? 1 : 0;
+    if (typeof bVal === 'boolean') bVal = bVal ? 1 : 0;
 
     // Convert to lowercase for string comparison
     if (typeof aVal === 'string') aVal = aVal.toLowerCase();
@@ -77,6 +77,15 @@ export default function ApparecchiaturePage() {
 
   const toggleSortDirection = () => {
     setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+  };
+
+  const getRoleBadge = (role: string) => {
+    const colors: Record<string, string> = {
+      admin: "bg-purple-100 text-purple-800",
+      user: "bg-blue-100 text-blue-800",
+      tecnico: "bg-green-100 text-green-800",
+    };
+    return colors[role] || "bg-gray-100 text-gray-800";
   };
 
   if (loading) {
@@ -92,17 +101,17 @@ export default function ApparecchiaturePage() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Gestione Apparecchiature</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Gestione Utenti</h1>
           <p className="text-gray-600 mt-1">
-            Gestisci e monitora tutte le apparecchiature
+            Gestisci tutti gli utenti del sistema
           </p>
         </div>
         <button
-          onClick={() => router.push("/apparecchiature/new")}
+          onClick={() => router.push("/utenti/new")}
           className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium"
         >
           <Plus size={20} />
-          Nuova Apparecchiatura
+          Nuovo Utente
         </button>
       </div>
 
@@ -117,7 +126,7 @@ export default function ApparecchiaturePage() {
             <Search size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
-              placeholder="Cerca per modello, seriale o note..."
+              placeholder="Cerca utenti per nome, cognome o email..."
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -134,10 +143,11 @@ export default function ApparecchiaturePage() {
               value={sortField}
               onChange={(e) => setSortField(e.target.value as SortField)}
             >
-              <option value="modello">Modello</option>
-              <option value="seriale">Seriale</option>
-              <option value="data_test_funzionali">Test Funzionali</option>
-              <option value="data_test_elettrici">Test Elettrici</option>
+              <option value="nome">Nome</option>
+              <option value="cognome">Cognome</option>
+              <option value="email">Email</option>
+              <option value="role">Ruolo</option>
+              <option value="created_at">Data Creazione</option>
               <option value="id">ID</option>
             </select>
             <button
@@ -160,44 +170,44 @@ export default function ApparecchiaturePage() {
         </div>
       </div>
 
-      {/* Equipment List */}
+      {/* Users List */}
       <div className="grid gap-4">
-        {sortedApparecchiature.map((item) => (
+        {sortedUtenti.map((utente) => (
           <div
-            key={item.id}
+            key={utente.id}
             className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-            onClick={() => router.push(`/apparecchiature/${item.id}`)}
+            onClick={() => router.push(`/utenti/${utente.id}`)}
           >
-            <div className="flex items-start gap-3 mb-3">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <Monitor size={24} className="text-purple-600" />
+            <div className="flex items-start gap-3">
+              <div className="p-2 bg-indigo-100 rounded-lg">
+                <UserCircle size={24} className="text-indigo-600" />
               </div>
               <div className="flex-1">
-                <h3 className="text-xl font-semibold text-gray-900">{item.modello}</h3>
-                <p className="text-sm text-gray-600 mt-1">
-                  Seriale: {item.seriale || "N/D"}
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="text-xl font-semibold text-gray-900">
+                    {utente.nome} {utente.cognome}
+                  </h3>
+                  <span className={`px-2 py-1 text-xs font-medium rounded-full ${getRoleBadge(utente.role)}`}>
+                    {utente.role}
+                  </span>
+                  {!utente.active && (
+                    <span className="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">
+                      Disattivato
+                    </span>
+                  )}
+                </div>
+                <p className="text-sm text-gray-600">
+                  <span className="font-medium">Email:</span> {utente.email}
                 </p>
-                <p className="text-sm text-gray-600">Cliente ID: {item.id_cliente}</p>
               </div>
-            </div>
-            {item.note && (
-              <p className="text-gray-700 text-sm mt-2 line-clamp-2">{item.note}</p>
-            )}
-            <div className="mt-3 flex gap-4 text-sm text-gray-600">
-              {item.data_test_funzionali && (
-                <span>Test funzionali: {new Date(item.data_test_funzionali).toLocaleDateString()}</span>
-              )}
-              {item.data_test_elettrici && (
-                <span>Test elettrici: {new Date(item.data_test_elettrici).toLocaleDateString()}</span>
-              )}
             </div>
           </div>
         ))}
 
-        {sortedApparecchiature.length === 0 && (
+        {sortedUtenti.length === 0 && (
           <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
             <p className="text-gray-500">
-              {searchTerm ? "Nessuna apparecchiatura trovata con i criteri di ricerca" : "Nessuna apparecchiatura trovata"}
+              {searchTerm ? "Nessun utente trovato con i criteri di ricerca" : "Nessun utente trovato"}
             </p>
           </div>
         )}
