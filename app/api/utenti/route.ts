@@ -1,62 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withAuth } from "@/lib/middleware";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { createDatabaseClient } from "@/lib/db";
+import { hashPassword } from "@/lib/auth";
 
 /**
  * GET /api/utenti
- * List all utenti
+ * List all utenti (admin only)
  * Requires authentication
  */
 export const GET = withAuth(async (request, { user }) => {
   try {
-    // In development mode, return mock response
-    if (process.env.NODE_ENV === "development") {
-      const mockUtenti = [
-        {
-          id: 1,
-          email: "admin@medidea.local",
-          nome: "Admin",
-          cognome: "User",
-          role: "admin",
-          active: true,
-          last_login: "2025-01-19T10:30:00Z",
-          created_at: "2025-01-01T00:00:00Z",
-          updated_at: "2025-01-19T10:30:00Z",
-        },
-        {
-          id: 2,
-          email: "tecnico@medidea.local",
-          nome: "Mario",
-          cognome: "Rossi",
-          role: "tecnico",
-          active: true,
-          last_login: "2025-01-18T15:20:00Z",
-          created_at: "2025-01-05T09:00:00Z",
-          updated_at: "2025-01-18T15:20:00Z",
-        },
-        {
-          id: 3,
-          email: "user@medidea.local",
-          nome: "Giulia",
-          cognome: "Bianchi",
-          role: "user",
-          active: false,
-          last_login: null,
-          created_at: "2025-01-10T14:00:00Z",
-          updated_at: "2025-01-10T14:00:00Z",
-        },
-      ];
-
-      return NextResponse.json({
-        success: true,
-        data: mockUtenti,
-      });
+    // Only admin can list users
+    if (user.role !== "admin") {
+      return NextResponse.json(
+        { error: "Accesso non autorizzato" },
+        { status: 403 }
+      );
     }
 
-    // Production code would query database here
-    return NextResponse.json(
-      { error: "Endpoint not fully implemented" },
-      { status: 501 }
+    const { env } = getCloudflareContext();
+    const db = createDatabaseClient(env);
+
+    const utenti = await db.query(
+      "SELECT id, email, nome, cognome, role, active, last_login, created_at, updated_at FROM utenti ORDER BY nome ASC, cognome ASC"
     );
+
+    return NextResponse.json({
+      success: true,
+      data: utenti,
+    });
   } catch (error) {
     console.error("Error listing utenti:", error);
     return NextResponse.json(
@@ -71,11 +44,19 @@ export const GET = withAuth(async (request, { user }) => {
 
 /**
  * POST /api/utenti
- * Create a new utente
- * Requires authentication (admin only)
+ * Create a new utente (admin only)
+ * Requires authentication
  */
 export const POST = withAuth(async (request, { user }) => {
   try {
+    // Only admin can create users
+    if (user.role !== "admin") {
+      return NextResponse.json(
+        { error: "Accesso non autorizzato" },
+        { status: 403 }
+      );
+    }
+
     const body = await request.json() as {
       email?: string;
       password?: string;
@@ -85,81 +66,65 @@ export const POST = withAuth(async (request, { user }) => {
       active?: boolean;
     };
 
-    // Validate required fields
-    if (!body.email || !body.email.trim()) {
+    if (!body.email || !body.password || !body.nome || !body.cognome || !body.role) {
       return NextResponse.json(
-        { error: "Email obbligatoria" },
+        { error: "Email, password, nome, cognome e ruolo sono obbligatori" },
         { status: 400 }
       );
     }
 
-    if (!body.password || body.password.length < 8) {
-      return NextResponse.json(
-        { error: "Password deve essere di almeno 8 caratteri" },
-        { status: 400 }
-      );
-    }
-
-    if (!body.nome || !body.nome.trim()) {
-      return NextResponse.json(
-        { error: "Nome obbligatorio" },
-        { status: 400 }
-      );
-    }
-
-    if (!body.cognome || !body.cognome.trim()) {
-      return NextResponse.json(
-        { error: "Cognome obbligatorio" },
-        { status: 400 }
-      );
-    }
-
-    const validRoles = ["admin", "user", "tecnico"];
-    if (!body.role || !validRoles.includes(body.role)) {
+    if (!["admin", "tecnico", "user"].includes(body.role)) {
       return NextResponse.json(
         { error: "Ruolo non valido" },
         { status: 400 }
       );
     }
 
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(body.email)) {
+    const { env } = getCloudflareContext();
+    const db = createDatabaseClient(env);
+
+    // Check if email already exists
+    const existing = await db.queryFirst(
+      "SELECT id FROM utenti WHERE email = ?",
+      [body.email]
+    );
+
+    if (existing) {
       return NextResponse.json(
-        { error: "Email non valida" },
-        { status: 400 }
+        { error: "Email già in uso" },
+        { status: 409 }
       );
     }
 
-    // In development mode, return mock response
-    if (process.env.NODE_ENV === "development") {
-      const mockUtente = {
-        id: Math.floor(Math.random() * 1000) + 10,
-        email: body.email,
-        nome: body.nome,
-        cognome: body.cognome,
-        role: body.role,
-        active: body.active !== undefined ? body.active : true,
-        last_login: null,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      };
+    // Hash password
+    const password_hash = await hashPassword(body.password);
 
-      return NextResponse.json(
-        {
-          success: true,
-          data: mockUtente,
-          message: "Utente creato con successo",
-        },
-        { status: 201 }
-      );
-    }
+    const result = await db.execute(
+      `INSERT INTO utenti
+      (email, password_hash, nome, cognome, role, active, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+      [
+        body.email,
+        password_hash,
+        body.nome,
+        body.cognome,
+        body.role,
+        body.active !== false ? 1 : 0
+      ]
+    );
 
-    // Production code would query database here
-    // TODO: Hash password with bcrypt before storing
+    const utente = await db.queryFirst(
+      "SELECT id, email, nome, cognome, role, active, created_at, updated_at FROM utenti WHERE id = ?",
+      [result.lastInsertRowid]
+    );
+
     return NextResponse.json(
-      { error: "Endpoint not fully implemented" },
-      { status: 501 }
+      {
+        success: true,
+        data: utente,
+        message: "Utente creato con successo",
+      },
+      { status: 201 }
     );
   } catch (error) {
     console.error("Error creating utente:", error);

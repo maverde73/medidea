@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withAuth } from "@/lib/middleware";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { createDatabaseClient } from "@/lib/db";
+import { hashPassword } from "@/lib/auth";
 
 /**
  * GET /api/utenti/:id
- * Get a single utente by ID
+ * Get a single utente by ID (admin only or self)
  * Requires authentication
  */
 export const GET = withAuth<{ params: Promise<{ id: string }> }>(
@@ -19,31 +22,33 @@ export const GET = withAuth<{ params: Promise<{ id: string }> }>(
         );
       }
 
-      // In development mode, return mock response
-      if (process.env.NODE_ENV === "development") {
-        const mockUtente = {
-          id: utenteId,
-          email: `user${utenteId}@medidea.local`,
-          nome: "Nome",
-          cognome: "Cognome",
-          role: "user",
-          active: true,
-          last_login: "2025-01-19T10:00:00Z",
-          created_at: new Date(Date.now() - 30 * 86400000).toISOString(),
-          updated_at: new Date().toISOString(),
-        };
-
-        return NextResponse.json({
-          success: true,
-          data: mockUtente,
-        });
+      // Only admin or self can view user details
+      if (user.role !== "admin" && user.id !== utenteId) {
+        return NextResponse.json(
+          { error: "Accesso non autorizzato" },
+          { status: 403 }
+        );
       }
 
-      // Production code would query database here
-      return NextResponse.json(
-        { error: "Endpoint not fully implemented" },
-        { status: 501 }
+      const { env } = getCloudflareContext();
+      const db = createDatabaseClient(env);
+
+      const utente = await db.queryFirst(
+        "SELECT id, email, nome, cognome, role, active, last_login, created_at, updated_at FROM utenti WHERE id = ?",
+        [utenteId]
       );
+
+      if (!utente) {
+        return NextResponse.json(
+          { error: "Utente non trovato" },
+          { status: 404 }
+        );
+      }
+
+      return NextResponse.json({
+        success: true,
+        data: utente,
+      });
     } catch (error) {
       console.error("Error fetching utente:", error);
       return NextResponse.json(
@@ -59,8 +64,8 @@ export const GET = withAuth<{ params: Promise<{ id: string }> }>(
 
 /**
  * PUT /api/utenti/:id
- * Update an existing utente
- * Requires authentication (admin or self)
+ * Update an existing utente (admin only)
+ * Requires authentication
  */
 export const PUT = withAuth<{ params: Promise<{ id: string }> }>(
   async (request, { user, params }) => {
@@ -75,84 +80,122 @@ export const PUT = withAuth<{ params: Promise<{ id: string }> }>(
         );
       }
 
+      // Only admin can update users
+      if (user.role !== "admin") {
+        return NextResponse.json(
+          { error: "Accesso non autorizzato" },
+          { status: 403 }
+        );
+      }
+
       const body = await request.json() as {
         email?: string;
+        password?: string;
         nome?: string;
         cognome?: string;
         role?: string;
         active?: boolean;
       };
 
-      // Validate required fields
-      if (body.email && !body.email.trim()) {
+      if (!body.email || !body.nome || !body.cognome || !body.role) {
         return NextResponse.json(
-          { error: "Email non può essere vuota" },
+          { error: "Email, nome, cognome e ruolo sono obbligatori" },
           { status: 400 }
         );
       }
 
-      if (body.nome && !body.nome.trim()) {
+      if (!["admin", "tecnico", "user"].includes(body.role)) {
         return NextResponse.json(
-          { error: "Nome non può essere vuoto" },
+          { error: "Ruolo non valido" },
           { status: 400 }
         );
       }
 
-      if (body.cognome && !body.cognome.trim()) {
-        return NextResponse.json(
-          { error: "Cognome non può essere vuoto" },
-          { status: 400 }
-        );
-      }
+      const { env } = getCloudflareContext();
+      const db = createDatabaseClient(env);
 
-      // Email validation
-      if (body.email) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(body.email)) {
-          return NextResponse.json(
-            { error: "Email non valida" },
-            { status: 400 }
-          );
-        }
-      }
-
-      // Role validation
-      if (body.role) {
-        const validRoles = ["admin", "user", "tecnico"];
-        if (!validRoles.includes(body.role)) {
-          return NextResponse.json(
-            { error: "Ruolo non valido" },
-            { status: 400 }
-          );
-        }
-      }
-
-      // In development mode, return mock response
-      if (process.env.NODE_ENV === "development") {
-        const mockUtente = {
-          id: utenteId,
-          email: body.email || `user${utenteId}@medidea.local`,
-          nome: body.nome || "Nome",
-          cognome: body.cognome || "Cognome",
-          role: body.role || "user",
-          active: body.active !== undefined ? body.active : true,
-          last_login: "2025-01-19T10:00:00Z",
-          created_at: new Date(Date.now() - 30 * 86400000).toISOString(),
-          updated_at: new Date().toISOString(),
-        };
-
-        return NextResponse.json({
-          success: true,
-          data: mockUtente,
-          message: "Utente aggiornato con successo",
-        });
-      }
-
-      // Production code would query database here
-      return NextResponse.json(
-        { error: "Endpoint not fully implemented" },
-        { status: 501 }
+      // Check if utente exists
+      const exists = await db.queryFirst(
+        "SELECT id FROM utenti WHERE id = ?",
+        [utenteId]
       );
+
+      if (!exists) {
+        return NextResponse.json(
+          { error: "Utente non trovato" },
+          { status: 404 }
+        );
+      }
+
+      // Check if email is already in use by another user
+      const emailExists = await db.queryFirst<{ id: number }>(
+        "SELECT id FROM utenti WHERE email = ? AND id != ?",
+        [body.email, utenteId]
+      );
+
+      if (emailExists) {
+        return NextResponse.json(
+          { error: "Email già in uso" },
+          { status: 409 }
+        );
+      }
+
+      // If password is provided, hash it
+      let updateQuery: string;
+      let updateParams: any[];
+
+      if (body.password) {
+        const password_hash = await hashPassword(body.password);
+        updateQuery = `UPDATE utenti SET
+          email = ?,
+          password_hash = ?,
+          nome = ?,
+          cognome = ?,
+          role = ?,
+          active = ?,
+          updated_at = datetime('now')
+          WHERE id = ?`;
+        updateParams = [
+          body.email,
+          password_hash,
+          body.nome,
+          body.cognome,
+          body.role,
+          body.active !== false ? 1 : 0,
+          utenteId
+        ];
+      } else {
+        updateQuery = `UPDATE utenti SET
+          email = ?,
+          nome = ?,
+          cognome = ?,
+          role = ?,
+          active = ?,
+          updated_at = datetime('now')
+          WHERE id = ?`;
+        updateParams = [
+          body.email,
+          body.nome,
+          body.cognome,
+          body.role,
+          body.active !== false ? 1 : 0,
+          utenteId
+        ];
+      }
+
+      await db.execute(updateQuery, updateParams);
+
+      // Retrieve updated utente
+      const utente = await db.queryFirst(
+        "SELECT id, email, nome, cognome, role, active, created_at, updated_at FROM utenti WHERE id = ?",
+        [utenteId]
+      );
+
+      return NextResponse.json({
+        success: true,
+        data: utente,
+        message: "Utente aggiornato con successo",
+      });
     } catch (error) {
       console.error("Error updating utente:", error);
       return NextResponse.json(
@@ -168,8 +211,8 @@ export const PUT = withAuth<{ params: Promise<{ id: string }> }>(
 
 /**
  * DELETE /api/utenti/:id
- * Delete an utente
- * Requires authentication (admin only)
+ * Delete an utente (admin only)
+ * Requires authentication
  */
 export const DELETE = withAuth<{ params: Promise<{ id: string }> }>(
   async (request, { user, params }) => {
@@ -184,19 +227,48 @@ export const DELETE = withAuth<{ params: Promise<{ id: string }> }>(
         );
       }
 
-      // In development mode, return mock response
-      if (process.env.NODE_ENV === "development") {
-        return NextResponse.json({
-          success: true,
-          message: "Utente eliminato con successo",
-        });
+      // Only admin can delete users
+      if (user.role !== "admin") {
+        return NextResponse.json(
+          { error: "Accesso non autorizzato" },
+          { status: 403 }
+        );
       }
 
-      // Production code would query database here
-      return NextResponse.json(
-        { error: "Endpoint not fully implemented" },
-        { status: 501 }
+      // Prevent deleting yourself
+      if (user.id === utenteId) {
+        return NextResponse.json(
+          { error: "Non puoi eliminare il tuo account" },
+          { status: 400 }
+        );
+      }
+
+      const { env } = getCloudflareContext();
+      const db = createDatabaseClient(env);
+
+      // Check if utente exists
+      const utente = await db.queryFirst(
+        "SELECT id FROM utenti WHERE id = ?",
+        [utenteId]
       );
+
+      if (!utente) {
+        return NextResponse.json(
+          { error: "Utente non trovato" },
+          { status: 404 }
+        );
+      }
+
+      // Delete utente
+      await db.execute(
+        "DELETE FROM utenti WHERE id = ?",
+        [utenteId]
+      );
+
+      return NextResponse.json({
+        success: true,
+        message: "Utente eliminato con successo",
+      });
     } catch (error) {
       console.error("Error deleting utente:", error);
       return NextResponse.json(
