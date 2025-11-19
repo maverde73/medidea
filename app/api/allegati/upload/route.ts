@@ -7,6 +7,9 @@ import {
   generateR2Key,
 } from "@/lib/validators/allegati";
 import { ZodError } from "zod";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { createDatabaseClient } from "@/lib/db";
+import { createStorageClient } from "@/lib/storage";
 
 /**
  * POST /api/allegati/upload
@@ -60,86 +63,52 @@ export const POST = withAuth(async (request, { user }) => {
       file.name
     );
 
-    // In development mode, return mock response
-    if (process.env.NODE_ENV === "development") {
-      const mockAllegato = {
-        id: Math.floor(Math.random() * 1000) + 1,
+    const { env } = getCloudflareContext();
+    const storage = createStorageClient(env);
+    const db = createDatabaseClient(env);
+
+    // Upload file to R2
+    const fileBuffer = await file.arrayBuffer();
+    await storage.upload(r2Key, fileBuffer, {
+      contentType: file.type,
+      customMetadata: {
+        originalName: file.name,
+        uploadedBy: user.email,
         tipo_riferimento: validatedData.tipo_riferimento,
-        id_riferimento: validatedData.id_riferimento,
-        nome_file_originale: file.name,
-        chiave_r2: r2Key,
-        mime_type: file.type,
-        dimensione_bytes: file.size,
-        data_caricamento: new Date().toISOString(),
-        note: validatedData.note || null,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      };
+        id_riferimento: validatedData.id_riferimento.toString(),
+      },
+    });
 
-      return NextResponse.json(
-        {
-          success: true,
-          data: mockAllegato,
-          message: "File caricato con successo (mock)",
-        },
-        { status: 201 }
-      );
-    }
+    // Save metadata to D1
+    const result = await db.execute(
+      `INSERT INTO allegati (
+        tipo_riferimento, id_riferimento, nome_file_originale,
+        chiave_r2, mime_type, dimensione_bytes, note, data_caricamento, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'), datetime('now'))`,
+      [
+        validatedData.tipo_riferimento,
+        validatedData.id_riferimento,
+        file.name,
+        r2Key,
+        file.type,
+        file.size,
+        validatedData.note || null,
+      ]
+    );
 
-    // Production code would upload to R2 and save to D1
-    // const env = process.env as unknown as Env;
-    // const storage = new StorageClient(env.STORAGE);
-    // const db = new DatabaseClient(env.DB);
-    //
-    // // Upload file to R2
-    // const fileBuffer = await file.arrayBuffer();
-    // await storage.upload(r2Key, fileBuffer, {
-    //   contentType: file.type,
-    //   metadata: {
-    //     originalName: file.name,
-    //     uploadedBy: user.email,
-    //     tipo_riferimento: validatedData.tipo_riferimento,
-    //     id_riferimento: validatedData.id_riferimento.toString(),
-    //   },
-    // });
-    //
-    // // Save metadata to D1
-    // const result = await db.execute(
-    //   `INSERT INTO allegati (
-    //     tipo_riferimento, id_riferimento, nome_file_originale,
-    //     chiave_r2, mime_type, dimensione_bytes, note
-    //   ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    //   [
-    //     validatedData.tipo_riferimento,
-    //     validatedData.id_riferimento,
-    //     file.name,
-    //     r2Key,
-    //     file.type,
-    //     file.size,
-    //     validatedData.note || null,
-    //   ]
-    // );
-    //
-    // const allegatoId = result.meta.last_row_id;
-    //
-    // // Fetch the created allegato
-    // const allegato = await db.queryFirst(
-    //   "SELECT * FROM allegati WHERE id = ?",
-    //   [allegatoId]
-    // );
-    //
-    // return NextResponse.json(
-    //   {
-    //     success: true,
-    //     data: allegato,
-    //     message: "File caricato con successo",
-    //   },
-    //   { status: 201 }
-    // );
+    // Fetch the created allegato
+    const allegato = await db.queryFirst(
+      "SELECT * FROM allegati WHERE id = ?",
+      [result.lastInsertRowid]
+    );
 
     return NextResponse.json(
-      { error: "Endpoint not fully implemented" },
-      { status: 501 }
+      {
+        success: true,
+        data: allegato,
+        message: "File caricato con successo",
+      },
+      { status: 201 }
     );
   } catch (error) {
     if (error instanceof ZodError) {

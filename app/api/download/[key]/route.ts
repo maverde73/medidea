@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { createStorageClient } from "@/lib/storage";
 
 /**
  * File download endpoint
  * Downloads files from R2 storage by key
+ * NOTE: This is a direct R2 key access. For most use cases, use /api/allegati/:id instead
  */
 export async function GET(
   request: NextRequest,
@@ -18,37 +21,21 @@ export async function GET(
       );
     }
 
-    // In development, return mock response
-    if (process.env.NODE_ENV === "development") {
-      return NextResponse.json(
-        {
-          message: "File download endpoint ready",
-          note: "R2 storage will be available when deployed to Cloudflare",
-          requestedKey: key,
-        },
-        { status: 200 }
-      );
+    const { env } = getCloudflareContext();
+    const storage = createStorageClient(env);
+
+    const object = await storage.download(key);
+
+    if (!object) {
+      return NextResponse.json({ error: "File not found" }, { status: 404 });
     }
 
-    // Production code would download from R2 here
-    // const storage = createStorageClient(env);
-    // const object = await storage.download(key);
-    //
-    // if (!object) {
-    //   return NextResponse.json({ error: "File not found" }, { status: 404 });
-    // }
-    //
-    // return new NextResponse(object.body, {
-    //   headers: {
-    //     "Content-Type": object.httpMetadata?.contentType || "application/octet-stream",
-    //     "Content-Disposition": `attachment; filename="${key.split("/").pop()}"`,
-    //   },
-    // });
-
-    return NextResponse.json(
-      { error: "Download not implemented" },
-      { status: 501 }
-    );
+    return new NextResponse(object.body, {
+      headers: {
+        "Content-Type": object.httpMetadata?.contentType || "application/octet-stream",
+        "Content-Disposition": `attachment; filename="${key.split("/").pop()}"`,
+      },
+    });
   } catch (error) {
     return NextResponse.json(
       {
