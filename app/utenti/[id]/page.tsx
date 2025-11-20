@@ -118,7 +118,7 @@ export default function UtenteDetailPage() {
         setEditing(false);
         setError("");
       } else {
-        const errorData = await response.json();
+        const errorData = await response.json() as { error?: string };
         setError(errorData.error || "Errore durante l'aggiornamento");
       }
     } catch (err) {
@@ -163,7 +163,7 @@ export default function UtenteDetailPage() {
         <ErrorAlert message={error} />
         <button
           onClick={() => router.back()}
-          className="text-indigo-600 hover:text-indigo-800"
+          className="text-primary-500 hover:text-primary-600"
         >
           ← Torna indietro
         </button>
@@ -208,7 +208,7 @@ export default function UtenteDetailPage() {
           </div>
           <button
             onClick={() => setEditing(!editing)}
-            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
           >
             <Pencil size={16} />
             {editing ? "Annulla" : "Modifica"}
@@ -231,7 +231,7 @@ export default function UtenteDetailPage() {
                 type="email"
                 value={editForm.email}
                 onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
               />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -243,7 +243,7 @@ export default function UtenteDetailPage() {
                   type="text"
                   value={editForm.nome}
                   onChange={(e) => setEditForm({ ...editForm, nome: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
                 />
               </div>
               <div>
@@ -254,7 +254,7 @@ export default function UtenteDetailPage() {
                   type="text"
                   value={editForm.cognome}
                   onChange={(e) => setEditForm({ ...editForm, cognome: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
                 />
               </div>
             </div>
@@ -265,7 +265,7 @@ export default function UtenteDetailPage() {
               <select
                 value={editForm.role}
                 onChange={(e) => setEditForm({ ...editForm, role: e.target.value as "admin" | "user" | "tecnico" })}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
               >
                 <option value="user">Utente</option>
                 <option value="tecnico">Tecnico</option>
@@ -277,7 +277,7 @@ export default function UtenteDetailPage() {
                 type="checkbox"
                 checked={editForm.active}
                 onChange={(e) => setEditForm({ ...editForm, active: e.target.checked })}
-                className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                className="w-4 h-4 text-primary-500 border-gray-300 rounded focus:ring-primary-500"
                 id="active-edit"
               />
               <label htmlFor="active-edit" className="ml-2 block text-sm text-gray-700">
@@ -288,7 +288,7 @@ export default function UtenteDetailPage() {
               <button
                 onClick={handleUpdate}
                 disabled={loading}
-                className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50"
+                className="px-6 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 disabled:opacity-50"
               >
                 {loading ? "Salvataggio..." : "Salva Modifiche"}
               </button>

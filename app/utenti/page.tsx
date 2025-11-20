@@ -108,7 +108,7 @@ export default function UtentiPage() {
         </div>
         <button
           onClick={() => router.push("/utenti/new")}
-          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium"
+          className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors font-medium"
         >
           <Plus size={20} />
           Nuovo Utente
@@ -127,7 +127,7 @@ export default function UtentiPage() {
             <input
               type="text"
               placeholder="Cerca utenti per nome, cognome o email..."
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -139,7 +139,7 @@ export default function UtentiPage() {
               <span className="text-sm font-medium text-gray-700">Ordina per:</span>
             </div>
             <select
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
               value={sortField}
               onChange={(e) => setSortField(e.target.value as SortField)}
             >
@@ -179,8 +179,8 @@ export default function UtentiPage() {
             onClick={() => router.push(`/utenti/${utente.id}`)}
           >
             <div className="flex items-start gap-3">
-              <div className="p-2 bg-indigo-100 rounded-lg">
-                <UserCircle size={24} className="text-indigo-600" />
+              <div className="p-2 bg-primary-100 rounded-lg">
+                <UserCircle size={24} className="text-primary-500" />
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">

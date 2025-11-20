@@ -1,14 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 
 export type AlertType = "error" | "warning" | "success" | "info";
 
 export interface ErrorAlertProps {
   /** Alert type/severity */
-  type: AlertType;
+  type?: AlertType;
   /** Alert title */
-  title: string;
+  title?: string;
   /** Alert message/description */
   message?: string;
   /** Make alert dismissible */
@@ -26,7 +26,7 @@ const alertConfig: Record<
     borderColor: string;
     textColor: string;
     iconColor: string;
-    icon: JSX.Element;
+    icon: React.ReactElement;
   }
 > = {
   error: {
@@ -88,7 +88,7 @@ const alertConfig: Record<
 };
 
 export function ErrorAlert({
-  type,
+  type = "error",
   title,
   message,
   dismissible = true,
@@ -98,6 +98,7 @@ export function ErrorAlert({
   const [isVisible, setIsVisible] = useState(true);
 
   const config = alertConfig[type];
+  const displayTitle = title || (type === "error" ? "Errore" : type === "warning" ? "Attenzione" : type === "success" ? "Successo" : "Info");
 
   const handleDismiss = () => {
     setIsVisible(false);
@@ -128,7 +129,7 @@ export function ErrorAlert({
         </div>
         <div className="ml-3 flex-1">
           <h3 className={`text-sm font-medium ${config.textColor}`}>
-            {title}
+            {displayTitle}
           </h3>
           {message && (
             <div className={`mt-2 text-sm ${config.textColor}`}>

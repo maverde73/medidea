@@ -14,7 +14,7 @@ export interface User {
   password_hash: string;
   nome: string;
   cognome: string;
-  role: "admin" | "tecnico";
+  role: "admin" | "tecnico" | "user";
   active: boolean;
   last_login: string | null;
   created_at: string;
@@ -27,7 +27,7 @@ export interface User {
 export interface JWTPayload extends jose.JWTPayload {
   userId: number;
   email: string;
-  role: "admin" | "tecnico";
+  role: "admin" | "tecnico" | "user";
 }
 
 /**
@@ -124,12 +124,17 @@ export function extractTokenFromHeader(authHeader: string | null): string | null
  * @returns True if user has required role or higher
  */
 export function hasRole(
-  userRole: "admin" | "tecnico",
-  requiredRole: "admin" | "tecnico"
+  userRole: "admin" | "tecnico" | "user",
+  requiredRole: "admin" | "tecnico" | "user"
 ): boolean {
+  if (requiredRole === "user") {
+    // All roles can access user-level resources
+    return true;
+  }
+
   if (requiredRole === "tecnico") {
     // Both admin and tecnico can access
-    return true;
+    return userRole === "admin" || userRole === "tecnico";
   }
 
   // Only admin can access admin-only resources

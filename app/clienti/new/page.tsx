@@ -50,7 +50,7 @@ export default function NewClientePage() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = await response.json() as { error?: string };
         throw new Error(errorData.error || "Errore durante la creazione");
       }
 
@@ -96,7 +96,7 @@ export default function NewClientePage() {
               <input
                 type="text"
                 {...register("nome")}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
                 placeholder="Inserisci nome cliente"
               />
               {errors.nome && (
@@ -108,7 +108,7 @@ export default function NewClientePage() {
               <input
                 type="text"
                 {...register("indirizzo")}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
                 placeholder="Inserisci indirizzo"
               />
             </div>
@@ -117,7 +117,7 @@ export default function NewClientePage() {
               <textarea
                 {...register("contatti")}
                 rows={3}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
                 placeholder="Inserisci contatti (telefono, email, ecc.)"
               />
             </div>
@@ -137,7 +137,7 @@ export default function NewClientePage() {
           <button
             type="submit"
             disabled={loading}
-            className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 inline-flex items-center"
+            className="px-6 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 disabled:opacity-50 inline-flex items-center"
           >
             {loading ? (
               <>

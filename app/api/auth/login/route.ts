@@ -9,7 +9,7 @@ interface User {
   password_hash: string;
   nome: string;
   cognome: string;
-  role: string;
+  role: "admin" | "tecnico" | "user";
   active: number;
 }
 

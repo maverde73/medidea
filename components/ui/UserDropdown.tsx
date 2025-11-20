@@ -44,7 +44,7 @@ export function UserDropdown({ userName = 'Admin', userEmail = 'admin@medidea.lo
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
       >
-        <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white font-medium text-sm">
+        <div className="w-8 h-8 rounded-full bg-primary-500 flex items-center justify-center text-white font-medium text-sm">
           {userName.charAt(0).toUpperCase()}
         </div>
         <div className="hidden md:block text-left">

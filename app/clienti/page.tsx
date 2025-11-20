@@ -97,7 +97,7 @@ export default function ClientiPage() {
         </div>
         <button
           onClick={() => router.push("/clienti/new")}
-          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium"
+          className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors font-medium"
         >
           <Plus size={20} />
           Nuovo Cliente
@@ -116,7 +116,7 @@ export default function ClientiPage() {
             <input
               type="text"
               placeholder="Cerca clienti per nome, indirizzo o contatti..."
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -128,7 +128,7 @@ export default function ClientiPage() {
               <span className="text-sm font-medium text-gray-700">Ordina per:</span>
             </div>
             <select
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
               value={sortField}
               onChange={(e) => setSortField(e.target.value as SortField)}
             >

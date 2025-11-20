@@ -16,7 +16,7 @@ import {
 // Validation schema
 const attivitaSchema = z.object({
   // Cliente
-  id_cliente: z.number({ required_error: "Cliente obbligatorio" }).positive("Cliente obbligatorio"),
+  id_cliente: z.number().positive("Cliente obbligatorio"),
 
   // Apparecchiatura
   modello: z.string().min(1, "Modello obbligatorio"),
@@ -85,7 +85,7 @@ export default function NewAttivitaPage() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = await response.json() as { error?: string };
         throw new Error(errorData.error || "Errore durante la creazione");
       }
 
@@ -181,7 +181,7 @@ export default function NewAttivitaPage() {
                 <input
                   type="text"
                   {...register("modello")}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                   placeholder="Inserisci modello"
                 />
                 {errors.modello && (
@@ -195,7 +195,7 @@ export default function NewAttivitaPage() {
                 <input
                   type="text"
                   {...register("seriale")}
-                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary-500"
                   placeholder="Inserisci numero seriale"
                 />
               </div>
@@ -206,7 +206,7 @@ export default function NewAttivitaPage() {
                 <input
                   type="text"
                   {...register("codice_inventario_cliente")}
-                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary-500"
                   placeholder="Inserisci codice inventario"
                 />
               </div>
@@ -226,7 +226,7 @@ export default function NewAttivitaPage() {
                 <input
                   type="date"
                   {...register("data_apertura_richiesta")}
-                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary-500"
                 />
                 {errors.data_apertura_richiesta && (
                   <p className="mt-1 text-sm text-red-600">
@@ -241,7 +241,7 @@ export default function NewAttivitaPage() {
                 <input
                   type="text"
                   {...register("modalita_apertura_richiesta")}
-                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary-500"
                   placeholder="es. Email, Telefono, Visita"
                 />
               </div>
@@ -261,7 +261,7 @@ export default function NewAttivitaPage() {
                 <input
                   type="text"
                   {...register("numero_preventivo")}
-                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary-500"
                   placeholder="Inserisci numero"
                 />
               </div>
@@ -272,14 +272,14 @@ export default function NewAttivitaPage() {
                 <input
                   type="date"
                   {...register("data_preventivo")}
-                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary-500"
                 />
               </div>
             </div>
             {uploadedFiles.preventivo && (
               <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-md">
                 <p className="text-sm text-green-800">
-                  ✓ File caricato: {uploadedFiles.preventivo.filename}
+                  ✓ File caricato: {uploadedFiles.preventivo.nome_file_originale}
                 </p>
               </div>
             )}
@@ -307,7 +307,7 @@ export default function NewAttivitaPage() {
                 <input
                   type="text"
                   {...register("numero_accettazione_preventivo")}
-                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary-500"
                   placeholder="Inserisci numero"
                 />
               </div>
@@ -318,14 +318,14 @@ export default function NewAttivitaPage() {
                 <input
                   type="date"
                   {...register("data_accettazione_preventivo")}
-                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary-500"
                 />
               </div>
             </div>
             {uploadedFiles.accettazione && (
               <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-md">
                 <p className="text-sm text-green-800">
-                  ✓ File caricato: {uploadedFiles.accettazione.filename}
+                  ✓ File caricato: {uploadedFiles.accettazione.nome_file_originale}
                 </p>
               </div>
             )}
@@ -348,7 +348,7 @@ export default function NewAttivitaPage() {
             <textarea
               {...register("note_generali")}
               rows={4}
-              className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary-500"
               placeholder="Inserisci eventuali note aggiuntive..."
             />
           </div>
@@ -366,7 +366,7 @@ export default function NewAttivitaPage() {
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center transition-colors"
+              className="px-6 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center transition-colors"
             >
               {loading ? (
                 <>

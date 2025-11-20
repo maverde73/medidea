@@ -122,8 +122,8 @@ export default function Home() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
           <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 rounded-lg bg-indigo-100 flex items-center justify-center">
-              <Activity className="text-indigo-600" size={24} />
+            <div className="w-12 h-12 rounded-lg bg-accent-teal-bg flex items-center justify-center">
+              <Activity className="text-accent-teal-text" size={24} />
             </div>
             <span className="text-2xl font-bold text-gray-900">{stats.attivita_totali}</span>
           </div>
@@ -136,8 +136,8 @@ export default function Home() {
 
         <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
           <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 rounded-lg bg-purple-100 flex items-center justify-center">
-              <Calendar className="text-purple-600" size={24} />
+            <div className="w-12 h-12 rounded-lg bg-accent-blue-bg flex items-center justify-center">
+              <Calendar className="text-accent-blue-text" size={24} />
             </div>
             <span className="text-2xl font-bold text-gray-900">{stats.attivita_mese_corrente}</span>
           </div>
@@ -147,8 +147,8 @@ export default function Home() {
 
         <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
           <div className="flex items-center justify-between mb-4">
-            <div className="w-12 h-12 rounded-lg bg-orange-100 flex items-center justify-center">
-              <Monitor className="text-orange-600" size={24} />
+            <div className="w-12 h-12 rounded-lg bg-accent-coral-bg flex items-center justify-center">
+              <Monitor className="text-accent-coral-text" size={24} />
             </div>
             <span className="text-2xl font-bold text-gray-900">{stats.apparecchiature_totali}</span>
           </div>

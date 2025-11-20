@@ -111,7 +111,7 @@ export default function ClienteDetailPage() {
         setEditing(false);
         setError("");
       } else {
-        const errorData = await response.json();
+        const errorData = await response.json() as { error?: string };
         setError(errorData.error || "Errore durante l'aggiornamento");
       }
     } catch (err) {
@@ -139,7 +139,7 @@ export default function ClienteDetailPage() {
         <ErrorAlert message={error} />
         <button
           onClick={() => router.back()}
-          className="text-indigo-600 hover:text-indigo-800"
+          className="text-primary-500 hover:text-primary-600"
         >
           ← Torna indietro
         </button>
@@ -162,7 +162,7 @@ export default function ClienteDetailPage() {
           </div>
           <button
             onClick={() => setEditing(!editing)}
-            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
           >
             <Pencil size={16} />
             {editing ? "Annulla" : "Modifica"}
@@ -185,7 +185,7 @@ export default function ClienteDetailPage() {
                 type="text"
                 value={editForm.nome}
                 onChange={(e) => setEditForm({ ...editForm, nome: e.target.value })}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
               />
             </div>
             <div>
@@ -194,7 +194,7 @@ export default function ClienteDetailPage() {
                 type="text"
                 value={editForm.indirizzo}
                 onChange={(e) => setEditForm({ ...editForm, indirizzo: e.target.value })}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
               />
             </div>
             <div>
@@ -203,14 +203,14 @@ export default function ClienteDetailPage() {
                 value={editForm.contatti}
                 onChange={(e) => setEditForm({ ...editForm, contatti: e.target.value })}
                 rows={3}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
               />
             </div>
             <div className="flex justify-end">
               <button
                 onClick={handleUpdate}
                 disabled={loading}
-                className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50"
+                className="px-6 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 disabled:opacity-50"
               >
                 {loading ? "Salvataggio..." : "Salva Modifiche"}
               </button>

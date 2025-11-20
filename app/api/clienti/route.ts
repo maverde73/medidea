@@ -64,7 +64,7 @@ export const POST = withAuth(async (request, { user }) => {
     // Retrieve the created cliente
     const cliente = await db.queryFirst(
       "SELECT * FROM clienti WHERE id = ?",
-      [result.lastInsertRowid]
+      [result.meta.last_row_id]
     );
 
     return NextResponse.json(

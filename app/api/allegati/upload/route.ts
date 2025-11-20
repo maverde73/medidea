@@ -99,7 +99,7 @@ export const POST = withAuth(async (request, { user }) => {
     // Fetch the created allegato
     const allegato = await db.queryFirst(
       "SELECT * FROM allegati WHERE id = ?",
-      [result.lastInsertRowid]
+      [result.meta.last_row_id]
     );
 
     return NextResponse.json(

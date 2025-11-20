@@ -115,7 +115,7 @@ export const POST = withAuth(async (request, { user }) => {
 
     const utente = await db.queryFirst(
       "SELECT id, email, nome, cognome, role, active, created_at, updated_at FROM utenti WHERE id = ?",
-      [result.lastInsertRowid]
+      [result.meta.last_row_id]
     );
 
     return NextResponse.json(

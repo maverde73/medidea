@@ -12,10 +12,8 @@ const utenteSchema = z.object({
   password: z.string().min(8, "La password deve essere di almeno 8 caratteri"),
   nome: z.string().min(1, "Nome obbligatorio"),
   cognome: z.string().min(1, "Cognome obbligatorio"),
-  role: z.enum(["admin", "user", "tecnico"], {
-    required_error: "Ruolo obbligatorio",
-  }),
-  active: z.boolean().default(true),
+  role: z.enum(["admin", "user", "tecnico"]),
+  active: z.boolean(),
 });
 
 type UtenteFormData = z.infer<typeof utenteSchema>;
@@ -59,7 +57,7 @@ export default function NewUtentePage() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = await response.json() as { error?: string };
         throw new Error(errorData.error || "Errore durante la creazione");
       }
 
@@ -105,7 +103,7 @@ export default function NewUtentePage() {
               <input
                 type="email"
                 {...register("email")}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
                 placeholder="utente@example.com"
               />
               {errors.email && (
@@ -119,7 +117,7 @@ export default function NewUtentePage() {
               <input
                 type="password"
                 {...register("password")}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
                 placeholder="Almeno 8 caratteri"
               />
               {errors.password && (
@@ -140,7 +138,7 @@ export default function NewUtentePage() {
               <input
                 type="text"
                 {...register("nome")}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
                 placeholder="Inserisci nome"
               />
               {errors.nome && (
@@ -154,7 +152,7 @@ export default function NewUtentePage() {
               <input
                 type="text"
                 {...register("cognome")}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
                 placeholder="Inserisci cognome"
               />
               {errors.cognome && (
@@ -174,7 +172,7 @@ export default function NewUtentePage() {
               </label>
               <select
                 {...register("role")}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
               >
                 <option value="user">Utente</option>
                 <option value="tecnico">Tecnico</option>
@@ -188,7 +186,7 @@ export default function NewUtentePage() {
               <input
                 type="checkbox"
                 {...register("active")}
-                className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                className="w-4 h-4 text-primary-500 border-gray-300 rounded focus:ring-primary-500"
                 id="active"
               />
               <label htmlFor="active" className="ml-2 block text-sm text-gray-700">
@@ -211,7 +209,7 @@ export default function NewUtentePage() {
           <button
             type="submit"
             disabled={loading}
-            className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 inline-flex items-center"
+            className="px-6 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 disabled:opacity-50 inline-flex items-center"
           >
             {loading ? (
               <>

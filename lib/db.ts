@@ -2,8 +2,6 @@
  * Database utilities and helpers for Cloudflare D1
  */
 
-import { Env } from "./env";
-
 /**
  * Database client wrapper for D1
  */
@@ -51,7 +49,7 @@ export class DatabaseClient {
 /**
  * Create a database client from environment
  */
-export function createDatabaseClient(env: Env): DatabaseClient {
+export function createDatabaseClient(env: CloudflareEnv): DatabaseClient {
   return new DatabaseClient(env.DB);
 }
 

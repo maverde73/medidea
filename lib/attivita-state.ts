@@ -150,7 +150,7 @@ export function getAllowedTransitions(
  * @returns True if user has permission
  */
 export function canUserTransitionState(
-  userRole: "admin" | "tecnico",
+  userRole: "admin" | "tecnico" | "user",
   currentState: StatoAttivitaType,
   newState: StatoAttivitaType
 ): boolean {
@@ -160,9 +160,13 @@ export function canUserTransitionState(
   }
 
   // Tecnico can open and reopen, but only admin can close
-  if (newState === "CHIUSO") {
-    return false; // Only admin can close
+  if (userRole === "tecnico") {
+    if (newState === "CHIUSO") {
+      return false; // Only admin can close
+    }
+    return true; // Tecnico can do other transitions
   }
 
-  return true; // Tecnico can do other transitions
+  // Regular users cannot transition states
+  return false;
 }

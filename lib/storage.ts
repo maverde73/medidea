@@ -2,8 +2,6 @@
  * Storage utilities and helpers for Cloudflare R2
  */
 
-import { Env } from "./env";
-
 /**
  * Storage client wrapper for R2
  */
@@ -117,7 +115,7 @@ export class StorageClient {
 /**
  * Create a storage client from environment
  */
-export function createStorageClient(env: Env): StorageClient {
+export function createStorageClient(env: CloudflareEnv): StorageClient {
   return new StorageClient(env.STORAGE);
 }
 

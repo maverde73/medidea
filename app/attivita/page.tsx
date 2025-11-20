@@ -99,7 +99,7 @@ export default function AttivitaPage() {
         </div>
         <button
           onClick={() => router.push("/attivita/new")}
-          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium"
+          className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors font-medium"
         >
           <Plus size={20} />
           Nuova Attività
@@ -115,7 +115,7 @@ export default function AttivitaPage() {
         <div className="flex flex-col gap-3">
           <div className="flex flex-col sm:flex-row gap-3">
             <select
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
               value={filter.stato}
               onChange={(e) => setFilter({ ...filter, stato: e.target.value })}
             >
@@ -130,7 +130,7 @@ export default function AttivitaPage() {
               <input
                 type="text"
                 placeholder="Cerca per modello..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                 value={filter.modello}
                 onChange={(e) => setFilter({ ...filter, modello: e.target.value })}
               />
@@ -138,7 +138,7 @@ export default function AttivitaPage() {
 
             <button
               onClick={fetchAttivita}
-              className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium"
+              className="px-6 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors font-medium"
             >
               Applica Filtri
             </button>
@@ -150,7 +150,7 @@ export default function AttivitaPage() {
               <span className="text-sm font-medium text-gray-700">Ordina per:</span>
             </div>
             <select
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm"
               value={sortField}
               onChange={(e) => setSortField(e.target.value as SortField)}
             >

@@ -105,7 +105,7 @@ export const POST = withAuth(async (request, { user }) => {
 
     const apparecchiatura = await db.queryFirst(
       "SELECT * FROM apparecchiature WHERE id = ?",
-      [result.lastInsertRowid]
+      [result.meta.last_row_id]
     );
 
     return NextResponse.json(

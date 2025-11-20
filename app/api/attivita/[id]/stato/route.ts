@@ -78,7 +78,7 @@ export const PUT = withAuth<{ params: Promise<{ id: string }> }>(
 
       // Update the state
       const updateFields = ["stato = ?"];
-      const updateValues = [transitionData.nuovo_stato];
+      const updateValues: any[] = [transitionData.nuovo_stato];
 
       if (transitionData.data_chiusura) {
         updateFields.push("data_chiusura = ?");

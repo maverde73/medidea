@@ -97,7 +97,7 @@ export default function ApparecchiaturaDetailPage() {
         <ErrorAlert message={error || "Apparecchiatura non trovata"} />
         <button
           onClick={() => router.back()}
-          className="text-indigo-600 hover:text-indigo-800"
+          className="text-primary-500 hover:text-primary-600"
         >
           ← Torna indietro
         </button>

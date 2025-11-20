@@ -40,7 +40,7 @@ export function NavLink({
       {Icon && <Icon size={20} className="shrink-0" />}
       {!collapsed && <span className="flex-1 truncate">{children}</span>}
       {!collapsed && badge && (
-        <span className="px-2 py-0.5 text-xs rounded-full bg-indigo-600 text-white">
+        <span className="px-2 py-0.5 text-xs rounded-full bg-primary-500 text-white">
           {badge}
         </span>
       )}

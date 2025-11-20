@@ -25,11 +25,12 @@ interface Attivita {
 
 interface FileInfo {
   id: number;
-  filename: string;
+  nome_file_originale: string;
   chiave_r2: string;
   dimensione: number;
-  tipo_riferimento: string;
-  created_at: string;
+  data_caricamento: string;
+  tipo_riferimento?: string;
+  id_riferimento?: number;
 }
 
 export default function AttivitaDetailPage() {
@@ -169,7 +170,7 @@ export default function AttivitaDetailPage() {
         <ErrorAlert message={error || "Attività non trovata"} />
         <button
           onClick={() => router.back()}
-          className="text-indigo-600 hover:text-indigo-800"
+          className="text-primary-500 hover:text-primary-600"
         >
           ← Torna indietro
         </button>
@@ -190,7 +191,7 @@ export default function AttivitaDetailPage() {
               Creata il {formatDate(attivita.created_at)}
             </p>
           </div>
-          <AttivitaStatusBadge stato={attivita.stato} />
+          <AttivitaStatusBadge status={attivita.stato} />
         </div>
       </div>
 

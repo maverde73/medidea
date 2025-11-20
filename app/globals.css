@@ -44,12 +44,12 @@ body {
   }
 
   .sidebar-scroll::-webkit-scrollbar-thumb {
-    background: #334155;
+    background: #1A5252;
     border-radius: 3px;
   }
 
   .sidebar-scroll::-webkit-scrollbar-thumb:hover {
-    background: #475569;
+    background: #5FB8AC;
   }
 
   /* Backdrop Animation */
@@ -74,6 +74,6 @@ body {
 
 /* Smooth focus outlines */
 *:focus-visible {
-  outline: 2px solid #6366F1;
+  outline: 2px solid #5FB8AC;
   outline-offset: 2px;
 }

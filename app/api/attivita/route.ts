@@ -181,7 +181,7 @@ export const POST = withAuth(async (request, { user }) => {
     // Fetch the created attività
     const attivita = await db.queryFirst(
       "SELECT * FROM attivita WHERE id = ?",
-      [result.lastInsertRowid]
+      [result.meta.last_row_id]
     );
 
     return NextResponse.json(

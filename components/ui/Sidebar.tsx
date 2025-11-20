@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { Home, Activity, Monitor, Users, UserCircle, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { MenuItem } from './MenuItem';
@@ -40,9 +41,13 @@ export function Sidebar({ className, isMobileOpen = false, onMobileClose }: Side
       <div className="h-16 flex items-center justify-between px-4 border-b border-sidebar-hover">
         {!isCollapsed && (
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold text-sm">
-              M
-            </div>
+            <Image
+              src="/images/medidea-logo.png"
+              alt="Medidea Logo"
+              width={32}
+              height={32}
+              className="rounded-lg"
+            />
             <span className="text-white font-semibold text-lg">Medidea</span>
           </div>
         )}

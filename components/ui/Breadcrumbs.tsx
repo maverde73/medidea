@@ -69,7 +69,7 @@ export function Breadcrumbs({ items }: BreadcrumbsProps) {
               <Link
                 href={item.href}
                 className={cn(
-                  'hover:text-indigo-600 transition-colors flex items-center gap-1',
+                  'hover:text-primary-500 transition-colors flex items-center gap-1',
                   isHome ? 'text-gray-600' : 'text-gray-500'
                 )}
               >

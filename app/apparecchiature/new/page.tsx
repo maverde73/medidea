@@ -8,7 +8,7 @@ import { z } from "zod";
 import { ClientSelector, LoadingSpinner, ErrorAlert } from "@/components/ui";
 
 const apparecchiaturaSchema = z.object({
-  id_cliente: z.number({ required_error: "Cliente obbligatorio" }).positive("Cliente obbligatorio"),
+  id_cliente: z.number().positive("Cliente obbligatorio"),
   modello: z.string().min(1, "Modello obbligatorio"),
   seriale: z.string().optional(),
   data_test_funzionali: z.string().optional(),
@@ -60,7 +60,7 @@ export default function NewApparecchiaturaPage() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = await response.json() as { error?: string };
         throw new Error(errorData.error || "Errore durante la creazione");
       }
 
@@ -123,7 +123,7 @@ export default function NewApparecchiaturaPage() {
                 <input
                   type="text"
                   {...register("modello")}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
                   placeholder="Inserisci modello"
                 />
                 {errors.modello && (
@@ -135,7 +135,7 @@ export default function NewApparecchiaturaPage() {
                 <input
                   type="text"
                   {...register("seriale")}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
                   placeholder="Inserisci numero seriale"
                 />
               </div>
@@ -153,7 +153,7 @@ export default function NewApparecchiaturaPage() {
                 <input
                   type="date"
                   {...register("data_test_funzionali")}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
                 />
               </div>
               <div>
@@ -163,7 +163,7 @@ export default function NewApparecchiaturaPage() {
                 <input
                   type="date"
                   {...register("data_test_elettrici")}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
                 />
               </div>
             </div>
@@ -175,7 +175,7 @@ export default function NewApparecchiaturaPage() {
             <textarea
               {...register("note")}
               rows={4}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
               placeholder="Inserisci eventuali note..."
             />
           </div>
@@ -193,7 +193,7 @@ export default function NewApparecchiaturaPage() {
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 inline-flex items-center"
+              className="px-6 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 disabled:opacity-50 inline-flex items-center"
             >
               {loading ? (
                 <>

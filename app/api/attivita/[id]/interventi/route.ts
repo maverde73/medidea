@@ -124,7 +124,7 @@ export const POST = withAuth<{ params: Promise<{ id: string }> }>(
       // Fetch the created intervento
       const intervento = await db.queryFirst(
         "SELECT * FROM interventi_attivita WHERE id = ?",
-        [result.lastInsertRowid]
+        [result.meta.last_row_id]
       );
 
       return NextResponse.json(
