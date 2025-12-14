@@ -169,6 +169,37 @@ export const POST = withAuth(async (request, { user }) => {
       );
     }
 
+    // Auto-create equipment if model is provided and it doesn't exist
+    if (validatedData.modello) {
+      // Check if equipment exists for this client with same model and serial (if provided)
+      let equipmentQuery = "SELECT id FROM apparecchiature WHERE id_cliente = ? AND modello = ?";
+      const equipmentParams: any[] = [validatedData.id_cliente, validatedData.modello];
+
+      if (validatedData.seriale) {
+        equipmentQuery += " AND seriale = ?";
+        equipmentParams.push(validatedData.seriale);
+      } else {
+        // If no serial provided, check for equipment with null serial
+        equipmentQuery += " AND seriale IS NULL";
+      }
+
+      const existingEquipment = await db.queryFirst(equipmentQuery, equipmentParams);
+
+      if (!existingEquipment) {
+        // Create new equipment
+        await db.execute(
+          `INSERT INTO apparecchiature (
+            id_cliente, modello, seriale, created_at, updated_at
+          ) VALUES (?, ?, ?, datetime('now'), datetime('now'))`,
+          [
+            validatedData.id_cliente,
+            validatedData.modello,
+            validatedData.seriale || null,
+          ]
+        );
+      }
+    }
+
     // Insert new attività
     const result = await db.execute(
       `INSERT INTO attivita (
