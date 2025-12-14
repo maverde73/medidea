@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { Trash2, Pencil } from "lucide-react";
-import { LoadingSpinner, ErrorAlert, AttivitaStatusBadge, FileList } from "@/components/ui";
+import { LoadingSpinner, ErrorAlert, AttivitaStatusBadge, FileList, FileUploader } from "@/components/ui";
 
 interface Attivita {
   id: number;
@@ -267,255 +267,276 @@ export default function AttivitaDetailPage() {
 
       {error && <ErrorAlert message={error} onDismiss={() => setError("")} />}
 
-        {/* Cliente */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Dati Cliente</h2>
-          <p className="text-gray-700">Cliente ID: {attivita.id_cliente}</p>
-        </div>
+      {/* Cliente */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-semibold mb-4">Dati Cliente</h2>
+        <p className="text-gray-700">Cliente ID: {attivita.id_cliente}</p>
+      </div>
 
-        {/* Apparecchiatura */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Dati Apparecchiatura</h2>
-          {editing ? (
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Modello</label>
-                <input
-                  type="text"
-                  value={editForm.modello}
-                  onChange={(e) => setEditForm({ ...editForm, modello: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Seriale</label>
-                <input
-                  type="text"
-                  value={editForm.seriale}
-                  onChange={(e) => setEditForm({ ...editForm, seriale: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Codice Inventario Cliente</label>
-                <input
-                  type="text"
-                  value={editForm.codice_inventario_cliente}
-                  onChange={(e) => setEditForm({ ...editForm, codice_inventario_cliente: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
-                />
-              </div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-gray-600">Modello</p>
-                <p className="text-gray-900 font-medium">{attivita.modello || "N/D"}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Seriale</p>
-                <p className="text-gray-900 font-medium">{attivita.seriale || "N/D"}</p>
-              </div>
-              <div className="col-span-2">
-                <p className="text-sm text-gray-600">Codice Inventario Cliente</p>
-                <p className="text-gray-900 font-medium">{attivita.codice_inventario_cliente || "N/D"}</p>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Stato */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Stato Attività</h2>
-          {editing ? (
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Stato</label>
-                <select
-                  value={editForm.stato}
-                  onChange={(e) => setEditForm({ ...editForm, stato: e.target.value as "APERTO" | "CHIUSO" | "RIAPERTO" })}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
-                >
-                  <option value="APERTO">Aperto</option>
-                  <option value="CHIUSO">Chiuso</option>
-                  <option value="RIAPERTO">Riaperto</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Data Chiusura</label>
-                <input
-                  type="date"
-                  value={editForm.data_chiusura}
-                  onChange={(e) => setEditForm({ ...editForm, data_chiusura: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
-                />
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <p className="text-sm text-gray-600">Stato:</p>
-                <AttivitaStatusBadge status={attivita.stato} />
-              </div>
-              {attivita.data_chiusura && (
-                <div>
-                  <p className="text-sm text-gray-600">Data Chiusura</p>
-                  <p className="text-gray-900 font-medium">{formatDate(attivita.data_chiusura)}</p>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* Apertura Richiesta */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Apertura Richiesta</h2>
-          {editing ? (
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Data Apertura</label>
-                <input
-                  type="date"
-                  value={editForm.data_apertura_richiesta}
-                  onChange={(e) => setEditForm({ ...editForm, data_apertura_richiesta: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Modalità</label>
-                <input
-                  type="text"
-                  value={editForm.modalita_apertura_richiesta}
-                  onChange={(e) => setEditForm({ ...editForm, modalita_apertura_richiesta: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
-                />
-              </div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-gray-600">Data Apertura</p>
-                <p className="text-gray-900 font-medium">{formatDate(attivita.data_apertura_richiesta)}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Modalità</p>
-                <p className="text-gray-900 font-medium">{attivita.modalita_apertura_richiesta || "N/D"}</p>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Preventivo */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Preventivo</h2>
-          {editing ? (
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Numero Preventivo</label>
-                <input
-                  type="text"
-                  value={editForm.numero_preventivo}
-                  onChange={(e) => setEditForm({ ...editForm, numero_preventivo: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Data Preventivo</label>
-                <input
-                  type="date"
-                  value={editForm.data_preventivo}
-                  onChange={(e) => setEditForm({ ...editForm, data_preventivo: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
-                />
-              </div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-gray-600">Numero</p>
-                <p className="text-gray-900 font-medium">{attivita.numero_preventivo || "N/D"}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Data</p>
-                <p className="text-gray-900 font-medium">{formatDate(attivita.data_preventivo)}</p>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Accettazione */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Accettazione Preventivo</h2>
-          {editing ? (
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Numero Accettazione</label>
-                <input
-                  type="text"
-                  value={editForm.numero_accettazione_preventivo}
-                  onChange={(e) => setEditForm({ ...editForm, numero_accettazione_preventivo: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Data Accettazione</label>
-                <input
-                  type="date"
-                  value={editForm.data_accettazione_preventivo}
-                  onChange={(e) => setEditForm({ ...editForm, data_accettazione_preventivo: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
-                />
-              </div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-gray-600">Numero</p>
-                <p className="text-gray-900 font-medium">{attivita.numero_accettazione_preventivo || "N/D"}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Data</p>
-                <p className="text-gray-900 font-medium">{formatDate(attivita.data_accettazione_preventivo)}</p>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Note */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Note Generali</h2>
-          {editing ? (
+      {/* Apparecchiatura */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-semibold mb-4">Dati Apparecchiatura</h2>
+        {editing ? (
+          <div className="space-y-4">
             <div>
-              <textarea
-                value={editForm.note_generali}
-                onChange={(e) => setEditForm({ ...editForm, note_generali: e.target.value })}
-                rows={5}
+              <label className="block text-sm font-medium text-gray-700 mb-1">Modello</label>
+              <input
+                type="text"
+                value={editForm.modello}
+                onChange={(e) => setEditForm({ ...editForm, modello: e.target.value })}
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
-                placeholder="Inserisci note generali..."
               />
             </div>
-          ) : (
-            attivita.note_generali ? (
-              <p className="text-gray-700 whitespace-pre-wrap">{attivita.note_generali}</p>
-            ) : (
-              <p className="text-gray-500">Nessuna nota</p>
-            )
-          )}
-        </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Seriale</label>
+              <input
+                type="text"
+                value={editForm.seriale}
+                onChange={(e) => setEditForm({ ...editForm, seriale: e.target.value })}
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Codice Inventario Cliente</label>
+              <input
+                type="text"
+                value={editForm.codice_inventario_cliente}
+                onChange={(e) => setEditForm({ ...editForm, codice_inventario_cliente: e.target.value })}
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
+              />
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm text-gray-600">Modello</p>
+              <p className="text-gray-900 font-medium">{attivita.modello || "N/D"}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">Seriale</p>
+              <p className="text-gray-900 font-medium">{attivita.seriale || "N/D"}</p>
+            </div>
+            <div className="col-span-2">
+              <p className="text-sm text-gray-600">Codice Inventario Cliente</p>
+              <p className="text-gray-900 font-medium">{attivita.codice_inventario_cliente || "N/D"}</p>
+            </div>
+          </div>
+        )}
+      </div>
 
-        {/* File Allegati */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">File Allegati</h2>
-          {files.length > 0 ? (
-            <FileList
-              files={files}
-              onDownload={handleDownload}
-              onDelete={handleFileDelete}
+      {/* Stato */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-semibold mb-4">Stato Attività</h2>
+        {editing ? (
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Stato</label>
+              <select
+                value={editForm.stato}
+                onChange={(e) => setEditForm({ ...editForm, stato: e.target.value as "APERTO" | "CHIUSO" | "RIAPERTO" })}
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
+              >
+                <option value="APERTO">Aperto</option>
+                <option value="CHIUSO">Chiuso</option>
+                <option value="RIAPERTO">Riaperto</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Data Chiusura</label>
+              <input
+                type="date"
+                value={editForm.data_chiusura}
+                onChange={(e) => setEditForm({ ...editForm, data_chiusura: e.target.value })}
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
+              />
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            <div className="flex items-center gap-2">
+              <p className="text-sm text-gray-600">Stato:</p>
+              <AttivitaStatusBadge status={attivita.stato} />
+            </div>
+            {attivita.data_chiusura && (
+              <div>
+                <p className="text-sm text-gray-600">Data Chiusura</p>
+                <p className="text-gray-900 font-medium">{formatDate(attivita.data_chiusura)}</p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Apertura Richiesta */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-semibold mb-4">Apertura Richiesta</h2>
+        {editing ? (
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Data Apertura</label>
+              <input
+                type="date"
+                value={editForm.data_apertura_richiesta}
+                onChange={(e) => setEditForm({ ...editForm, data_apertura_richiesta: e.target.value })}
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Modalità</label>
+              <input
+                type="text"
+                value={editForm.modalita_apertura_richiesta}
+                onChange={(e) => setEditForm({ ...editForm, modalita_apertura_richiesta: e.target.value })}
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
+              />
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm text-gray-600">Data Apertura</p>
+              <p className="text-gray-900 font-medium">{formatDate(attivita.data_apertura_richiesta)}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">Modalità</p>
+              <p className="text-gray-900 font-medium">{attivita.modalita_apertura_richiesta || "N/D"}</p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Preventivo */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-semibold mb-4">Preventivo</h2>
+        {editing ? (
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Numero Preventivo</label>
+              <input
+                type="text"
+                value={editForm.numero_preventivo}
+                onChange={(e) => setEditForm({ ...editForm, numero_preventivo: e.target.value })}
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Data Preventivo</label>
+              <input
+                type="date"
+                value={editForm.data_preventivo}
+                onChange={(e) => setEditForm({ ...editForm, data_preventivo: e.target.value })}
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
+              />
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm text-gray-600">Numero</p>
+              <p className="text-gray-900 font-medium">{attivita.numero_preventivo || "N/D"}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">Data</p>
+              <p className="text-gray-900 font-medium">{formatDate(attivita.data_preventivo)}</p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Accettazione */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-semibold mb-4">Accettazione Preventivo</h2>
+        {editing ? (
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Numero Accettazione</label>
+              <input
+                type="text"
+                value={editForm.numero_accettazione_preventivo}
+                onChange={(e) => setEditForm({ ...editForm, numero_accettazione_preventivo: e.target.value })}
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Data Accettazione</label>
+              <input
+                type="date"
+                value={editForm.data_accettazione_preventivo}
+                onChange={(e) => setEditForm({ ...editForm, data_accettazione_preventivo: e.target.value })}
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
+              />
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm text-gray-600">Numero</p>
+              <p className="text-gray-900 font-medium">{attivita.numero_accettazione_preventivo || "N/D"}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">Data</p>
+              <p className="text-gray-900 font-medium">{formatDate(attivita.data_accettazione_preventivo)}</p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Note */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-semibold mb-4">Note Generali</h2>
+        {editing ? (
+          <div>
+            <textarea
+              value={editForm.note_generali}
+              onChange={(e) => setEditForm({ ...editForm, note_generali: e.target.value })}
+              rows={5}
+              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
+              placeholder="Inserisci note generali..."
             />
+          </div>
+        ) : (
+          attivita.note_generali ? (
+            <p className="text-gray-700 whitespace-pre-wrap">{attivita.note_generali}</p>
           ) : (
-            <p className="text-gray-500">Nessun file allegato</p>
-          )}
+            <p className="text-gray-500">Nessuna nota</p>
+          )
+        )}
+      </div>
+
+      {/* File Allegati */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-semibold mb-4">File Allegati</h2>
+        {files.length > 0 ? (
+          <FileList
+            files={files}
+            onDownload={handleDownload}
+            onDelete={handleFileDelete}
+          />
+        ) : (
+          <p className="text-gray-500 mb-4">Nessun file allegato</p>
+        )}
+
+        <div className="mt-4 pt-4 border-t">
+          <h3 className="text-sm font-medium text-gray-700 mb-2">Carica nuovo file</h3>
+          <FileUploader
+            accept={{ "application/pdf": [".pdf"] }}
+            maxSize={10 * 1024 * 1024}
+            onUploadComplete={(file) => {
+              setFiles([...files, {
+                id: file.id,
+                nome_file_originale: file.nome_file_originale,
+                chiave_r2: file.chiave_r2,
+                dimensione: file.dimensione,
+                data_caricamento: new Date().toISOString(),
+              }]);
+            }}
+            uploadContext={{
+              tipo_riferimento: "attivita",
+              id_riferimento: parseInt(id),
+            }}
+          />
         </div>
+      </div>
 
       {/* Actions */}
       <div className="flex justify-end space-x-4">

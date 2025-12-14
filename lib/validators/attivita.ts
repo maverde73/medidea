@@ -25,28 +25,14 @@ export const CreateAttivitaSchema = z.object({
   seriale: z.string().optional(),
   codice_inventario_cliente: z.string().optional(),
   modalita_apertura_richiesta: z.string().optional(),
-  data_apertura_richiesta: z
-    .string()
-    .datetime({ message: "Data apertura deve essere in formato ISO 8601" })
-    .optional(),
+  data_apertura_richiesta: z.string().optional(),
   descrizione_richiesta: z.string().optional(),
   numero_preventivo: z.string().optional(),
-  data_preventivo: z
-    .string()
-    .datetime({ message: "Data preventivo deve essere in formato ISO 8601" })
-    .optional(),
+  data_preventivo: z.string().optional(),
   numero_accettazione_preventivo: z.string().optional(),
-  data_accettazione_preventivo: z
-    .string()
-    .datetime({
-      message: "Data accettazione preventivo deve essere in formato ISO 8601",
-    })
-    .optional(),
+  data_accettazione_preventivo: z.string().optional(),
   note_generali: z.string().optional(),
-  data_presa_in_carico: z
-    .string()
-    .datetime({ message: "Data presa in carico deve essere in formato ISO 8601" })
-    .optional(),
+  data_presa_in_carico: z.string().optional(),
   reparto: z.string().optional(),
   tecnico: z.string().optional(),
   urgenza: UrgenzaAttivita.optional(),

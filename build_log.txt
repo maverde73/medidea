@@ -4,8 +4,10 @@
      · serverActions
 
    Creating an optimized production build ...
- ✓ Compiled successfully in 3.8s
+ ✓ Compiled successfully in 3.7s
    Linting and checking validity of types ...
+
+Failed to compile.
 
 ./app/apparecchiature/[id]/page.tsx
 42:6  Warning: React Hook useEffect has a missing dependency: 'fetchApparecchiatura'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
@@ -15,6 +17,10 @@
 
 ./app/attivita/[id]/page.tsx
 68:6  Warning: React Hook useEffect has missing dependencies: 'fetchAttivita' and 'fetchFiles'. Either include them or remove the dependency array.  react-hooks/exhaustive-deps
+
+./app/attivita/new/page.tsx
+271:71  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+304:72  Error: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
 
 ./app/attivita/page.tsx
 42:6  Warning: React Hook useEffect has a missing dependency: 'fetchAttivita'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
@@ -41,16 +47,3 @@
 109:9  Warning: The attribute aria-expanded is not supported by the role textbox. This role is implicit on the element input.  jsx-a11y/role-supports-aria-props
 
 info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules
-Failed to compile.
-
-./app/registro/page.tsx:54:17
-Type error: 'data' is of type 'unknown'.
-
-[0m [90m 52 |[39m             [36mconst[39m data [33m=[39m [36mawait[39m res[33m.[39mjson()[33m;[39m
- [90m 53 |[39m
-[31m[1m>[22m[39m[90m 54 |[39m             [36mif[39m (data[33m.[39msuccess) {
- [90m    |[39m                 [31m[1m^[22m[39m
- [90m 55 |[39m                 [36mlet[39m filteredData [33m=[39m data[33m.[39mdata[33m;[39m
- [90m 56 |[39m                 [36mif[39m (filters[33m.[39mcliente) {
- [90m 57 |[39m                     filteredData [33m=[39m filteredData[33m.[39mfilter((a[33m:[39m [33mAttivita[39m) [33m=>[39m[0m
-Next.js build worker exited with code: 1 and signal: null
