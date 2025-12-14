@@ -2,7 +2,7 @@
 -- Created: 2025-11-19
 -- Description: Create users table with authentication and role management
 
-CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE IF NOT EXISTS utenti (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   email TEXT NOT NULL UNIQUE,
   password_hash TEXT NOT NULL,
@@ -16,6 +16,6 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 -- Index for faster email lookup during login
-CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
-CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);
-CREATE INDEX IF NOT EXISTS idx_users_active ON users(active);
+CREATE INDEX IF NOT EXISTS idx_utenti_email ON utenti(email);
+CREATE INDEX IF NOT EXISTS idx_utenti_role ON utenti(role);
+CREATE INDEX IF NOT EXISTS idx_utenti_active ON utenti(active);

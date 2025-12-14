@@ -65,6 +65,11 @@ export const GET = withAuth(async (request, { user }) => {
       whereParams.push(`%${filters.modello}%`);
     }
 
+    if (filters.descrizione_richiesta) {
+      whereClauses.push("descrizione_richiesta LIKE ?");
+      whereParams.push(`%${filters.descrizione_richiesta}%`);
+    }
+
     if (filters.seriale) {
       whereClauses.push("seriale LIKE ?");
       whereParams.push(`%${filters.seriale}%`);
@@ -168,12 +173,12 @@ export const POST = withAuth(async (request, { user }) => {
     const result = await db.execute(
       `INSERT INTO attivita (
         id_cliente, modello, seriale, codice_inventario_cliente,
-        modalita_apertura_richiesta, data_apertura_richiesta,
+        modalita_apertura_richiesta, data_apertura_richiesta, descrizione_richiesta,
         numero_preventivo, data_preventivo,
         numero_accettazione_preventivo, data_accettazione_preventivo,
         note_generali, data_presa_in_carico, reparto, tecnico, urgenza,
         stato, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'APERTO', datetime('now'), datetime('now'))`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'APERTO', datetime('now'), datetime('now'))`,
       [
         validatedData.id_cliente,
         validatedData.modello || null,
@@ -181,6 +186,7 @@ export const POST = withAuth(async (request, { user }) => {
         validatedData.codice_inventario_cliente || null,
         validatedData.modalita_apertura_richiesta || null,
         validatedData.data_apertura_richiesta || null,
+        validatedData.descrizione_richiesta || null,
         validatedData.numero_preventivo || null,
         validatedData.data_preventivo || null,
         validatedData.numero_accettazione_preventivo || null,

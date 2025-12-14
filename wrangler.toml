@@ -13,6 +13,7 @@ pages_build_output_dir = ".open-next/assets"
 binding = "DB"
 database_name = "medidea-db"
 database_id = "a1de6fa4-c485-4b6d-bb9a-8f9bf34c3482"
+migrations_dir = "db/migrations"
 
 # R2 Storage binding
 [[r2_buckets]]
@@ -42,6 +43,7 @@ name = "medidea"
 binding = "DB"
 database_name = "medidea-db"
 database_id = "a1de6fa4-c485-4b6d-bb9a-8f9bf34c3482"
+migrations_dir = "db/migrations"
 
 [[env.production.r2_buckets]]
 binding = "STORAGE"

@@ -29,6 +29,7 @@ export const CreateAttivitaSchema = z.object({
     .string()
     .datetime({ message: "Data apertura deve essere in formato ISO 8601" })
     .optional(),
+  descrizione_richiesta: z.string().optional(),
   numero_preventivo: z.string().optional(),
   data_preventivo: z
     .string()
@@ -62,6 +63,7 @@ export const UpdateAttivitaSchema = z.object({
   codice_inventario_cliente: z.string().optional(),
   modalita_apertura_richiesta: z.string().optional(),
   data_apertura_richiesta: z.string().datetime().optional(),
+  descrizione_richiesta: z.string().optional(),
   numero_preventivo: z.string().optional(),
   data_preventivo: z.string().datetime().optional(),
   numero_accettazione_preventivo: z.string().optional(),
@@ -134,6 +136,9 @@ export const AttivitaFiltersSchema = z.object({
   // Filtro per modello
   modello: z.string().optional(),
 
+  // Filtro per descrizione richiesta
+  descrizione_richiesta: z.string().optional(),
+
   // Filtro per seriale
   seriale: z.string().optional(),
 
@@ -194,6 +199,7 @@ export interface Attivita {
   codice_inventario_cliente: string | null;
   modalita_apertura_richiesta: string | null;
   data_apertura_richiesta: string | null;
+  descrizione_richiesta: string | null;
   numero_preventivo: string | null;
   data_preventivo: string | null;
   numero_accettazione_preventivo: string | null;
