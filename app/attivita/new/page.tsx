@@ -35,6 +35,12 @@ const attivitaSchema = z.object({
 
   // Note
   note_generali: z.string().optional(),
+
+  // Presa in carico
+  data_presa_in_carico: z.string().optional(),
+  reparto: z.string().optional(),
+  tecnico: z.string().optional(),
+  urgenza: z.enum(["BASSA", "MEDIA", "ALTA"]).optional(),
 });
 
 type AttivitaFormData = z.infer<typeof attivitaSchema>;
@@ -235,6 +241,61 @@ export default function NewAttivitaPage() {
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
                 placeholder="es. Email, Telefono, Visita"
               />
+            </div>
+          </div>
+        </div>
+
+        {/* Presa in Carico */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+            Presa in Carico
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Data Presa in Carico
+              </label>
+              <input
+                type="date"
+                {...register("data_presa_in_carico")}
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Reparto
+              </label>
+              <input
+                type="text"
+                {...register("reparto")}
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
+                placeholder="es. Laboratorio, Magazzino"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Tecnico
+              </label>
+              <input
+                type="text"
+                {...register("tecnico")}
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
+                placeholder="Nome del tecnico"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Urgenza
+              </label>
+              <select
+                {...register("urgenza")}
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
+              >
+                <option value="">Seleziona urgenza</option>
+                <option value="BASSA">Bassa</option>
+                <option value="MEDIA">Media</option>
+                <option value="ALTA">Alta</option>
+              </select>
             </div>
           </div>
         </div>

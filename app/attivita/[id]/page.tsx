@@ -20,6 +20,10 @@ interface Attivita {
   data_accettazione_preventivo: string | null;
   data_chiusura: string | null;
   note_generali: string | null;
+  data_presa_in_carico: string | null;
+  reparto: string | null;
+  tecnico: string | null;
+  urgenza: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -60,6 +64,10 @@ export default function AttivitaDetailPage() {
     data_accettazione_preventivo: "",
     data_chiusura: "",
     note_generali: "",
+    data_presa_in_carico: "",
+    reparto: "",
+    tecnico: "",
+    urgenza: "" as "" | "BASSA" | "MEDIA" | "ALTA",
   });
 
   useEffect(() => {
@@ -95,6 +103,10 @@ export default function AttivitaDetailPage() {
           data_accettazione_preventivo: data.data.data_accettazione_preventivo || "",
           data_chiusura: data.data.data_chiusura || "",
           note_generali: data.data.note_generali || "",
+          data_presa_in_carico: data.data.data_presa_in_carico || "",
+          reparto: data.data.reparto || "",
+          tecnico: data.data.tecnico || "",
+          urgenza: (data.data.urgenza || "") as "" | "BASSA" | "MEDIA" | "ALTA",
         });
       } else {
         setError("Attività non trovata");
@@ -400,6 +412,76 @@ export default function AttivitaDetailPage() {
             <div>
               <p className="text-sm text-gray-600">Modalità</p>
               <p className="text-gray-900 font-medium">{attivita.modalita_apertura_richiesta || "N/D"}</p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Presa in Carico */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-semibold mb-4">Presa in Carico</h2>
+        {editing ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Data Presa in Carico</label>
+              <input
+                type="date"
+                value={editForm.data_presa_in_carico}
+                onChange={(e) => setEditForm({ ...editForm, data_presa_in_carico: e.target.value })}
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Reparto</label>
+              <input
+                type="text"
+                value={editForm.reparto}
+                onChange={(e) => setEditForm({ ...editForm, reparto: e.target.value })}
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
+                placeholder="es. Laboratorio, Magazzino"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Tecnico</label>
+              <input
+                type="text"
+                value={editForm.tecnico}
+                onChange={(e) => setEditForm({ ...editForm, tecnico: e.target.value })}
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
+                placeholder="Nome del tecnico"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Urgenza</label>
+              <select
+                value={editForm.urgenza}
+                onChange={(e) => setEditForm({ ...editForm, urgenza: e.target.value as "" | "BASSA" | "MEDIA" | "ALTA" })}
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
+              >
+                <option value="">Seleziona urgenza</option>
+                <option value="BASSA">Bassa</option>
+                <option value="MEDIA">Media</option>
+                <option value="ALTA">Alta</option>
+              </select>
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm text-gray-600">Data Presa in Carico</p>
+              <p className="text-gray-900 font-medium">{formatDate(attivita.data_presa_in_carico)}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">Reparto</p>
+              <p className="text-gray-900 font-medium">{attivita.reparto || "N/D"}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">Tecnico</p>
+              <p className="text-gray-900 font-medium">{attivita.tecnico || "N/D"}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">Urgenza</p>
+              <p className="text-gray-900 font-medium">{attivita.urgenza || "N/D"}</p>
             </div>
           </div>
         )}

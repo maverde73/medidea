@@ -202,7 +202,11 @@ export default function RegistroAttivita() {
                                 </tr>
                             ) : (
                                 attivita.map((a) => (
-                                    <tr key={a.id} className="hover:bg-gray-50 transition-colors">
+                                    <tr
+                                        key={a.id}
+                                        className="hover:bg-gray-50 transition-colors cursor-pointer"
+                                        onClick={() => router.push(`/attivita/${a.id}`)}
+                                    >
                                         <td className="px-4 py-3 font-medium text-gray-900">#{a.id}</td>
                                         <td className="px-4 py-3 text-gray-900 font-medium">{a.nome_cliente}</td>
                                         <td className="px-4 py-3 text-gray-500 whitespace-nowrap">
