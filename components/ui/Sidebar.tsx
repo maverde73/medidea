@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { Home, Activity, Monitor, Users, UserCircle, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { Home, Activity, Monitor, Users, UserCircle, ChevronLeft, ChevronRight, X, Table } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { MenuItem } from './MenuItem';
 import { MenuGroup } from './MenuGroup';
@@ -88,6 +88,15 @@ export function Sidebar({ className, isMobileOpen = false, onMobileClose }: Side
           label="Attività"
           icon={Activity}
           href="/attivita"
+          collapsed={isCollapsed}
+        />
+
+        {/* Registro */}
+        <MenuItem
+          id="registro"
+          label="Registro"
+          icon={Table}
+          href="/registro"
           collapsed={isCollapsed}
         />
 

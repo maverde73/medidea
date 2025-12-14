@@ -48,7 +48,15 @@ export default function RegistroAttivita() {
             params.append("data_apertura_a", endDate.toISOString());
             params.append("limit", "1000");
 
-            const res = await fetch(`/api/attivita?${params.toString()}`);
+            const token = localStorage.getItem("token");
+            if (!token) {
+                router.push("/login");
+                return;
+            }
+
+            const res = await fetch(`/api/attivita?${params.toString()}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
             const data = (await res.json()) as { success: boolean; data: Attivita[] };
 
             if (data.success) {
