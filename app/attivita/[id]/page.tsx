@@ -51,6 +51,29 @@ export default function AttivitaDetailPage() {
   const [error, setError] = useState("");
   const [deleting, setDeleting] = useState(false);
   const [editing, setEditing] = useState(initialMode === "edit");
+  const [reparti, setReparti] = useState<{ id: number; nome: string }[]>([]);
+  const [modalita, setModalita] = useState<{ id: number; descrizione: string }[]>([]);
+
+  useEffect(() => {
+    const fetchLookups = async () => {
+      const token = localStorage.getItem("token");
+      try {
+        const [resReparti, resModalita] = await Promise.all([
+          fetch("/api/reparti", { headers: { Authorization: `Bearer ${token}` } }),
+          fetch("/api/modalita-apertura", { headers: { Authorization: `Bearer ${token}` } })
+        ]);
+
+        const dataReparti = (await resReparti.json()) as { success: boolean; data: { id: number; nome: string }[] };
+        const dataModalita = (await resModalita.json()) as { success: boolean; data: { id: number; descrizione: string }[] };
+
+        if (dataReparti.success) setReparti(dataReparti.data);
+        if (dataModalita.success) setModalita(dataModalita.data);
+      } catch (error) {
+        console.error("Error fetching lookups", error);
+      }
+    };
+    fetchLookups();
+  }, []);
   const [editForm, setEditForm] = useState({
     modello: "",
     seriale: "",
@@ -395,12 +418,18 @@ export default function AttivitaDetailPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Modalità</label>
-              <input
-                type="text"
+              <select
                 value={editForm.modalita_apertura_richiesta}
                 onChange={(e) => setEditForm({ ...editForm, modalita_apertura_richiesta: e.target.value })}
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
-              />
+              >
+                <option value="">Seleziona modalità</option>
+                {modalita.map((m) => (
+                  <option key={m.id} value={m.descrizione}>
+                    {m.descrizione}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
         ) : (
@@ -433,13 +462,18 @@ export default function AttivitaDetailPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Reparto</label>
-              <input
-                type="text"
+              <select
                 value={editForm.reparto}
                 onChange={(e) => setEditForm({ ...editForm, reparto: e.target.value })}
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
-                placeholder="es. Laboratorio, Magazzino"
-              />
+              >
+                <option value="">Seleziona reparto</option>
+                {reparti.map((r) => (
+                  <option key={r.id} value={r.nome}>
+                    {r.nome}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Tecnico</label>

@@ -126,6 +126,15 @@ export function Sidebar({ className, isMobileOpen = false, onMobileClose }: Side
           href="/utenti"
           collapsed={isCollapsed}
         />
+
+        {/* Impostazioni */}
+        <MenuItem
+          id="impostazioni"
+          label="Tabelle"
+          icon={Table}
+          href="/impostazioni/tabelle"
+          collapsed={isCollapsed}
+        />
       </nav>
 
       {/* Footer info (when not collapsed) */}

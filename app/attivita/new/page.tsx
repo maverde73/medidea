@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -50,6 +50,29 @@ export default function NewAttivitaPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [reparti, setReparti] = useState<{ id: number; nome: string }[]>([]);
+  const [modalita, setModalita] = useState<{ id: number; descrizione: string }[]>([]);
+
+  useEffect(() => {
+    const fetchLookups = async () => {
+      const token = localStorage.getItem("token");
+      try {
+        const [resReparti, resModalita] = await Promise.all([
+          fetch("/api/reparti", { headers: { Authorization: `Bearer ${token}` } }),
+          fetch("/api/modalita-apertura", { headers: { Authorization: `Bearer ${token}` } })
+        ]);
+
+        const dataReparti = (await resReparti.json()) as { success: boolean; data: { id: number; nome: string }[] };
+        const dataModalita = (await resModalita.json()) as { success: boolean; data: { id: number; descrizione: string }[] };
+
+        if (dataReparti.success) setReparti(dataReparti.data);
+        if (dataModalita.success) setModalita(dataModalita.data);
+      } catch (error) {
+        console.error("Error fetching lookups", error);
+      }
+    };
+    fetchLookups();
+  }, []);
 
 
   const {
@@ -235,12 +258,17 @@ export default function NewAttivitaPage() {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Modalità Apertura
               </label>
-              <input
-                type="text"
+              <select
                 {...register("modalita_apertura_richiesta")}
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
-                placeholder="es. Email, Telefono, Visita"
-              />
+              >
+                <option value="">Seleziona modalità</option>
+                {modalita.map((m) => (
+                  <option key={m.id} value={m.descrizione}>
+                    {m.descrizione}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
         </div>
@@ -265,12 +293,17 @@ export default function NewAttivitaPage() {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Reparto
               </label>
-              <input
-                type="text"
+              <select
                 {...register("reparto")}
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
-                placeholder="es. Laboratorio, Magazzino"
-              />
+              >
+                <option value="">Seleziona reparto</option>
+                {reparti.map((r) => (
+                  <option key={r.id} value={r.nome}>
+                    {r.nome}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
