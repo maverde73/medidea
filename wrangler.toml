@@ -19,10 +19,7 @@ database_id = "a1de6fa4-c485-4b6d-bb9a-8f9bf34c3482"
 binding = "STORAGE"
 bucket_name = "medidea-storage"
 
-# Static assets configuration
-[assets]
-directory = ".open-next/assets"
-binding = "ASSETS"
+
 
 # Preview settings (for PR previews and testing)
 [env.preview]
