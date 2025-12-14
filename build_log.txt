@@ -1,0 +1,56 @@
+   ▲ Next.js 15.5.2
+   - Environments: .env
+   - Experiments (use with caution):
+     · serverActions
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 3.8s
+   Linting and checking validity of types ...
+
+./app/apparecchiature/[id]/page.tsx
+42:6  Warning: React Hook useEffect has a missing dependency: 'fetchApparecchiatura'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./app/apparecchiature/page.tsx
+41:6  Warning: React Hook useEffect has a missing dependency: 'fetchApparecchiature'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./app/attivita/[id]/page.tsx
+68:6  Warning: React Hook useEffect has missing dependencies: 'fetchAttivita' and 'fetchFiles'. Either include them or remove the dependency array.  react-hooks/exhaustive-deps
+
+./app/attivita/page.tsx
+42:6  Warning: React Hook useEffect has a missing dependency: 'fetchAttivita'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./app/clienti/[id]/page.tsx
+37:6  Warning: React Hook useEffect has a missing dependency: 'fetchCliente'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./app/clienti/page.tsx
+39:6  Warning: React Hook useEffect has a missing dependency: 'fetchClienti'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./app/page.tsx
+42:6  Warning: React Hook useEffect has a missing dependency: 'fetchDashboardData'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./app/registro/page.tsx
+37:8  Warning: React Hook useEffect has a missing dependency: 'fetchAttivita'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./app/utenti/[id]/page.tsx
+42:6  Warning: React Hook useEffect has a missing dependency: 'fetchUtente'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./app/utenti/page.tsx
+41:6  Warning: React Hook useEffect has a missing dependency: 'fetchUtenti'. Either include it or remove the dependency array.  react-hooks/exhaustive-deps
+
+./components/ui/ClientSelector.tsx
+109:9  Warning: The attribute aria-expanded is not supported by the role textbox. This role is implicit on the element input.  jsx-a11y/role-supports-aria-props
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules
+Failed to compile.
+
+./app/registro/page.tsx:54:17
+Type error: 'data' is of type 'unknown'.
+
+[0m [90m 52 |[39m             [36mconst[39m data [33m=[39m [36mawait[39m res[33m.[39mjson()[33m;[39m
+ [90m 53 |[39m
+[31m[1m>[22m[39m[90m 54 |[39m             [36mif[39m (data[33m.[39msuccess) {
+ [90m    |[39m                 [31m[1m^[22m[39m
+ [90m 55 |[39m                 [36mlet[39m filteredData [33m=[39m data[33m.[39mdata[33m;[39m
+ [90m 56 |[39m                 [36mif[39m (filters[33m.[39mcliente) {
+ [90m 57 |[39m                     filteredData [33m=[39m filteredData[33m.[39mfilter((a[33m:[39m [33mAttivita[39m) [33m=>[39m[0m
+Next.js build worker exited with code: 1 and signal: null

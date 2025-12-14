@@ -76,7 +76,7 @@ export const GET = withAuth(async (request, { user }) => {
     }
 
     if (filters.tecnico) {
-      whereClauses.push("tecnico LIKE ?");
+      whereClauses.push("attivita.tecnico LIKE ?");
       whereParams.push(`%${filters.tecnico}%`);
     }
 
@@ -91,7 +91,9 @@ export const GET = withAuth(async (request, { user }) => {
 
     // Get total count
     const countResult = await db.queryFirst<{ count: number }>(
-      `SELECT COUNT(*) as count FROM attivita ${whereClause}`,
+      `SELECT COUNT(*) as count FROM attivita 
+       LEFT JOIN clienti ON attivita.id_cliente = clienti.id
+       ${whereClause}`,
       whereParams
     );
 
@@ -102,7 +104,10 @@ export const GET = withAuth(async (request, { user }) => {
     const orderClause = `ORDER BY ${filters.sort_by} ${filters.sort_order}`;
 
     const attivita = await db.query(
-      `SELECT * FROM attivita ${whereClause} ${orderClause} LIMIT ? OFFSET ?`,
+      `SELECT attivita.*, clienti.nome as nome_cliente 
+       FROM attivita 
+       LEFT JOIN clienti ON attivita.id_cliente = clienti.id
+       ${whereClause} ${orderClause} LIMIT ? OFFSET ?`,
       [...whereParams, filters.limit, offset]
     );
 
