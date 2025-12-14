@@ -15,6 +15,10 @@ export type { LoadingSpinnerProps } from "./LoadingSpinner";
 export { ErrorAlert } from "./ErrorAlert";
 export type { ErrorAlertProps, AlertType } from "./ErrorAlert";
 
+// Action Components
+export { ConfirmDialog } from "./ConfirmDialog";
+export { ListItemActions } from "./ListItemActions";
+
 // Form Components
 export { DateRangePicker } from "./DateRangePicker";
 export type { DateRangePickerProps, DateRange } from "./DateRangePicker";

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, UserCircle, Search, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { ConfirmDialog, ListItemActions } from "@/components/ui";
 
 interface Utente {
   id: number;
@@ -23,6 +24,16 @@ export default function UtentiPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortField, setSortField] = useState<SortField>('nome');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  const [deleteDialog, setDeleteDialog] = useState<{
+    isOpen: boolean;
+    utenteId: number | null;
+    utenteNome: string;
+  }>({
+    isOpen: false,
+    utenteId: null,
+    utenteNome: "",
+  });
+  const [deleting, setDeleting] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -49,6 +60,29 @@ export default function UtentiPage() {
       console.error("Error fetching utenti:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    setDeleting(true);
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`/api/utenti/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (response.ok) {
+        setUtenti(utenti.filter((u) => u.id !== id));
+        setDeleteDialog({ isOpen: false, utenteId: null, utenteNome: "" });
+      } else {
+        alert("Errore durante l'eliminazione");
+      }
+    } catch (error) {
+      console.error("Error deleting utente:", error);
+      alert("Errore durante l'eliminazione");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -200,6 +234,17 @@ export default function UtentiPage() {
                   <span className="font-medium">Email:</span> {utente.email}
                 </p>
               </div>
+              <ListItemActions
+                onView={() => router.push(`/utenti/${utente.id}`)}
+                onEdit={() => router.push(`/utenti/${utente.id}?mode=edit`)}
+                onDelete={() =>
+                  setDeleteDialog({
+                    isOpen: true,
+                    utenteId: utente.id,
+                    utenteNome: `${utente.nome} ${utente.cognome}`,
+                  })
+                }
+              />
             </div>
           </div>
         ))}
@@ -212,6 +257,16 @@ export default function UtentiPage() {
           </div>
         )}
       </div>
+
+      <ConfirmDialog
+        isOpen={deleteDialog.isOpen}
+        onClose={() => setDeleteDialog({ isOpen: false, utenteId: null, utenteNome: "" })}
+        onConfirm={() => deleteDialog.utenteId && handleDelete(deleteDialog.utenteId)}
+        title="Conferma Eliminazione"
+        message={`Sei sicuro di voler eliminare l'utente "${deleteDialog.utenteNome}"? Questa azione non può essere annullata.`}
+        confirmText="Elimina"
+        loading={deleting}
+      />
     </div>
   );
 }

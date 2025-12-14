@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Users, Search, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { ConfirmDialog, ListItemActions } from "@/components/ui";
 
 interface Cliente {
   id: number;
@@ -21,6 +22,16 @@ export default function ClientiPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortField, setSortField] = useState<SortField>('nome');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  const [deleteDialog, setDeleteDialog] = useState<{
+    isOpen: boolean;
+    clienteId: number | null;
+    clienteNome: string;
+  }>({
+    isOpen: false,
+    clienteId: null,
+    clienteNome: "",
+  });
+  const [deleting, setDeleting] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -47,6 +58,29 @@ export default function ClientiPage() {
       console.error("Error fetching clienti:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    setDeleting(true);
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`/api/clienti/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (response.ok) {
+        setClienti(clienti.filter((c) => c.id !== id));
+        setDeleteDialog({ isOpen: false, clienteId: null, clienteNome: "" });
+      } else {
+        alert("Errore durante l'eliminazione");
+      }
+    } catch (error) {
+      console.error("Error deleting cliente:", error);
+      alert("Errore durante l'eliminazione");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -184,6 +218,17 @@ export default function ClientiPage() {
                   </p>
                 )}
               </div>
+              <ListItemActions
+                onView={() => router.push(`/clienti/${cliente.id}`)}
+                onEdit={() => router.push(`/clienti/${cliente.id}?mode=edit`)}
+                onDelete={() =>
+                  setDeleteDialog({
+                    isOpen: true,
+                    clienteId: cliente.id,
+                    clienteNome: cliente.nome,
+                  })
+                }
+              />
             </div>
           </div>
         ))}
@@ -196,6 +241,16 @@ export default function ClientiPage() {
           </div>
         )}
       </div>
+
+      <ConfirmDialog
+        isOpen={deleteDialog.isOpen}
+        onClose={() => setDeleteDialog({ isOpen: false, clienteId: null, clienteNome: "" })}
+        onConfirm={() => deleteDialog.clienteId && handleDelete(deleteDialog.clienteId)}
+        title="Conferma Eliminazione"
+        message={`Sei sicuro di voler eliminare il cliente "${deleteDialog.clienteNome}"? Questa azione non può essere annullata.`}
+        confirmText="Elimina"
+        loading={deleting}
+      />
     </div>
   );
 }

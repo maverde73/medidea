@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { LoadingSpinner, ErrorAlert } from "@/components/ui";
 import { Pencil, Trash2, Shield, ShieldOff } from "lucide-react";
 
@@ -20,13 +20,15 @@ interface Utente {
 export default function UtenteDetailPage() {
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
   const id = params.id as string;
+  const initialMode = searchParams.get("mode");
 
   const [utente, setUtente] = useState<Utente | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [deleting, setDeleting] = useState(false);
-  const [editing, setEditing] = useState(false);
+  const [editing, setEditing] = useState(initialMode === "edit");
   const [editForm, setEditForm] = useState({
     nome: "",
     cognome: "",

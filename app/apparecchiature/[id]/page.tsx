@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { LoadingSpinner, ErrorAlert } from "@/components/ui";
+import { Pencil, Trash2 } from "lucide-react";
 
 interface Apparecchiatura {
   id: number;
@@ -19,12 +20,22 @@ interface Apparecchiatura {
 export default function ApparecchiaturaDetailPage() {
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
   const id = params.id as string;
+  const initialMode = searchParams.get("mode");
 
   const [apparecchiatura, setApparecchiatura] = useState<Apparecchiatura | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [deleting, setDeleting] = useState(false);
+  const [editing, setEditing] = useState(initialMode === "edit");
+  const [editForm, setEditForm] = useState({
+    modello: "",
+    seriale: "",
+    data_test_funzionali: "",
+    data_test_elettrici: "",
+    note: "",
+  });
 
   useEffect(() => {
     fetchApparecchiatura();
@@ -45,6 +56,13 @@ export default function ApparecchiaturaDetailPage() {
       if (response.ok) {
         const data = await response.json() as { data: Apparecchiatura };
         setApparecchiatura(data.data);
+        setEditForm({
+          modello: data.data.modello,
+          seriale: data.data.seriale || "",
+          data_test_funzionali: data.data.data_test_funzionali || "",
+          data_test_elettrici: data.data.data_test_elettrici || "",
+          note: data.data.note || "",
+        });
       } else {
         setError("Apparecchiatura non trovata");
       }
@@ -75,6 +93,40 @@ export default function ApparecchiaturaDetailPage() {
       setError("Errore durante l'eliminazione");
     } finally {
       setDeleting(false);
+    }
+  };
+
+  const handleUpdate = async () => {
+    if (!editForm.modello.trim()) {
+      setError("Il modello è obbligatorio");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`/api/apparecchiature/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(editForm),
+      });
+
+      if (response.ok) {
+        const data = await response.json() as { data: Apparecchiatura };
+        setApparecchiatura(data.data);
+        setEditing(false);
+        setError("");
+      } else {
+        const errorData = await response.json() as { error?: string };
+        setError(errorData.error || "Errore durante l'aggiornamento");
+      }
+    } catch (err) {
+      setError("Errore durante l'aggiornamento");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -109,71 +161,158 @@ export default function ApparecchiaturaDetailPage() {
     <div className="max-w-4xl space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">
-          Apparecchiatura #{apparecchiatura.id}
-        </h1>
-        <p className="text-gray-600 mt-1">
-          Creata il {formatDate(apparecchiatura.created_at)}
-        </p>
+        <div className="flex justify-between items-start">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Apparecchiatura #{apparecchiatura.id}
+            </h1>
+            <p className="text-gray-600 mt-1">
+              Creata il {formatDate(apparecchiatura.created_at)}
+            </p>
+          </div>
+          <button
+            onClick={() => setEditing(!editing)}
+            className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
+          >
+            <Pencil size={16} />
+            {editing ? "Annulla" : "Modifica"}
+          </button>
+        </div>
       </div>
 
+      {error && <ErrorAlert message={error} onDismiss={() => setError("")} />}
+
         {/* Cliente */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <div className="bg-white rounded-lg shadow p-6">
           <h2 className="text-xl font-semibold mb-4">Dati Cliente</h2>
           <p className="text-gray-700">Cliente ID: {apparecchiatura.id_cliente}</p>
         </div>
 
         {/* Dati Apparecchiatura */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <div className="bg-white rounded-lg shadow p-6">
           <h2 className="text-xl font-semibold mb-4">Dati Apparecchiatura</h2>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="text-sm text-gray-600">Modello</p>
-              <p className="text-gray-900 font-medium">{apparecchiatura.modello}</p>
+          {editing ? (
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Modello <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={editForm.modello}
+                  onChange={(e) => setEditForm({ ...editForm, modello: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Seriale</label>
+                <input
+                  type="text"
+                  value={editForm.seriale}
+                  onChange={(e) => setEditForm({ ...editForm, seriale: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
+                />
+              </div>
             </div>
-            <div>
-              <p className="text-sm text-gray-600">Seriale</p>
-              <p className="text-gray-900 font-medium">{apparecchiatura.seriale || "N/D"}</p>
+          ) : (
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-gray-600">Modello</p>
+                <p className="text-gray-900 font-medium">{apparecchiatura.modello}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Seriale</p>
+                <p className="text-gray-900 font-medium">{apparecchiatura.seriale || "N/D"}</p>
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Test e Verifiche */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <div className="bg-white rounded-lg shadow p-6">
           <h2 className="text-xl font-semibold mb-4">Test e Verifiche</h2>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="text-sm text-gray-600">Data Test Funzionali</p>
-              <p className="text-gray-900 font-medium">
-                {formatDate(apparecchiatura.data_test_funzionali)}
-              </p>
+          {editing ? (
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Data Test Funzionali</label>
+                <input
+                  type="date"
+                  value={editForm.data_test_funzionali}
+                  onChange={(e) => setEditForm({ ...editForm, data_test_funzionali: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Data Test Elettrici</label>
+                <input
+                  type="date"
+                  value={editForm.data_test_elettrici}
+                  onChange={(e) => setEditForm({ ...editForm, data_test_elettrici: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
+                />
+              </div>
             </div>
-            <div>
-              <p className="text-sm text-gray-600">Data Test Elettrici</p>
-              <p className="text-gray-900 font-medium">
-                {formatDate(apparecchiatura.data_test_elettrici)}
-              </p>
+          ) : (
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm text-gray-600">Data Test Funzionali</p>
+                <p className="text-gray-900 font-medium">
+                  {formatDate(apparecchiatura.data_test_funzionali)}
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Data Test Elettrici</p>
+                <p className="text-gray-900 font-medium">
+                  {formatDate(apparecchiatura.data_test_elettrici)}
+                </p>
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Note */}
-        {apparecchiatura.note && (
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
-            <h2 className="text-xl font-semibold mb-4">Note</h2>
-            <p className="text-gray-700 whitespace-pre-wrap">{apparecchiatura.note}</p>
-          </div>
-        )}
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-xl font-semibold mb-4">Note</h2>
+          {editing ? (
+            <div>
+              <textarea
+                value={editForm.note}
+                onChange={(e) => setEditForm({ ...editForm, note: e.target.value })}
+                rows={5}
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
+                placeholder="Inserisci note..."
+              />
+            </div>
+          ) : (
+            apparecchiatura.note ? (
+              <p className="text-gray-700 whitespace-pre-wrap">{apparecchiatura.note}</p>
+            ) : (
+              <p className="text-gray-500">Nessuna nota</p>
+            )
+          )}
+        </div>
 
         {/* Actions */}
         <div className="flex justify-end space-x-4">
-          <button
-            onClick={handleDelete}
-            disabled={deleting}
-            className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
-          >
-            {deleting ? "Eliminazione..." : "Elimina Apparecchiatura"}
-          </button>
+          {editing && (
+            <button
+              onClick={handleUpdate}
+              disabled={loading}
+              className="flex items-center gap-2 px-6 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 disabled:opacity-50 transition-colors"
+            >
+              {loading ? "Salvataggio..." : "Salva Modifiche"}
+            </button>
+          )}
+          {!editing && (
+            <button
+              onClick={handleDelete}
+              disabled={deleting}
+              className="flex items-center gap-2 px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors"
+            >
+              <Trash2 size={16} />
+              {deleting ? "Eliminazione..." : "Elimina Apparecchiatura"}
+            </button>
+          )}
         </div>
     </div>
   );

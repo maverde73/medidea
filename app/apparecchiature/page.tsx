@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Monitor, Search, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { ConfirmDialog, ListItemActions } from "@/components/ui";
 
 interface Apparecchiatura {
   id: number;
@@ -23,6 +24,16 @@ export default function ApparecchiaturePage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortField, setSortField] = useState<SortField>('modello');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  const [deleteDialog, setDeleteDialog] = useState<{
+    isOpen: boolean;
+    apparecchiaturaId: number | null;
+    apparecchiaturaModello: string;
+  }>({
+    isOpen: false,
+    apparecchiaturaId: null,
+    apparecchiaturaModello: "",
+  });
+  const [deleting, setDeleting] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -49,6 +60,29 @@ export default function ApparecchiaturePage() {
       console.error("Error fetching apparecchiature:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    setDeleting(true);
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`/api/apparecchiature/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (response.ok) {
+        setApparecchiature(apparecchiature.filter((a) => a.id !== id));
+        setDeleteDialog({ isOpen: false, apparecchiaturaId: null, apparecchiaturaModello: "" });
+      } else {
+        alert("Errore durante l'eliminazione");
+      }
+    } catch (error) {
+      console.error("Error deleting apparecchiatura:", error);
+      alert("Errore durante l'eliminazione");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -179,6 +213,17 @@ export default function ApparecchiaturePage() {
                 </p>
                 <p className="text-sm text-gray-600">Cliente ID: {item.id_cliente}</p>
               </div>
+              <ListItemActions
+                onView={() => router.push(`/apparecchiature/${item.id}`)}
+                onEdit={() => router.push(`/apparecchiature/${item.id}?mode=edit`)}
+                onDelete={() =>
+                  setDeleteDialog({
+                    isOpen: true,
+                    apparecchiaturaId: item.id,
+                    apparecchiaturaModello: `${item.modello} - ${item.seriale || "N/D"}`,
+                  })
+                }
+              />
             </div>
             {item.note && (
               <p className="text-gray-700 text-sm mt-2 line-clamp-2">{item.note}</p>
@@ -202,6 +247,16 @@ export default function ApparecchiaturePage() {
           </div>
         )}
       </div>
+
+      <ConfirmDialog
+        isOpen={deleteDialog.isOpen}
+        onClose={() => setDeleteDialog({ isOpen: false, apparecchiaturaId: null, apparecchiaturaModello: "" })}
+        onConfirm={() => deleteDialog.apparecchiaturaId && handleDelete(deleteDialog.apparecchiaturaId)}
+        title="Conferma Eliminazione"
+        message={`Sei sicuro di voler eliminare l'apparecchiatura "${deleteDialog.apparecchiaturaModello}"? Questa azione non può essere annullata.`}
+        confirmText="Elimina"
+        loading={deleting}
+      />
     </div>
   );
 }

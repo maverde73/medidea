@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Search, Filter, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
-import { AttivitaStatusBadge } from "@/components/ui";
+import { Plus, Search, Filter, ArrowUpDown, ArrowUp, ArrowDown, Activity } from "lucide-react";
+import { AttivitaStatusBadge, ConfirmDialog, ListItemActions } from "@/components/ui";
 
 interface Attivita {
   id: number;
@@ -25,6 +25,16 @@ export default function AttivitaPage() {
   const [filter, setFilter] = useState({ stato: "", modello: "" });
   const [sortField, setSortField] = useState<SortField>('data_apertura_richiesta');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+  const [deleteDialog, setDeleteDialog] = useState<{
+    isOpen: boolean;
+    attivitaId: number | null;
+    attivitaModello: string;
+  }>({
+    isOpen: false,
+    attivitaId: null,
+    attivitaModello: "",
+  });
+  const [deleting, setDeleting] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -55,6 +65,29 @@ export default function AttivitaPage() {
       console.error("Error fetching attivita:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    setDeleting(true);
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(`/api/attivita/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (response.ok) {
+        setAttivita(attivita.filter((a) => a.id !== id));
+        setDeleteDialog({ isOpen: false, attivitaId: null, attivitaModello: "" });
+      } else {
+        alert("Errore durante l'eliminazione");
+      }
+    } catch (error) {
+      console.error("Error deleting attivita:", error);
+      alert("Errore durante l'eliminazione");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -187,11 +220,16 @@ export default function AttivitaPage() {
             className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
             onClick={() => router.push(`/attivita/${item.id}`)}
           >
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
+            <div className="flex items-start gap-3">
+              <div className="p-2 bg-accent-teal-bg rounded-lg">
+                <Activity size={24} className="text-accent-teal-text" />
+              </div>
               <div className="flex-1">
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  {item.modello || "N/D"} - {item.seriale || "N/D"}
-                </h3>
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3">
+                  <div className="flex-1">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                      {item.modello || "N/D"} - {item.seriale || "N/D"}
+                    </h3>
                 <p className="text-sm text-gray-600 mb-2">
                   Cliente ID: {item.id_cliente}
                 </p>
@@ -212,6 +250,19 @@ export default function AttivitaPage() {
               <div className="shrink-0">
                 <AttivitaStatusBadge status={item.stato as any} />
               </div>
+                </div>
+              </div>
+              <ListItemActions
+                onView={() => router.push(`/attivita/${item.id}`)}
+                onEdit={() => router.push(`/attivita/${item.id}?mode=edit`)}
+                onDelete={() =>
+                  setDeleteDialog({
+                    isOpen: true,
+                    attivitaId: item.id,
+                    attivitaModello: `${item.modello || "N/D"} - ${item.seriale || "N/D"}`,
+                  })
+                }
+              />
             </div>
           </div>
         ))}
@@ -222,6 +273,16 @@ export default function AttivitaPage() {
           </div>
         )}
       </div>
+
+      <ConfirmDialog
+        isOpen={deleteDialog.isOpen}
+        onClose={() => setDeleteDialog({ isOpen: false, attivitaId: null, attivitaModello: "" })}
+        onConfirm={() => deleteDialog.attivitaId && handleDelete(deleteDialog.attivitaId)}
+        title="Conferma Eliminazione"
+        message={`Sei sicuro di voler eliminare l'attività "${deleteDialog.attivitaModello}"? Questa azione non può essere annullata.`}
+        confirmText="Elimina"
+        loading={deleting}
+      />
     </div>
   );
 }

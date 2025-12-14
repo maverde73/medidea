@@ -38,24 +38,24 @@ export function Sidebar({ className, isMobileOpen = false, onMobileClose }: Side
   const sidebarContent = (
     <>
       {/* Header / Logo */}
-      <div className="h-16 flex items-center justify-between px-4 border-b border-sidebar-hover">
+      <div className="h-16 flex items-center justify-between px-4 border-b border-sidebar-hover bg-white">
         {!isCollapsed && (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center flex-1">
             <Image
               src="/images/medidea-logo.png"
               alt="Medidea Logo"
-              width={32}
-              height={32}
-              className="rounded-lg"
+              width={200}
+              height={70}
+              className="max-h-10 w-auto"
+              priority
             />
-            <span className="text-white font-semibold text-lg">Medidea</span>
           </div>
         )}
 
         {/* Collapse toggle (desktop only) */}
         <button
           onClick={toggleCollapse}
-          className="hidden lg:flex p-1.5 rounded-lg hover:bg-sidebar-hover text-sidebar-text hover:text-white transition-colors"
+          className="hidden lg:flex p-1.5 rounded-lg hover:bg-primary/10 text-primary hover:text-primary-700 transition-colors"
           aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
           {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
@@ -64,7 +64,7 @@ export function Sidebar({ className, isMobileOpen = false, onMobileClose }: Side
         {/* Close button (mobile only) */}
         <button
           onClick={onMobileClose}
-          className="lg:hidden p-1.5 rounded-lg hover:bg-sidebar-hover text-sidebar-text hover:text-white transition-colors"
+          className="lg:hidden p-1.5 rounded-lg hover:bg-primary/10 text-primary hover:text-primary-700 transition-colors"
           aria-label="Close menu"
         >
           <X size={20} />

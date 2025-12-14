@@ -5,41 +5,37 @@ import { useRouter } from "next/navigation";
 import { Activity, Monitor, Calendar, TrendingUp, Clock } from "lucide-react";
 
 interface DashboardStats {
-  attivita_totali: number;
-  attivita_aperte: number;
-  attivita_chiuse: number;
-  attivita_mese_corrente: number;
-  apparecchiature_totali: number;
-  clienti_totali: number;
-}
-
-interface AttivitaMensile {
-  mese: string;
-  totale: number;
-  aperte: number;
-  chiuse: number;
-}
-
-interface AttivitaRecente {
-  id: number;
-  modello: string;
-  stato: string;
-  data_apertura_richiesta: string;
+  totals: {
+    attivita: number;
+    attivita_aperte: number;
+    attivita_chiuse: number;
+    apparecchiature: number;
+    clienti: number;
+  };
+  attivita_by_month: {
+    month: string;
+    count: number;
+  }[];
+  attivita_by_status: {
+    stato: string;
+    count: number;
+  }[];
+  recent_activities: {
+    id: number;
+    modello: string;
+    seriale: string;
+    stato: string;
+    data_apertura_richiesta: string;
+    data_chiusura: string | null;
+    cliente_nome: string;
+  }[];
 }
 
 export default function Home() {
   const router = useRouter();
-  const [stats, setStats] = useState<DashboardStats>({
-    attivita_totali: 0,
-    attivita_aperte: 0,
-    attivita_chiuse: 0,
-    attivita_mese_corrente: 0,
-    apparecchiature_totali: 0,
-    clienti_totali: 0,
-  });
-  const [attivitaMensili, setAttivitaMensili] = useState<AttivitaMensile[]>([]);
-  const [attivitaRecenti, setAttivitaRecenti] = useState<AttivitaRecente[]>([]);
+  const [data, setData] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchDashboardData();
@@ -53,42 +49,52 @@ export default function Home() {
         return;
       }
 
-      // Mock data for development
-      setStats({
-        attivita_totali: 156,
-        attivita_aperte: 23,
-        attivita_chiuse: 133,
-        attivita_mese_corrente: 18,
-        apparecchiature_totali: 87,
-        clienti_totali: 42,
+      const response = await fetch("/api/dashboard/stats", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
 
-      setAttivitaMensili([
-        { mese: "Novembre 2024", totale: 18, aperte: 5, chiuse: 13 },
-        { mese: "Ottobre 2024", totale: 24, aperte: 2, chiuse: 22 },
-        { mese: "Settembre 2024", totale: 19, aperte: 1, chiuse: 18 },
-        { mese: "Agosto 2024", totale: 15, aperte: 0, chiuse: 15 },
-        { mese: "Luglio 2024", totale: 21, aperte: 0, chiuse: 21 },
-        { mese: "Giugno 2024", totale: 17, aperte: 0, chiuse: 17 },
-      ]);
+      if (!response.ok) {
+        if (response.status === 401) {
+          router.push("/login");
+          return;
+        }
+        throw new Error("Failed to fetch dashboard data");
+      }
 
-      setAttivitaRecenti([
-        { id: 1, modello: "HP LaserJet Pro", stato: "APERTO", data_apertura_richiesta: "2025-01-15T10:00:00Z" },
-        { id: 2, modello: "Canon Pixma", stato: "CHIUSO", data_apertura_richiesta: "2025-01-10T14:30:00Z" },
-      ]);
+      const result = (await response.json()) as {
+        success: boolean;
+        data: DashboardStats;
+        error?: string;
+      };
+      if (result.success) {
+        setData(result.data);
+      } else {
+        throw new Error(result.error || "Unknown error");
+      }
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
+      setError("Errore nel caricamento dei dati");
     } finally {
       setLoading(false);
     }
   };
 
   const formatDate = (dateString: string) => {
+    if (!dateString) return "-";
     return new Date(dateString).toLocaleDateString("it-IT", {
       day: "2-digit",
       month: "short",
       year: "numeric",
     });
+  };
+
+  const formatMonth = (monthString: string) => {
+    if (!monthString) return "-";
+    const [year, month] = monthString.split("-");
+    const date = new Date(parseInt(year), parseInt(month) - 1);
+    return date.toLocaleDateString("it-IT", { month: "long", year: "numeric" });
   };
 
   const getStatoBadge = (stato: string) => {
@@ -108,6 +114,20 @@ export default function Home() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-red-600">{error}</div>
+      </div>
+    );
+  }
+
+  if (!data) return null;
+
+  // Calculate stats for display
+  const attivitaMeseCorrente = data.attivita_by_month.length > 0 ? data.attivita_by_month[0].count : 0;
+  const meseCorrenteLabel = data.attivita_by_month.length > 0 ? formatMonth(data.attivita_by_month[0].month) : "";
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -125,12 +145,12 @@ export default function Home() {
             <div className="w-12 h-12 rounded-lg bg-accent-teal-bg flex items-center justify-center">
               <Activity className="text-accent-teal-text" size={24} />
             </div>
-            <span className="text-2xl font-bold text-gray-900">{stats.attivita_totali}</span>
+            <span className="text-2xl font-bold text-gray-900">{data.totals.attivita}</span>
           </div>
           <h3 className="text-sm font-medium text-gray-600 mb-1">Attività Totali</h3>
           <div className="flex items-center gap-4 text-sm">
-            <span className="text-green-600">● {stats.attivita_aperte} aperte</span>
-            <span className="text-gray-600">● {stats.attivita_chiuse} chiuse</span>
+            <span className="text-green-600">● {data.totals.attivita_aperte} aperte</span>
+            <span className="text-gray-600">● {data.totals.attivita_chiuse} chiuse</span>
           </div>
         </div>
 
@@ -139,10 +159,10 @@ export default function Home() {
             <div className="w-12 h-12 rounded-lg bg-accent-blue-bg flex items-center justify-center">
               <Calendar className="text-accent-blue-text" size={24} />
             </div>
-            <span className="text-2xl font-bold text-gray-900">{stats.attivita_mese_corrente}</span>
+            <span className="text-2xl font-bold text-gray-900">{attivitaMeseCorrente}</span>
           </div>
           <h3 className="text-sm font-medium text-gray-600 mb-1">Attività Mese Corrente</h3>
-          <p className="text-xs text-gray-500">Novembre 2024</p>
+          <p className="text-xs text-gray-500 capitalize">{meseCorrenteLabel}</p>
         </div>
 
         <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
@@ -150,7 +170,7 @@ export default function Home() {
             <div className="w-12 h-12 rounded-lg bg-accent-coral-bg flex items-center justify-center">
               <Monitor className="text-accent-coral-text" size={24} />
             </div>
-            <span className="text-2xl font-bold text-gray-900">{stats.apparecchiature_totali}</span>
+            <span className="text-2xl font-bold text-gray-900">{data.totals.apparecchiature}</span>
           </div>
           <h3 className="text-sm font-medium text-gray-600 mb-1">Apparecchiature</h3>
           <p className="text-xs text-gray-500">Totale registrate</p>
@@ -172,34 +192,20 @@ export default function Home() {
                 <tr className="border-b border-gray-200">
                   <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Mese</th>
                   <th className="text-right py-3 px-4 text-sm font-medium text-gray-600">Totale</th>
-                  <th className="text-right py-3 px-4 text-sm font-medium text-gray-600">Aperte</th>
-                  <th className="text-right py-3 px-4 text-sm font-medium text-gray-600">Chiuse</th>
-                  <th className="text-right py-3 px-4 text-sm font-medium text-gray-600">% Chiusura</th>
                 </tr>
               </thead>
               <tbody>
-                {attivitaMensili.map((mese, index) => {
-                  const percentualeChiusura = mese.totale > 0
-                    ? Math.round((mese.chiuse / mese.totale) * 100)
-                    : 0;
-                  return (
-                    <tr key={index} className="border-b border-gray-100 hover:bg-gray-50">
-                      <td className="py-3 px-4 text-sm text-gray-900 font-medium">{mese.mese}</td>
-                      <td className="py-3 px-4 text-sm text-gray-900 text-right font-semibold">{mese.totale}</td>
-                      <td className="py-3 px-4 text-sm text-green-600 text-right">{mese.aperte}</td>
-                      <td className="py-3 px-4 text-sm text-gray-600 text-right">{mese.chiuse}</td>
-                      <td className="py-3 px-4 text-sm text-right">
-                        <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
-                          percentualeChiusura >= 90 ? 'bg-green-100 text-green-800' :
-                          percentualeChiusura >= 70 ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-red-100 text-red-800'
-                        }`}>
-                          {percentualeChiusura}%
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
+                {data.attivita_by_month.map((mese, index) => (
+                  <tr key={index} className="border-b border-gray-100 hover:bg-gray-50">
+                    <td className="py-3 px-4 text-sm text-gray-900 font-medium capitalize">{formatMonth(mese.month)}</td>
+                    <td className="py-3 px-4 text-sm text-gray-900 text-right font-semibold">{mese.count}</td>
+                  </tr>
+                ))}
+                {data.attivita_by_month.length === 0 && (
+                  <tr>
+                    <td colSpan={2} className="py-4 text-center text-gray-500 text-sm">Nessun dato disponibile</td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -216,14 +222,14 @@ export default function Home() {
         </div>
         <div className="p-6">
           <div className="space-y-3">
-            {attivitaRecenti.map((attivita) => (
+            {data.recent_activities.map((attivita) => (
               <div
                 key={attivita.id}
                 onClick={() => router.push(`/attivita/${attivita.id}`)}
                 className="flex items-center justify-between p-4 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer transition-colors"
               >
                 <div className="flex-1">
-                  <h3 className="font-medium text-gray-900">{attivita.modello}</h3>
+                  <h3 className="font-medium text-gray-900">{attivita.modello} <span className="text-gray-500 text-sm">({attivita.cliente_nome})</span></h3>
                   <p className="text-sm text-gray-500">Aperta il {formatDate(attivita.data_apertura_richiesta)}</p>
                 </div>
                 <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatoBadge(attivita.stato)}`}>
@@ -231,6 +237,9 @@ export default function Home() {
                 </span>
               </div>
             ))}
+            {data.recent_activities.length === 0 && (
+              <div className="text-center text-gray-500 text-sm py-4">Nessuna attività recente</div>
+            )}
           </div>
         </div>
       </div>
