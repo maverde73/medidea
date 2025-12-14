@@ -4,7 +4,7 @@ const config: OpenNextConfig = {
   default: {
     // Override the default lambda handler
     override: {
-      wrapper: "cloudflare-edge",
+      wrapper: "cloudflare-node",
       converter: "edge",
       proxyExternalRequest: "fetch",
       // Use incremental cache for better performance
