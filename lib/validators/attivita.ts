@@ -10,6 +10,11 @@ import { z } from "zod";
 export const StatoAttivita = z.enum(["APERTO", "CHIUSO", "RIAPERTO"]);
 
 /**
+ * Livelli di urgenza validi
+ */
+export const UrgenzaAttivita = z.enum(["BASSA", "MEDIA", "ALTA"]);
+
+/**
  * Schema per la creazione di una nuova attività
  */
 export const CreateAttivitaSchema = z.object({
@@ -37,6 +42,13 @@ export const CreateAttivitaSchema = z.object({
     })
     .optional(),
   note_generali: z.string().optional(),
+  data_presa_in_carico: z
+    .string()
+    .datetime({ message: "Data presa in carico deve essere in formato ISO 8601" })
+    .optional(),
+  reparto: z.string().optional(),
+  tecnico: z.string().optional(),
+  urgenza: UrgenzaAttivita.optional(),
 });
 
 /**
@@ -57,6 +69,10 @@ export const UpdateAttivitaSchema = z.object({
   stato: StatoAttivita.optional(),
   data_chiusura: z.string().datetime().optional(),
   note_generali: z.string().optional(),
+  data_presa_in_carico: z.string().datetime().optional(),
+  reparto: z.string().optional(),
+  tecnico: z.string().optional(),
+  urgenza: UrgenzaAttivita.optional(),
 });
 
 /**
@@ -82,6 +98,11 @@ export type UpdateAttivitaInput = z.infer<typeof UpdateAttivitaSchema>;
  * Tipo TypeScript per lo stato attività
  */
 export type StatoAttivitaType = z.infer<typeof StatoAttivita>;
+
+/**
+ * Tipo TypeScript per l'urgenza attività
+ */
+export type UrgenzaAttivitaType = z.infer<typeof UrgenzaAttivita>;
 
 /**
  * Tipo TypeScript per il parametro ID
@@ -115,6 +136,12 @@ export const AttivitaFiltersSchema = z.object({
 
   // Filtro per seriale
   seriale: z.string().optional(),
+
+  // Filtro per tecnico
+  tecnico: z.string().optional(),
+
+  // Filtro per urgenza
+  urgenza: UrgenzaAttivita.optional(),
 
   // Paginazione
   page: z
@@ -176,4 +203,8 @@ export interface Attivita {
   note_generali: string | null;
   created_at: string;
   updated_at: string;
+  data_presa_in_carico: string | null;
+  reparto: string | null;
+  tecnico: string | null;
+  urgenza: string | null;
 }

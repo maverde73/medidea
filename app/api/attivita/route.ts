@@ -70,6 +70,16 @@ export const GET = withAuth(async (request, { user }) => {
       whereParams.push(`%${filters.seriale}%`);
     }
 
+    if (filters.tecnico) {
+      whereClauses.push("tecnico LIKE ?");
+      whereParams.push(`%${filters.tecnico}%`);
+    }
+
+    if (filters.urgenza) {
+      whereClauses.push("urgenza = ?");
+      whereParams.push(filters.urgenza);
+    }
+
     const whereClause = whereClauses.length > 0
       ? `WHERE ${whereClauses.join(" AND ")}`
       : "";
@@ -161,8 +171,9 @@ export const POST = withAuth(async (request, { user }) => {
         modalita_apertura_richiesta, data_apertura_richiesta,
         numero_preventivo, data_preventivo,
         numero_accettazione_preventivo, data_accettazione_preventivo,
-        note_generali, stato, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'APERTO', datetime('now'), datetime('now'))`,
+        note_generali, data_presa_in_carico, reparto, tecnico, urgenza,
+        stato, created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'APERTO', datetime('now'), datetime('now'))`,
       [
         validatedData.id_cliente,
         validatedData.modello || null,
@@ -175,6 +186,10 @@ export const POST = withAuth(async (request, { user }) => {
         validatedData.numero_accettazione_preventivo || null,
         validatedData.data_accettazione_preventivo || null,
         validatedData.note_generali || null,
+        validatedData.data_presa_in_carico || null,
+        validatedData.reparto || null,
+        validatedData.tecnico || null,
+        validatedData.urgenza || null,
       ]
     );
 
