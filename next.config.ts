@@ -1,4 +1,8 @@
 import type { NextConfig } from "next";
+import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
+
+// Initialize OpenNext Cloudflare for development
+initOpenNextCloudflareForDev();
 
 const nextConfig: NextConfig = {
   // Enable React strict mode for better development experience

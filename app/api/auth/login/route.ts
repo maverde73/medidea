@@ -42,27 +42,36 @@ export async function POST(request: NextRequest) {
 
     // In development mode (or when using dev secret), return mock response
     const isDevelopment = process.env.NODE_ENV !== "production" ||
-                          jwtSecret === "dev-secret-change-in-production";
+      jwtSecret === "dev-secret-change-in-production";
 
     if (isDevelopment) {
-      // Mock user for testing
-      const mockUser = {
-        id: 1,
-        email: "admin@medidea.local",
-        role: "admin" as const,
-      };
+      // Check for specific dev credentials
+      if (email === "admin@medidea.local" && password === "admin123") {
+        // Mock user for testing
+        const mockUser = {
+          id: 1,
+          email: "admin@medidea.local",
+          role: "admin" as const,
+        };
 
-      const mockToken = await generateToken(mockUser, jwtSecret);
+        const mockToken = await generateToken(mockUser, jwtSecret);
 
-      return NextResponse.json({
-        success: true,
-        token: mockToken,
-        user: {
-          id: mockUser.id,
-          email: mockUser.email,
-          role: mockUser.role,
-        },
-      });
+        return NextResponse.json({
+          success: true,
+          token: mockToken,
+          user: {
+            id: mockUser.id,
+            email: mockUser.email,
+            role: mockUser.role,
+          },
+        });
+      } else {
+        // Invalid dev credentials
+        return NextResponse.json(
+          { error: "Invalid credentials" },
+          { status: 401 }
+        );
+      }
     }
 
     // Production: query database

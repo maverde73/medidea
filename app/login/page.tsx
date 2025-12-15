@@ -89,7 +89,7 @@ export default function LoginPage() {
         </form>
 
         <p className="mt-4 text-sm text-gray-600 text-center">
-          Dev: admin@medidea.local / qualsiasi password
+          Dev: admin@medidea.local / admin123
         </p>
       </div>
     </div>
