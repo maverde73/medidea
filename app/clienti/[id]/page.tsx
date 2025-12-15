@@ -34,6 +34,7 @@ export default function ClienteDetailPage() {
 
   useEffect(() => {
     fetchCliente();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const fetchCliente = async () => {

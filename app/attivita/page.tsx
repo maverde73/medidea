@@ -39,6 +39,7 @@ export default function AttivitaPage() {
 
   useEffect(() => {
     fetchAttivita();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchAttivita = async () => {
@@ -230,26 +231,26 @@ export default function AttivitaPage() {
                     <h3 className="text-xl font-semibold text-gray-900 mb-2">
                       {item.modello || "N/D"} - {item.seriale || "N/D"}
                     </h3>
-                <p className="text-sm text-gray-600 mb-2">
-                  Cliente ID: {item.id_cliente}
-                </p>
-                {item.note_generali && (
-                  <p className="text-gray-700 text-sm mt-2 line-clamp-2">
-                    {item.note_generali}
-                  </p>
-                )}
-                <div className="mt-3 flex gap-4 text-sm text-gray-600">
-                  {item.data_apertura_richiesta && (
-                    <span>Apertura: {new Date(item.data_apertura_richiesta).toLocaleDateString()}</span>
-                  )}
-                  {item.data_chiusura && (
-                    <span>Chiusura: {new Date(item.data_chiusura).toLocaleDateString()}</span>
-                  )}
-                </div>
-              </div>
-              <div className="shrink-0">
-                <AttivitaStatusBadge status={item.stato as any} />
-              </div>
+                    <p className="text-sm text-gray-600 mb-2">
+                      Cliente ID: {item.id_cliente}
+                    </p>
+                    {item.note_generali && (
+                      <p className="text-gray-700 text-sm mt-2 line-clamp-2">
+                        {item.note_generali}
+                      </p>
+                    )}
+                    <div className="mt-3 flex gap-4 text-sm text-gray-600">
+                      {item.data_apertura_richiesta && (
+                        <span>Apertura: {new Date(item.data_apertura_richiesta).toLocaleDateString()}</span>
+                      )}
+                      {item.data_chiusura && (
+                        <span>Chiusura: {new Date(item.data_chiusura).toLocaleDateString()}</span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="shrink-0">
+                    <AttivitaStatusBadge status={item.stato as any} />
+                  </div>
                 </div>
               </div>
               <ListItemActions

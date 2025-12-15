@@ -39,6 +39,7 @@ export default function ApparecchiaturaDetailPage() {
 
   useEffect(() => {
     fetchApparecchiatura();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const fetchApparecchiatura = async () => {
@@ -182,138 +183,138 @@ export default function ApparecchiaturaDetailPage() {
 
       {error && <ErrorAlert message={error} onDismiss={() => setError("")} />}
 
-        {/* Cliente */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Dati Cliente</h2>
-          <p className="text-gray-700">Cliente ID: {apparecchiatura.id_cliente}</p>
-        </div>
+      {/* Cliente */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-semibold mb-4">Dati Cliente</h2>
+        <p className="text-gray-700">Cliente ID: {apparecchiatura.id_cliente}</p>
+      </div>
 
-        {/* Dati Apparecchiatura */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Dati Apparecchiatura</h2>
-          {editing ? (
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Modello <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={editForm.modello}
-                  onChange={(e) => setEditForm({ ...editForm, modello: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Seriale</label>
-                <input
-                  type="text"
-                  value={editForm.seriale}
-                  onChange={(e) => setEditForm({ ...editForm, seriale: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
-                />
-              </div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-gray-600">Modello</p>
-                <p className="text-gray-900 font-medium">{apparecchiatura.modello}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Seriale</p>
-                <p className="text-gray-900 font-medium">{apparecchiatura.seriale || "N/D"}</p>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Test e Verifiche */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Test e Verifiche</h2>
-          {editing ? (
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Data Test Funzionali</label>
-                <input
-                  type="date"
-                  value={editForm.data_test_funzionali}
-                  onChange={(e) => setEditForm({ ...editForm, data_test_funzionali: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Data Test Elettrici</label>
-                <input
-                  type="date"
-                  value={editForm.data_test_elettrici}
-                  onChange={(e) => setEditForm({ ...editForm, data_test_elettrici: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
-                />
-              </div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-gray-600">Data Test Funzionali</p>
-                <p className="text-gray-900 font-medium">
-                  {formatDate(apparecchiatura.data_test_funzionali)}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Data Test Elettrici</p>
-                <p className="text-gray-900 font-medium">
-                  {formatDate(apparecchiatura.data_test_elettrici)}
-                </p>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Note */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Note</h2>
-          {editing ? (
+      {/* Dati Apparecchiatura */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-semibold mb-4">Dati Apparecchiatura</h2>
+        {editing ? (
+          <div className="space-y-4">
             <div>
-              <textarea
-                value={editForm.note}
-                onChange={(e) => setEditForm({ ...editForm, note: e.target.value })}
-                rows={5}
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Modello <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={editForm.modello}
+                onChange={(e) => setEditForm({ ...editForm, modello: e.target.value })}
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
-                placeholder="Inserisci note..."
               />
             </div>
-          ) : (
-            apparecchiatura.note ? (
-              <p className="text-gray-700 whitespace-pre-wrap">{apparecchiatura.note}</p>
-            ) : (
-              <p className="text-gray-500">Nessuna nota</p>
-            )
-          )}
-        </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Seriale</label>
+              <input
+                type="text"
+                value={editForm.seriale}
+                onChange={(e) => setEditForm({ ...editForm, seriale: e.target.value })}
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
+              />
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm text-gray-600">Modello</p>
+              <p className="text-gray-900 font-medium">{apparecchiatura.modello}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">Seriale</p>
+              <p className="text-gray-900 font-medium">{apparecchiatura.seriale || "N/D"}</p>
+            </div>
+          </div>
+        )}
+      </div>
 
-        {/* Actions */}
-        <div className="flex justify-end space-x-4">
-          {editing && (
-            <button
-              onClick={handleUpdate}
-              disabled={loading}
-              className="flex items-center gap-2 px-6 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 disabled:opacity-50 transition-colors"
-            >
-              {loading ? "Salvataggio..." : "Salva Modifiche"}
-            </button>
-          )}
-          {!editing && (
-            <button
-              onClick={handleDelete}
-              disabled={deleting}
-              className="flex items-center gap-2 px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors"
-            >
-              <Trash2 size={16} />
-              {deleting ? "Eliminazione..." : "Elimina Apparecchiatura"}
-            </button>
-          )}
-        </div>
+      {/* Test e Verifiche */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-semibold mb-4">Test e Verifiche</h2>
+        {editing ? (
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Data Test Funzionali</label>
+              <input
+                type="date"
+                value={editForm.data_test_funzionali}
+                onChange={(e) => setEditForm({ ...editForm, data_test_funzionali: e.target.value })}
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Data Test Elettrici</label>
+              <input
+                type="date"
+                value={editForm.data_test_elettrici}
+                onChange={(e) => setEditForm({ ...editForm, data_test_elettrici: e.target.value })}
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
+              />
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm text-gray-600">Data Test Funzionali</p>
+              <p className="text-gray-900 font-medium">
+                {formatDate(apparecchiatura.data_test_funzionali)}
+              </p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">Data Test Elettrici</p>
+              <p className="text-gray-900 font-medium">
+                {formatDate(apparecchiatura.data_test_elettrici)}
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Note */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-semibold mb-4">Note</h2>
+        {editing ? (
+          <div>
+            <textarea
+              value={editForm.note}
+              onChange={(e) => setEditForm({ ...editForm, note: e.target.value })}
+              rows={5}
+              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
+              placeholder="Inserisci note..."
+            />
+          </div>
+        ) : (
+          apparecchiatura.note ? (
+            <p className="text-gray-700 whitespace-pre-wrap">{apparecchiatura.note}</p>
+          ) : (
+            <p className="text-gray-500">Nessuna nota</p>
+          )
+        )}
+      </div>
+
+      {/* Actions */}
+      <div className="flex justify-end space-x-4">
+        {editing && (
+          <button
+            onClick={handleUpdate}
+            disabled={loading}
+            className="flex items-center gap-2 px-6 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 disabled:opacity-50 transition-colors"
+          >
+            {loading ? "Salvataggio..." : "Salva Modifiche"}
+          </button>
+        )}
+        {!editing && (
+          <button
+            onClick={handleDelete}
+            disabled={deleting}
+            className="flex items-center gap-2 px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors"
+          >
+            <Trash2 size={16} />
+            {deleting ? "Eliminazione..." : "Elimina Apparecchiatura"}
+          </button>
+        )}
+      </div>
     </div>
   );
 }

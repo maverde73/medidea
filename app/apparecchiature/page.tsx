@@ -38,6 +38,7 @@ export default function ApparecchiaturePage() {
 
   useEffect(() => {
     fetchApparecchiature();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchApparecchiature = async () => {

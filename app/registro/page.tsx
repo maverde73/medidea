@@ -34,6 +34,7 @@ export default function RegistroAttivita() {
 
     useEffect(() => {
         fetchAttivita();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [filters]);
 
     const fetchAttivita = async () => {

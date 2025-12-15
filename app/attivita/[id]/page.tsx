@@ -96,6 +96,7 @@ export default function AttivitaDetailPage() {
   useEffect(() => {
     fetchAttivita();
     fetchFiles();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const fetchAttivita = async () => {
@@ -223,7 +224,7 @@ export default function AttivitaDetailPage() {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(`/api/attivita/${id}`, {
-        method: "PUT",
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,

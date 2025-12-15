@@ -25,6 +25,7 @@ export default function TabelleLookupPage() {
 
     useEffect(() => {
         fetchItems();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [activeTab]);
 
     const fetchItems = async () => {
@@ -149,7 +150,7 @@ export default function TabelleLookupPage() {
         <div className="max-w-4xl mx-auto py-8 px-4">
             <div className="mb-8">
                 <h1 className="text-3xl font-bold text-gray-900">Gestione Tabelle</h1>
-                <p className="text-gray-500 mt-1">Configura le liste di valori per l'applicazione</p>
+                <p className="text-gray-500 mt-1">Configura le liste di valori per l&apos;applicazione</p>
             </div>
 
             {error && (

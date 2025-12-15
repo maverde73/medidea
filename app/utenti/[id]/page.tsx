@@ -39,6 +39,7 @@ export default function UtenteDetailPage() {
 
   useEffect(() => {
     fetchUtente();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   const fetchUtente = async () => {
