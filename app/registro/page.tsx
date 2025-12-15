@@ -20,6 +20,9 @@ interface Attivita {
     stato: string;
     urgenza: string | null;
     descrizione_richiesta: string | null;
+    tecnico: string | null;
+    nome_tecnico: string | null;
+    cognome_tecnico: string | null;
 }
 
 export default function RegistroAttivita() {
@@ -84,6 +87,7 @@ export default function RegistroAttivita() {
                 "Richiesta N°": a.id,
                 "Del (Data Apertura)": a.data_apertura_richiesta ? format(new Date(a.data_apertura_richiesta), "dd/MM/yyyy") : "",
                 Apparecchiatura: `${a.modello || ""} ${a.seriale ? `(${a.seriale})` : ""}`,
+                Tecnico: a.nome_tecnico && a.cognome_tecnico ? `${a.cognome_tecnico} ${a.nome_tecnico}` : (a.tecnico || ""),
                 Stato: a.stato,
                 Urgenza: a.urgenza,
                 Descrizione: a.descrizione_richiesta
@@ -180,6 +184,7 @@ export default function RegistroAttivita() {
                                 <th className="px-4 py-3 whitespace-nowrap">Data Apertura</th>
                                 <th className="px-4 py-3 whitespace-nowrap">Data Presa in Carico</th>
                                 <th className="px-4 py-3 whitespace-nowrap">Apparecchiatura</th>
+                                <th className="px-4 py-3 whitespace-nowrap">Tecnico</th>
                                 <th className="px-4 py-3 whitespace-nowrap">Descrizione</th>
                                 <th className="px-4 py-3 whitespace-nowrap">Urgenza</th>
                                 <th className="px-4 py-3 whitespace-nowrap">Stato</th>
@@ -219,6 +224,11 @@ export default function RegistroAttivita() {
                                         <td className="px-4 py-3">
                                             <div className="font-medium text-gray-900">{a.modello}</div>
                                             <div className="text-xs text-gray-500">{a.seriale}</div>
+                                        </td>
+                                        <td className="px-4 py-3 text-gray-900 whitespace-nowrap">
+                                            {a.nome_tecnico && a.cognome_tecnico
+                                                ? `${a.cognome_tecnico} ${a.nome_tecnico}`
+                                                : a.tecnico || "-"}
                                         </td>
                                         <td className="px-4 py-3 text-gray-600 max-w-xs truncate" title={a.descrizione_richiesta || ""}>
                                             {a.descrizione_richiesta || "-"}
