@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Plus, Pencil, Trash2, Loader2, Save, X } from "lucide-react";
 import { ErrorAlert } from "@/components/ui";
 
@@ -12,7 +13,11 @@ interface LookupItem {
 }
 
 export default function TabelleLookupPage() {
-    const [activeTab, setActiveTab] = useState<"reparti" | "modalita">("reparti");
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const tabParam = searchParams.get("tab");
+    const activeTab = (tabParam === "modalita" ? "modalita" : "reparti") as "reparti" | "modalita";
+
     const [items, setItems] = useState<LookupItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -170,7 +175,11 @@ export default function TabelleLookupPage() {
                         ? "border-primary-500 text-primary-600"
                         : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                         }`}
-                    onClick={() => { setActiveTab("reparti"); setIsCreating(false); setEditingItem(null); }}
+                    onClick={() => {
+                        router.push("/impostazioni/tabelle?tab=reparti");
+                        setIsCreating(false);
+                        setEditingItem(null);
+                    }}
                 >
                     Reparti
                 </button>
@@ -179,7 +188,11 @@ export default function TabelleLookupPage() {
                         ? "border-primary-500 text-primary-600"
                         : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                         }`}
-                    onClick={() => { setActiveTab("modalita"); setIsCreating(false); setEditingItem(null); }}
+                    onClick={() => {
+                        router.push("/impostazioni/tabelle?tab=modalita");
+                        setIsCreating(false);
+                        setEditingItem(null);
+                    }}
                 >
                     Modalità Apertura
                 </button>

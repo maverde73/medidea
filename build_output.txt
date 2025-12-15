@@ -1,0 +1,18 @@
+   ▲ Next.js 15.5.2
+   - Environments: .env
+   - Experiments (use with caution):
+     · serverActions
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 4.3s
+   Linting and checking validity of types ...
+
+Failed to compile.
+
+./components/ui/ClientSelector.tsx
+109:9  Warning: The attribute aria-expanded is not supported by the role textbox. This role is implicit on the element input.  jsx-a11y/role-supports-aria-props
+
+./components/ui/Sidebar.tsx
+136:11  Error: Do not pass children as props. Instead, nest children between the opening and closing tags.  react/no-children-prop
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules

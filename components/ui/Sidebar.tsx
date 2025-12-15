@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { Home, Activity, Monitor, Users, UserCircle, ChevronLeft, ChevronRight, X, Table } from 'lucide-react';
+import { Home, Activity, Monitor, Users, UserCircle, ChevronLeft, ChevronRight, X, Table, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { MenuItem } from './MenuItem';
 import { MenuGroup } from './MenuGroup';
@@ -128,12 +128,25 @@ export function Sidebar({ className, isMobileOpen = false, onMobileClose }: Side
         />
 
         {/* Impostazioni */}
-        <MenuItem
+        <MenuGroup
           id="impostazioni"
-          label="Tabelle"
-          icon={Table}
-          href="/impostazioni/tabelle"
+          label="Impostazioni"
+          icon={Settings}
           collapsed={isCollapsed}
+          items={[
+            {
+              id: 'reparti',
+              label: 'Reparti',
+              icon: Table,
+              href: '/impostazioni/tabelle?tab=reparti'
+            },
+            {
+              id: 'modalita',
+              label: 'Modalità Apertura',
+              icon: Table,
+              href: '/impostazioni/tabelle?tab=modalita'
+            }
+          ]}
         />
       </nav>
 

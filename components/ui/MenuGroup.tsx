@@ -17,7 +17,7 @@ interface MenuGroupProps {
   id: string;
   label: string;
   icon: LucideIcon;
-  children: MenuItemType[];
+  items: MenuItemType[];
   collapsed?: boolean;
   defaultOpen?: boolean;
 }
@@ -26,7 +26,7 @@ export function MenuGroup({
   id,
   label,
   icon: Icon,
-  children,
+  items,
   collapsed = false,
   defaultOpen = false,
 }: MenuGroupProps) {
@@ -82,7 +82,7 @@ export function MenuGroup({
 
       {isOpen && (
         <div className="ml-6 space-y-1 border-l border-sidebar-active pl-2">
-          {children.map((item) => (
+          {items.map((item) => (
             <MenuItem key={item.id} {...item} collapsed={false} />
           ))}
         </div>
