@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Plus, Pencil, Trash2, Loader2, Save, X } from "lucide-react";
 import { ErrorAlert } from "@/components/ui";
@@ -12,7 +12,7 @@ interface LookupItem {
     active: number;
 }
 
-export default function TabelleLookupPage() {
+function TabelleLookupContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const tabParam = searchParams.get("tab");
@@ -310,5 +310,13 @@ export default function TabelleLookupPage() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function TabelleLookupPage() {
+    return (
+        <Suspense fallback={<div className="flex justify-center p-8"><Loader2 className="w-6 h-6 animate-spin" /></div>}>
+            <TabelleLookupContent />
+        </Suspense>
     );
 }
