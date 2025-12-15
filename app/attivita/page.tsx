@@ -14,6 +14,10 @@ interface Attivita {
   data_apertura_richiesta: string | null;
   data_chiusura: string | null;
   note_generali: string | null;
+  tecnico: string | null; // Text field
+  id_tecnico: number | null;
+  nome_tecnico: string | null;
+  cognome_tecnico: string | null;
 }
 
 type SortField = 'data_apertura_richiesta' | 'modello' | 'stato' | 'id';
@@ -247,6 +251,14 @@ export default function AttivitaPage() {
                         <span>Chiusura: {new Date(item.data_chiusura).toLocaleDateString()}</span>
                       )}
                     </div>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm text-gray-600 mb-1">
+                      <span className="font-medium">Tecnico:</span>{" "}
+                      {item.nome_tecnico && item.cognome_tecnico
+                        ? `${item.cognome_tecnico} ${item.nome_tecnico}`
+                        : item.tecnico || "Non assegnato"}
+                    </p>
                   </div>
                   <div className="shrink-0">
                     <AttivitaStatusBadge status={item.stato as any} />

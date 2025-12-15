@@ -104,9 +104,10 @@ export const GET = withAuth(async (request, { user }) => {
     const orderClause = `ORDER BY ${filters.sort_by} ${filters.sort_order}`;
 
     const attivita = await db.query(
-      `SELECT attivita.*, clienti.nome as nome_cliente 
+      `SELECT attivita.*, clienti.nome as nome_cliente, tecnici.nome as nome_tecnico, tecnici.cognome as cognome_tecnico
        FROM attivita 
        LEFT JOIN clienti ON attivita.id_cliente = clienti.id
+       LEFT JOIN tecnici ON attivita.id_tecnico = tecnici.id
        ${whereClause} ${orderClause} LIMIT ? OFFSET ?`,
       [...whereParams, filters.limit, offset]
     );
