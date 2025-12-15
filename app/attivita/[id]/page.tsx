@@ -223,13 +223,34 @@ export default function AttivitaDetailPage() {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
+      // Prepare payload: convert empty strings to null for date fields
+      const payload = {
+        ...editForm,
+        data_apertura_richiesta: editForm.data_apertura_richiesta || null,
+        data_preventivo: editForm.data_preventivo || null,
+        data_accettazione_preventivo: editForm.data_accettazione_preventivo || null,
+        data_chiusura: editForm.data_chiusura || null,
+        data_presa_in_carico: editForm.data_presa_in_carico || null,
+        // Also handle other optional fields that might be empty strings
+        modello: editForm.modello || null,
+        seriale: editForm.seriale || null,
+        codice_inventario_cliente: editForm.codice_inventario_cliente || null,
+        modalita_apertura_richiesta: editForm.modalita_apertura_richiesta || null,
+        numero_preventivo: editForm.numero_preventivo || null,
+        numero_accettazione_preventivo: editForm.numero_accettazione_preventivo || null,
+        note_generali: editForm.note_generali || null,
+        reparto: editForm.reparto || null,
+        tecnico: editForm.tecnico || null,
+        urgenza: editForm.urgenza || null,
+      };
+
       const response = await fetch(`/api/attivita/${id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(editForm),
+        body: JSON.stringify(payload),
       });
 
       if (response.ok) {
