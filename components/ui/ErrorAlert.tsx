@@ -17,6 +17,8 @@ export interface ErrorAlertProps {
   onDismiss?: () => void;
   /** Additional CSS classes */
   className?: string;
+  /** Custom content */
+  children?: React.ReactNode;
 }
 
 const alertConfig: Record<
@@ -94,6 +96,7 @@ export function ErrorAlert({
   dismissible = true,
   onDismiss,
   className = "",
+  children,
 }: ErrorAlertProps) {
   const [isVisible, setIsVisible] = useState(true);
 
@@ -134,6 +137,11 @@ export function ErrorAlert({
           {message && (
             <div className={`mt-2 text-sm ${config.textColor}`}>
               <p>{message}</p>
+            </div>
+          )}
+          {children && (
+            <div className={`mt-2 text-sm ${config.textColor}`}>
+              {children}
             </div>
           )}
         </div>

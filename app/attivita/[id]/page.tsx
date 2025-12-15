@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { Trash2, Pencil } from "lucide-react";
 import { LoadingSpinner, ErrorAlert, AttivitaStatusBadge, FileList, FileUploader } from "@/components/ui";
+import { TechnicianSelect } from "@/components/tecnici/TechnicianSelect";
 
 interface Attivita {
   id: number;
@@ -23,6 +24,7 @@ interface Attivita {
   data_presa_in_carico: string | null;
   reparto: string | null;
   tecnico: string | null;
+  id_tecnico: number | null;
   urgenza: string | null;
   created_at: string;
   updated_at: string;
@@ -48,6 +50,7 @@ export default function AttivitaDetailPage() {
   const [attivita, setAttivita] = useState<Attivita | null>(null);
   const [files, setFiles] = useState<FileInfo[]>([]);
   const [loading, setLoading] = useState(true);
+  const [saveError, setSaveError] = useState<{ error: string; details?: { field: string; message: string }[] } | null>(null);
   const [error, setError] = useState("");
   const [deleting, setDeleting] = useState(false);
   const [editing, setEditing] = useState(initialMode === "edit");
@@ -74,6 +77,7 @@ export default function AttivitaDetailPage() {
     };
     fetchLookups();
   }, []);
+
   const [editForm, setEditForm] = useState({
     modello: "",
     seriale: "",
@@ -90,6 +94,7 @@ export default function AttivitaDetailPage() {
     data_presa_in_carico: "",
     reparto: "",
     tecnico: "",
+    id_tecnico: null as number | null,
     urgenza: "" as "" | "BASSA" | "MEDIA" | "ALTA",
   });
 
@@ -130,6 +135,7 @@ export default function AttivitaDetailPage() {
           data_presa_in_carico: data.data.data_presa_in_carico || "",
           reparto: data.data.reparto || "",
           tecnico: data.data.tecnico || "",
+          id_tecnico: data.data.id_tecnico || null,
           urgenza: (data.data.urgenza || "") as "" | "BASSA" | "MEDIA" | "ALTA",
         });
       } else {
@@ -221,6 +227,7 @@ export default function AttivitaDetailPage() {
 
   const handleUpdate = async () => {
     setLoading(true);
+    setSaveError(null);
     try {
       const token = localStorage.getItem("token");
       // Prepare payload: convert empty strings to null for date fields
@@ -241,6 +248,7 @@ export default function AttivitaDetailPage() {
         note_generali: editForm.note_generali || null,
         reparto: editForm.reparto || null,
         tecnico: editForm.tecnico || null,
+        id_tecnico: editForm.id_tecnico || null,
         urgenza: editForm.urgenza || null,
       };
 
@@ -257,13 +265,16 @@ export default function AttivitaDetailPage() {
         const data = await response.json() as { data: Attivita };
         setAttivita(data.data);
         setEditing(false);
-        setError("");
+        setSaveError(null);
       } else {
-        const errorData = await response.json() as { error?: string };
-        setError(errorData.error || "Errore durante l'aggiornamento");
+        const errorData = await response.json() as { error: string; details?: { field: string; message: string }[] };
+        setSaveError({
+          error: errorData.error || "Errore durante l'aggiornamento",
+          details: errorData.details
+        });
       }
     } catch (err) {
-      setError("Errore durante l'aggiornamento");
+      setSaveError({ error: "Errore di rete durante l'aggiornamento" });
     } finally {
       setLoading(false);
     }
@@ -274,7 +285,7 @@ export default function AttivitaDetailPage() {
     return new Date(dateString).toLocaleDateString("it-IT");
   };
 
-  if (loading) {
+  if (loading && !attivita) { // Only show full page loading if no data yet
     return (
       <div className="flex items-center justify-center py-12">
         <LoadingSpinner size="lg" />
@@ -322,7 +333,22 @@ export default function AttivitaDetailPage() {
         </div>
       </div>
 
-      {error && <ErrorAlert message={error} onDismiss={() => setError("")} />}
+      {saveError && (
+        <ErrorAlert
+          message={saveError.error}
+          onDismiss={() => setSaveError(null)}
+        >
+          {saveError.details && (
+            <ul className="list-disc pl-5 mt-2 space-y-1">
+              {saveError.details.map((err, i) => (
+                <li key={i}>
+                  <span className="font-medium">{err.field}:</span> {err.message}
+                </li>
+              ))}
+            </ul>
+          )}
+        </ErrorAlert>
+      )}
 
       {/* Cliente */}
       <div className="bg-white rounded-lg shadow p-6">
@@ -499,12 +525,9 @@ export default function AttivitaDetailPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Tecnico</label>
-              <input
-                type="text"
-                value={editForm.tecnico}
-                onChange={(e) => setEditForm({ ...editForm, tecnico: e.target.value })}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
-                placeholder="Nome del tecnico"
+              <TechnicianSelect
+                value={editForm.id_tecnico?.toString()}
+                onChange={(val) => setEditForm({ ...editForm, id_tecnico: parseInt(val) })}
               />
             </div>
             <div>

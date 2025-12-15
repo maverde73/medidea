@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { LoadingSpinner, ErrorAlert } from "@/components/ui";
 import { Pencil, Trash2, Shield, ShieldOff } from "lucide-react";
+import { TechnicianSelect } from "@/components/tecnici/TechnicianSelect";
 
 interface Utente {
   id: number;
@@ -15,6 +16,7 @@ interface Utente {
   last_login?: string;
   created_at: string;
   updated_at: string;
+  id_tecnico?: number;
 }
 
 export default function UtenteDetailPage() {
@@ -35,6 +37,7 @@ export default function UtenteDetailPage() {
     email: "",
     role: "user" as "admin" | "user" | "tecnico",
     active: true,
+    id_tecnico: undefined as number | undefined,
   });
 
   useEffect(() => {
@@ -63,6 +66,7 @@ export default function UtenteDetailPage() {
           email: data.data.email,
           role: data.data.role as "admin" | "user" | "tecnico",
           active: data.data.active,
+          id_tecnico: data.data.id_tecnico,
         });
       } else {
         setError("Utente non trovato");
@@ -287,6 +291,29 @@ export default function UtenteDetailPage() {
                 Account attivo
               </label>
             </div>
+
+            {/* Selezione Tecnico (solo se ruolo è tecnico) */}
+            {editForm.role === "tecnico" && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Associa Tecnico
+                </label>
+                <TechnicianSelect
+                  value={editForm.id_tecnico?.toString()}
+                  onChange={(val) => setEditForm({ ...editForm, id_tecnico: parseInt(val) })}
+                  onTechnicianSelect={(tecnico) => {
+                    if (tecnico) {
+                      setEditForm({ ...editForm, nome: tecnico.nome, cognome: tecnico.cognome, id_tecnico: tecnico.id });
+                    }
+                  }}
+                  availableForUserOnly={true}
+                  currentUserId={utente?.id}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Seleziona il tecnico da associare a questo utente. Nome e Cognome verranno compilati automaticamente.
+                </p>
+              </div>
+            )}
             <div className="flex justify-end">
               <button
                 onClick={handleUpdate}

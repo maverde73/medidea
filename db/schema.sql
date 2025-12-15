@@ -27,9 +27,13 @@ CREATE TABLE IF NOT EXISTS attivita (
   stato TEXT NOT NULL DEFAULT 'APERTO',
   data_chiusura TEXT,
   note_generali TEXT,
+  tecnico TEXT,
+  id_tecnico INTEGER,
+  urgenza TEXT,
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   updated_at TEXT NOT NULL DEFAULT (datetime('now')),
-  FOREIGN KEY(id_cliente) REFERENCES clienti(id) ON DELETE RESTRICT
+  FOREIGN KEY(id_cliente) REFERENCES clienti(id) ON DELETE RESTRICT,
+  FOREIGN KEY(id_tecnico) REFERENCES tecnici(id) ON DELETE SET NULL
 );
 
 -- Indici per attivita
@@ -108,3 +112,31 @@ CREATE TABLE IF NOT EXISTS utenti (
 CREATE INDEX IF NOT EXISTS idx_utenti_email ON utenti(email);
 CREATE INDEX IF NOT EXISTS idx_utenti_role ON utenti(role);
 CREATE INDEX IF NOT EXISTS idx_utenti_active ON utenti(active);
+
+-- Tabella tecnici
+CREATE TABLE IF NOT EXISTS tecnici (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  nome TEXT NOT NULL,
+  cognome TEXT NOT NULL,
+  id_utente INTEGER UNIQUE,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+  FOREIGN KEY(id_utente) REFERENCES utenti(id) ON DELETE SET NULL
+);
+
+-- Tabella reparti
+CREATE TABLE IF NOT EXISTS reparti (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  nome TEXT NOT NULL UNIQUE,
+  descrizione TEXT,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- Tabella modalita_apertura
+CREATE TABLE IF NOT EXISTS modalita_apertura (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  descrizione TEXT NOT NULL UNIQUE,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);

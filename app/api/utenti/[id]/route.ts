@@ -34,7 +34,10 @@ export const GET = withAuth<{ params: Promise<{ id: string }> }>(
       const db = createDatabaseClient(env);
 
       const utente = await db.queryFirst(
-        "SELECT id, email, nome, cognome, role, active, last_login, created_at, updated_at FROM utenti WHERE id = ?",
+        `SELECT u.id, u.email, u.nome, u.cognome, u.role, u.active, u.last_login, u.created_at, u.updated_at, t.id as id_tecnico
+         FROM utenti u
+         LEFT JOIN tecnici t ON t.id_utente = u.id
+         WHERE u.id = ?`,
         [utenteId]
       );
 
@@ -95,6 +98,7 @@ export const PUT = withAuth<{ params: Promise<{ id: string }> }>(
         cognome?: string;
         role?: string;
         active?: boolean;
+        id_tecnico?: number;
       };
 
       if (!body.email || !body.nome || !body.cognome || !body.role) {
@@ -185,9 +189,24 @@ export const PUT = withAuth<{ params: Promise<{ id: string }> }>(
 
       await db.execute(updateQuery, updateParams);
 
+      // Handle technician linking if role is 'tecnico' and id_tecnico is provided
+      if (body.role === "tecnico" && body.id_tecnico) {
+        // First, unlink this user from any other technician (just in case)
+        await db.execute("UPDATE tecnici SET id_utente = NULL WHERE id_utente = ?", [utenteId]);
+
+        // Link the new technician
+        await db.execute("UPDATE tecnici SET id_utente = ? WHERE id = ?", [utenteId, body.id_tecnico]);
+      } else if (body.role !== "tecnico") {
+        // If role changed from tecnico to something else, unlink any technician
+        await db.execute("UPDATE tecnici SET id_utente = NULL WHERE id_utente = ?", [utenteId]);
+      }
+
       // Retrieve updated utente
       const utente = await db.queryFirst(
-        "SELECT id, email, nome, cognome, role, active, created_at, updated_at FROM utenti WHERE id = ?",
+        `SELECT u.id, u.email, u.nome, u.cognome, u.role, u.active, u.created_at, u.updated_at, t.id as id_tecnico
+         FROM utenti u
+         LEFT JOIN tecnici t ON t.id_utente = u.id
+         WHERE u.id = ?`,
         [utenteId]
       );
 

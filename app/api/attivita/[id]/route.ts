@@ -23,7 +23,13 @@ export const GET = withAuth<{ params: Promise<{ id: string }> }>(
       const db = createDatabaseClient(env);
 
       const attivita = await db.queryFirst(
-        "SELECT * FROM attivita WHERE id = ?",
+        `SELECT a.*, 
+                t.nome || ' ' || t.cognome as tecnico,
+                c.nome as cliente_nome
+         FROM attivita a
+         LEFT JOIN tecnici t ON a.id_tecnico = t.id
+         LEFT JOIN clienti c ON a.id_cliente = c.id
+         WHERE a.id = ?`,
         [attivitaId]
       );
 

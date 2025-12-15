@@ -205,41 +205,42 @@ export const POST = withAuth(async (request, { user }) => {
       }
     }
 
-    // Insert new attività
-    const result = await db.execute(
+    const {
+      id_cliente,
+      modello,
+      seriale,
+      codice_inventario_cliente,
+      modalita_apertura_richiesta,
+      data_apertura_richiesta,
+      numero_preventivo,
+      data_preventivo,
+      numero_accettazione_preventivo,
+      data_accettazione_preventivo,
+      stato,
+      data_chiusura,
+      note_generali,
+      descrizione_richiesta,
+      id_tecnico,
+    } = validatedData;
+
+    const resultDb = await db.query(
       `INSERT INTO attivita (
         id_cliente, modello, seriale, codice_inventario_cliente,
-        modalita_apertura_richiesta, data_apertura_richiesta, descrizione_richiesta,
+        modalita_apertura_richiesta, data_apertura_richiesta,
         numero_preventivo, data_preventivo,
         numero_accettazione_preventivo, data_accettazione_preventivo,
-        note_generali, data_presa_in_carico, reparto, tecnico, urgenza,
-        stato, created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'APERTO', datetime('now'), datetime('now'))`,
+        stato, data_chiusura, note_generali, descrizione_richiesta, id_tecnico,
+        created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now')) RETURNING *`,
       [
-        validatedData.id_cliente,
-        validatedData.modello || null,
-        validatedData.seriale || null,
-        validatedData.codice_inventario_cliente || null,
-        validatedData.modalita_apertura_richiesta || null,
-        validatedData.data_apertura_richiesta || null,
-        validatedData.descrizione_richiesta || null,
-        validatedData.numero_preventivo || null,
-        validatedData.data_preventivo || null,
-        validatedData.numero_accettazione_preventivo || null,
-        validatedData.data_accettazione_preventivo || null,
-        validatedData.note_generali || null,
-        validatedData.data_presa_in_carico || null,
         validatedData.reparto || null,
         validatedData.tecnico || null,
         validatedData.urgenza || null,
       ]
     );
 
-    // Fetch the created attività
-    const attivita = await db.queryFirst(
-      "SELECT * FROM attivita WHERE id = ?",
-      [result.meta.last_row_id]
-    );
+    // The INSERT statement uses RETURNING *, so resultDb[0] is the created activity
+    const attivita = resultDb[0];
 
     return NextResponse.json(
       {

@@ -36,3 +36,10 @@ export { UserDropdown } from "./UserDropdown";
 export { NavLink } from "./NavLink";
 export { MenuItem } from "./MenuItem";
 export { MenuGroup } from "./MenuGroup";
+
+// UI Primitives
+export { Button } from "./button";
+export { Input } from "./input";
+export { Label } from "./label";
+export { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./select";
+export { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "./dialog";

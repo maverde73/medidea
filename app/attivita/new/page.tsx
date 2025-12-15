@@ -10,6 +10,7 @@ import {
   LoadingSpinner,
   ErrorAlert,
 } from "@/components/ui";
+import { TechnicianSelect } from "@/components/tecnici/TechnicianSelect";
 
 // Validation schema
 const attivitaSchema = z.object({
@@ -40,6 +41,7 @@ const attivitaSchema = z.object({
   data_presa_in_carico: z.string().optional(),
   reparto: z.string().optional(),
   tecnico: z.string().optional(),
+  id_tecnico: z.number().optional(),
   urgenza: z.enum(["BASSA", "MEDIA", "ALTA"]).optional(),
 });
 
@@ -309,11 +311,9 @@ export default function NewAttivitaPage() {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Tecnico
               </label>
-              <input
-                type="text"
-                {...register("tecnico")}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
-                placeholder="Nome del tecnico"
+              <TechnicianSelect
+                value={watch("id_tecnico")?.toString()}
+                onChange={(val) => setValue("id_tecnico", parseInt(val))}
               />
             </div>
             <div>

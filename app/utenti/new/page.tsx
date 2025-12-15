@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { LoadingSpinner, ErrorAlert } from "@/components/ui";
+import { TechnicianSelect } from "@/components/tecnici/TechnicianSelect";
 
 const utenteSchema = z.object({
   email: z.string().email("Email non valida"),
@@ -14,6 +15,7 @@ const utenteSchema = z.object({
   cognome: z.string().min(1, "Cognome obbligatorio"),
   role: z.enum(["admin", "user", "tecnico"]),
   active: z.boolean(),
+  id_tecnico: z.number().optional(),
 });
 
 type UtenteFormData = z.infer<typeof utenteSchema>;
@@ -27,6 +29,8 @@ export default function NewUtentePage() {
   const {
     register,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<UtenteFormData>({
     resolver: zodResolver(utenteSchema),
@@ -193,6 +197,29 @@ export default function NewUtentePage() {
                 Account attivo
               </label>
             </div>
+
+            {/* Selezione Tecnico (solo se ruolo è tecnico) */}
+            {watch("role") === "tecnico" && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Associa Tecnico
+                </label>
+                <TechnicianSelect
+                  value={watch("id_tecnico")?.toString()}
+                  onChange={(val) => setValue("id_tecnico", parseInt(val))}
+                  onTechnicianSelect={(tecnico) => {
+                    if (tecnico) {
+                      setValue("nome", tecnico.nome);
+                      setValue("cognome", tecnico.cognome);
+                    }
+                  }}
+                  availableForUserOnly={true}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Seleziona il tecnico da associare a questo utente. Nome e Cognome verranno compilati automaticamente.
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
