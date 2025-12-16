@@ -9,8 +9,11 @@ import {
   ClientSelector,
   LoadingSpinner,
   ErrorAlert,
+  ModelSelector,
+  EquipmentSelector,
 } from "@/components/ui";
 import { TechnicianSelect } from "@/components/tecnici/TechnicianSelect";
+import { Button } from "@/components/ui/button";
 
 // Validation schema
 const attivitaSchema = z.object({
@@ -18,31 +21,35 @@ const attivitaSchema = z.object({
   id_cliente: z.number().positive("Cliente obbligatorio"),
 
   // Apparecchiatura
-  modello: z.string().min(1, "Modello obbligatorio"),
-  seriale: z.string().optional(),
-  codice_inventario_cliente: z.string().optional(),
+  id_apparecchiatura: z.number().optional().nullable(),
+  id_modello: z.number().optional().nullable(),
+  seriale: z.string().optional().nullable(),
+  codice_inventario_cliente: z.string().optional().nullable(),
 
   // Apertura richiesta
-  modalita_apertura_richiesta: z.string().optional(),
+  modalita_apertura_richiesta: z.string().optional().nullable(),
   data_apertura_richiesta: z.string().min(1, "Data apertura obbligatoria"),
 
   // Preventivo
-  numero_preventivo: z.string().optional(),
-  data_preventivo: z.string().optional(),
+  numero_preventivo: z.string().optional().nullable(),
+  data_preventivo: z.string().optional().nullable(),
 
   // Accettazione
-  numero_accettazione_preventivo: z.string().optional(),
-  data_accettazione_preventivo: z.string().optional(),
+  numero_accettazione_preventivo: z.string().optional().nullable(),
+  data_accettazione_preventivo: z.string().optional().nullable(),
 
   // Note
-  note_generali: z.string().optional(),
+  note_generali: z.string().optional().nullable(),
 
   // Presa in carico
-  data_presa_in_carico: z.string().optional(),
-  reparto: z.string().optional(),
-  tecnico: z.string().optional(),
-  id_tecnico: z.number().optional(),
-  urgenza: z.enum(["BASSA", "MEDIA", "ALTA"]).optional(),
+  data_presa_in_carico: z.string().optional().nullable(),
+  reparto: z.string().optional().nullable(),
+  tecnico: z.string().optional().nullable(),
+  id_tecnico: z.number().optional().nullable(),
+  urgenza: z.enum(["BASSA", "MEDIA", "ALTA"]).optional().nullable(),
+}).refine((data) => data.id_apparecchiatura || data.id_modello, {
+  message: "Seleziona un'apparecchiatura esistente o specificane una nuova (modello)",
+  path: ["id_apparecchiatura"], // Error will be attached to id_apparecchiatura
 });
 
 type AttivitaFormData = z.infer<typeof attivitaSchema>;
@@ -54,6 +61,7 @@ export default function NewAttivitaPage() {
   const [success, setSuccess] = useState(false);
   const [reparti, setReparti] = useState<{ id: number; nome: string }[]>([]);
   const [modalita, setModalita] = useState<{ id: number; descrizione: string }[]>([]);
+  const [isNewEquipment, setIsNewEquipment] = useState(false);
 
   useEffect(() => {
     const fetchLookups = async () => {
@@ -83,15 +91,28 @@ export default function NewAttivitaPage() {
     setValue,
     watch,
     formState: { errors },
+    resetField,
   } = useForm<AttivitaFormData>({
     resolver: zodResolver(attivitaSchema),
     defaultValues: {
       id_cliente: 0, // Default to 0 to trigger validation
       data_apertura_richiesta: new Date().toISOString().split("T")[0],
+      id_apparecchiatura: null,
+      id_modello: null,
+      seriale: "",
     },
   });
 
   const selectedClientId = watch("id_cliente");
+  const selectedEquipmentId = watch("id_apparecchiatura");
+  const selectedModelId = watch("id_modello");
+
+  // Reset equipment fields when client changes
+  useEffect(() => {
+    setValue("id_apparecchiatura", null);
+    setValue("id_modello", null);
+    setValue("seriale", "");
+  }, [selectedClientId, setValue]);
 
   const onSubmit = async (data: AttivitaFormData) => {
     setLoading(true);
@@ -100,6 +121,16 @@ export default function NewAttivitaPage() {
     try {
       const token = localStorage.getItem("token");
 
+      // Prepare payload
+      const payload = {
+        ...data,
+        // If selecting existing equipment, ensure id_modello and seriale are ignored or handled correctly by API
+        // The API prioritizes id_apparecchiatura if present
+        id_modello: isNewEquipment ? data.id_modello : undefined,
+        seriale: isNewEquipment ? data.seriale : undefined,
+        id_apparecchiatura: isNewEquipment ? undefined : data.id_apparecchiatura,
+      };
+
       // Create attività
       const response = await fetch("/api/attivita", {
         method: "POST",
@@ -107,7 +138,7 @@ export default function NewAttivitaPage() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
@@ -130,8 +161,6 @@ export default function NewAttivitaPage() {
       setLoading(false);
     }
   };
-
-
 
   return (
     <div className="max-w-4xl space-y-6">
@@ -192,47 +221,89 @@ export default function NewAttivitaPage() {
 
         {/* Dati Apparecchiatura */}
         <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">
-            Dati Apparecchiatura
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Modello <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                {...register("modello")}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-                placeholder="Inserisci modello"
-              />
-              {errors.modello && (
-                <p className="mt-1 text-sm text-red-600">{errors.modello.message}</p>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Seriale
-              </label>
-              <input
-                type="text"
-                {...register("seriale")}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
-                placeholder="Inserisci numero seriale"
-              />
-            </div>
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Codice Inventario Cliente
-              </label>
-              <input
-                type="text"
-                {...register("codice_inventario_cliente")}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
-                placeholder="Inserisci codice inventario"
-              />
-            </div>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold text-gray-900">
+              Dati Apparecchiatura
+            </h2>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setIsNewEquipment(!isNewEquipment);
+                // Reset fields when toggling
+                setValue("id_apparecchiatura", null);
+                setValue("id_modello", null);
+                setValue("seriale", "");
+              }}
+              disabled={!selectedClientId}
+            >
+              {isNewEquipment ? "Seleziona Esistente" : "Nuova Apparecchiatura"}
+            </Button>
           </div>
+
+          {!selectedClientId ? (
+            <p className="text-sm text-gray-500">Seleziona prima un cliente.</p>
+          ) : (
+            <div className="space-y-4">
+              {isNewEquipment ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Modello <span className="text-red-500">*</span>
+                    </label>
+                    <ModelSelector
+                      value={selectedModelId || undefined}
+                      onSelect={(id) => setValue("id_modello", id, { shouldValidate: true })}
+                      error={errors.id_modello?.message}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Seriale
+                    </label>
+                    <input
+                      type="text"
+                      {...register("seriale")}
+                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
+                      placeholder="Inserisci numero seriale"
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Apparecchiatura <span className="text-red-500">*</span>
+                  </label>
+                  <EquipmentSelector
+                    idCliente={selectedClientId}
+                    value={selectedEquipmentId || undefined}
+                    onSelect={(id) => setValue("id_apparecchiatura", id, { shouldValidate: true })}
+                    error={errors.id_apparecchiatura?.message}
+                  />
+                </div>
+              )}
+
+              {/* Show generic error if validation fails on the group */}
+              {errors.id_apparecchiatura && !errors.id_apparecchiatura.message && (
+                <p className="mt-1 text-sm text-red-600">
+                  Seleziona un'apparecchiatura o crea una nuova.
+                </p>
+              )}
+
+              <div className="mt-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Codice Inventario Cliente
+                </label>
+                <input
+                  type="text"
+                  {...register("codice_inventario_cliente")}
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
+                  placeholder="Inserisci codice inventario"
+                />
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Apertura Richiesta */}

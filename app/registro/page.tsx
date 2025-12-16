@@ -29,6 +29,7 @@ export default function RegistroAttivita() {
     const router = useRouter();
     const [attivita, setAttivita] = useState<Attivita[]>([]);
     const [loading, setLoading] = useState(true);
+    const [initialized, setInitialized] = useState(false);
     const [sortConfig, setSortConfig] = useState<{ key: keyof Attivita; direction: 'asc' | 'desc' } | null>(null);
     const [filters, setFilters] = useState({
         search: "",
@@ -36,10 +37,32 @@ export default function RegistroAttivita() {
         month: (new Date().getMonth() + 1).toString(),
     });
 
+    // Load filters from session storage on mount
     useEffect(() => {
-        fetchAttivita();
+        const savedFilters = sessionStorage.getItem("registro_filters");
+        if (savedFilters) {
+            try {
+                setFilters(JSON.parse(savedFilters));
+            } catch (e) {
+                console.error("Failed to parse saved filters", e);
+            }
+        }
+        setInitialized(true);
+    }, []);
+
+    // Save filters to session storage when they change
+    useEffect(() => {
+        if (initialized) {
+            sessionStorage.setItem("registro_filters", JSON.stringify(filters));
+        }
+    }, [filters, initialized]);
+
+    useEffect(() => {
+        if (initialized) {
+            fetchAttivita();
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [filters]);
+    }, [filters, initialized]);
 
     const fetchAttivita = async () => {
         setLoading(true);

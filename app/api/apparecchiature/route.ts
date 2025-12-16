@@ -17,20 +17,26 @@ export const GET = withAuth(async (request, { user }) => {
     const { env } = getCloudflareContext();
     const db = createDatabaseClient(env);
 
-    let query = "SELECT * FROM apparecchiature WHERE 1=1";
+    let query = `
+      SELECT e.*, m.nome as modello, c.nome as nome_cliente 
+      FROM apparecchiature e
+      JOIN modelli_apparecchiature m ON e.id_modello = m.id
+      JOIN clienti c ON e.id_cliente = c.id
+      WHERE 1=1
+    `;
     const params: any[] = [];
 
     if (id_cliente) {
-      query += " AND id_cliente = ?";
+      query += " AND e.id_cliente = ?";
       params.push(parseInt(id_cliente));
     }
 
     if (modello) {
-      query += " AND modello LIKE ?";
+      query += " AND m.nome LIKE ?";
       params.push(`%${modello}%`);
     }
 
-    query += " ORDER BY modello ASC";
+    query += " ORDER BY m.nome ASC";
 
     const apparecchiature = await db.query(query, params);
 
@@ -59,16 +65,16 @@ export const POST = withAuth(async (request, { user }) => {
   try {
     const body = await request.json() as {
       id_cliente?: number;
-      modello?: string;
+      id_modello?: number;
       seriale?: string;
       data_test_funzionali?: string;
       data_test_elettrici?: string;
       note?: string;
     };
 
-    if (!body.id_cliente || !body.modello || body.modello.trim() === "") {
+    if (!body.id_cliente || !body.id_modello) {
       return NextResponse.json(
-        { error: "ID cliente e modello sono obbligatori" },
+        { error: "ID cliente e ID modello sono obbligatori" },
         { status: 400 }
       );
     }
@@ -91,11 +97,11 @@ export const POST = withAuth(async (request, { user }) => {
 
     const result = await db.execute(
       `INSERT INTO apparecchiature
-      (id_cliente, modello, seriale, data_test_funzionali, data_test_elettrici, note, created_at, updated_at)
+      (id_cliente, id_modello, seriale, data_test_funzionali, data_test_elettrici, note, created_at, updated_at)
       VALUES (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
       [
         body.id_cliente,
-        body.modello,
+        body.id_modello,
         body.seriale || null,
         body.data_test_funzionali || null,
         body.data_test_elettrici || null,
@@ -104,7 +110,10 @@ export const POST = withAuth(async (request, { user }) => {
     );
 
     const apparecchiatura = await db.queryFirst(
-      "SELECT * FROM apparecchiature WHERE id = ?",
+      `SELECT e.*, m.nome as modello 
+       FROM apparecchiature e
+       JOIN modelli_apparecchiature m ON e.id_modello = m.id
+       WHERE e.id = ?`,
       [result.meta.last_row_id]
     );
 

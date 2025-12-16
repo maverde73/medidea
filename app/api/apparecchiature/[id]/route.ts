@@ -5,7 +5,7 @@ import { createDatabaseClient } from "@/lib/db";
 
 /**
  * GET /api/apparecchiature/:id
- * Get a single apparecchiatura by ID
+ * Get a single apparecchiatura by ID, including model details
  * Requires authentication
  */
 export const GET = withAuth<{ params: Promise<{ id: string }> }>(
@@ -25,7 +25,11 @@ export const GET = withAuth<{ params: Promise<{ id: string }> }>(
       const db = createDatabaseClient(env);
 
       const apparecchiatura = await db.queryFirst(
-        "SELECT * FROM apparecchiature WHERE id = ?",
+        `SELECT e.*, m.nome as modello, c.nome as nome_cliente 
+         FROM apparecchiature e
+         JOIN modelli_apparecchiature m ON e.id_modello = m.id
+         JOIN clienti c ON e.id_cliente = c.id
+         WHERE e.id = ?`,
         [apparecchiaturaId]
       );
 
@@ -73,16 +77,16 @@ export const PUT = withAuth<{ params: Promise<{ id: string }> }>(
 
       const body = await request.json() as {
         id_cliente?: number;
-        modello?: string;
+        id_modello?: number;
         seriale?: string;
         data_test_funzionali?: string;
         data_test_elettrici?: string;
         note?: string;
       };
 
-      if (!body.id_cliente || !body.modello || body.modello.trim() === "") {
+      if (!body.id_cliente || !body.id_modello) {
         return NextResponse.json(
-          { error: "ID cliente e modello sono obbligatori" },
+          { error: "ID cliente e ID modello sono obbligatori" },
           { status: 400 }
         );
       }
@@ -116,11 +120,24 @@ export const PUT = withAuth<{ params: Promise<{ id: string }> }>(
         );
       }
 
+      // Check if modello exists
+      const modello = await db.queryFirst(
+        "SELECT id FROM modelli_apparecchiature WHERE id = ?",
+        [body.id_modello]
+      );
+
+      if (!modello) {
+        return NextResponse.json(
+          { error: "Modello non trovato" },
+          { status: 404 }
+        );
+      }
+
       // Update apparecchiatura
       await db.execute(
         `UPDATE apparecchiature SET
         id_cliente = ?,
-        modello = ?,
+        id_modello = ?,
         seriale = ?,
         data_test_funzionali = ?,
         data_test_elettrici = ?,
@@ -129,7 +146,7 @@ export const PUT = withAuth<{ params: Promise<{ id: string }> }>(
         WHERE id = ?`,
         [
           body.id_cliente,
-          body.modello,
+          body.id_modello,
           body.seriale || null,
           body.data_test_funzionali || null,
           body.data_test_elettrici || null,
@@ -138,9 +155,13 @@ export const PUT = withAuth<{ params: Promise<{ id: string }> }>(
         ]
       );
 
-      // Retrieve updated apparecchiatura
+      // Retrieve updated apparecchiatura with joins
       const apparecchiatura = await db.queryFirst(
-        "SELECT * FROM apparecchiature WHERE id = ?",
+        `SELECT e.*, m.nome as modello, c.nome as nome_cliente 
+         FROM apparecchiature e
+         JOIN modelli_apparecchiature m ON e.id_modello = m.id
+         JOIN clienti c ON e.id_cliente = c.id
+         WHERE e.id = ?`,
         [apparecchiaturaId]
       );
 

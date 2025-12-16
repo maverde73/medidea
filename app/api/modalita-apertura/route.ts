@@ -14,7 +14,7 @@ export const GET = withAuth(async (request, { user }) => {
         const db = createDatabaseClient(env);
 
         const modalita = await db.query(
-            "SELECT * FROM modalita_apertura WHERE active = 1 ORDER BY descrizione ASC"
+            "SELECT * FROM modalita_apertura ORDER BY descrizione ASC"
         );
 
         return NextResponse.json({
@@ -48,7 +48,7 @@ export const POST = withAuth(async (request, { user }) => {
 
         // Check if exists
         const existing = await db.queryFirst(
-            "SELECT * FROM modalita_apertura WHERE descrizione = ? AND active = 1",
+            "SELECT * FROM modalita_apertura WHERE descrizione = ?",
             [descrizione]
         );
 

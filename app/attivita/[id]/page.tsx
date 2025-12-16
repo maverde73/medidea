@@ -3,12 +3,14 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { Trash2, Pencil } from "lucide-react";
-import { LoadingSpinner, ErrorAlert, AttivitaStatusBadge, FileList, FileUploader } from "@/components/ui";
+import { LoadingSpinner, ErrorAlert, AttivitaStatusBadge, FileList, FileUploader, ModelSelector, EquipmentSelector } from "@/components/ui";
 import { TechnicianSelect } from "@/components/tecnici/TechnicianSelect";
+import { Button } from "@/components/ui/button";
 
 interface Attivita {
   id: number;
   id_cliente: number;
+  id_apparecchiatura: number | null;
   modello: string | null;
   seriale: string | null;
   codice_inventario_cliente: string | null;
@@ -56,6 +58,7 @@ export default function AttivitaDetailPage() {
   const [editing, setEditing] = useState(initialMode === "edit");
   const [reparti, setReparti] = useState<{ id: number; nome: string }[]>([]);
   const [modalita, setModalita] = useState<{ id: number; descrizione: string }[]>([]);
+  const [isNewEquipment, setIsNewEquipment] = useState(false);
 
   useEffect(() => {
     const fetchLookups = async () => {
@@ -79,7 +82,9 @@ export default function AttivitaDetailPage() {
   }, []);
 
   const [editForm, setEditForm] = useState({
-    modello: "",
+    id_apparecchiatura: null as number | null,
+    id_modello: null as number | null,
+    modello: "", // Used for display or fallback
     seriale: "",
     codice_inventario_cliente: "",
     stato: "APERTO" as "APERTO" | "CHIUSO" | "RIAPERTO",
@@ -120,6 +125,8 @@ export default function AttivitaDetailPage() {
         const data = await response.json() as { data: Attivita };
         setAttivita(data.data);
         setEditForm({
+          id_apparecchiatura: data.data.id_apparecchiatura || null,
+          id_modello: null, // Reset model selection
           modello: data.data.modello || "",
           seriale: data.data.seriale || "",
           codice_inventario_cliente: data.data.codice_inventario_cliente || "",
@@ -230,7 +237,7 @@ export default function AttivitaDetailPage() {
     setSaveError(null);
     try {
       const token = localStorage.getItem("token");
-      // Prepare payload: convert empty strings to null for date fields
+      // Prepare payload
       const payload = {
         ...editForm,
         data_apertura_richiesta: editForm.data_apertura_richiesta || null,
@@ -239,8 +246,6 @@ export default function AttivitaDetailPage() {
         data_chiusura: editForm.data_chiusura || null,
         data_presa_in_carico: editForm.data_presa_in_carico || null,
         // Also handle other optional fields that might be empty strings
-        modello: editForm.modello || null,
-        seriale: editForm.seriale || null,
         codice_inventario_cliente: editForm.codice_inventario_cliente || null,
         modalita_apertura_richiesta: editForm.modalita_apertura_richiesta || null,
         numero_preventivo: editForm.numero_preventivo || null,
@@ -250,7 +255,19 @@ export default function AttivitaDetailPage() {
         tecnico: editForm.tecnico || null,
         id_tecnico: editForm.id_tecnico || null,
         urgenza: editForm.urgenza || null,
+        // Equipment logic
+        id_modello: isNewEquipment ? editForm.id_modello : undefined,
+        seriale: isNewEquipment ? editForm.seriale : undefined,
+        id_apparecchiatura: isNewEquipment ? undefined : editForm.id_apparecchiatura,
       };
+
+      // Remove fields that shouldn't be sent if they are not relevant
+      if (!isNewEquipment) {
+        // If selecting existing, we don't send id_modello/seriale as they are for creating new
+        // But we send id_apparecchiatura
+      } else {
+        // If creating new, we don't send id_apparecchiatura (or send it as undefined/null)
+      }
 
       const response = await fetch(`/api/attivita/${id}`, {
         method: "PATCH",
@@ -266,6 +283,14 @@ export default function AttivitaDetailPage() {
         setAttivita(data.data);
         setEditing(false);
         setSaveError(null);
+        // Update form with new data
+        setEditForm(prev => ({
+          ...prev,
+          id_apparecchiatura: data.data.id_apparecchiatura || null,
+          modello: data.data.modello || "",
+          seriale: data.data.seriale || "",
+        }));
+        setIsNewEquipment(false);
       } else {
         const errorData = await response.json() as { error: string; details?: { field: string; message: string }[] };
         setSaveError({
@@ -285,7 +310,7 @@ export default function AttivitaDetailPage() {
     return new Date(dateString).toLocaleDateString("it-IT");
   };
 
-  if (loading && !attivita) { // Only show full page loading if no data yet
+  if (loading && !attivita) {
     return (
       <div className="flex items-center justify-center py-12">
         <LoadingSpinner size="lg" />
@@ -323,7 +348,11 @@ export default function AttivitaDetailPage() {
           <div className="flex items-center gap-3">
             {!editing && <AttivitaStatusBadge status={attivita.stato} />}
             <button
-              onClick={() => setEditing(!editing)}
+              onClick={() => {
+                setEditing(!editing);
+                // Reset equipment state when entering edit mode
+                setIsNewEquipment(false);
+              }}
               className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
             >
               <Pencil size={16} />
@@ -354,32 +383,75 @@ export default function AttivitaDetailPage() {
       <div className="bg-white rounded-lg shadow p-6">
         <h2 className="text-xl font-semibold mb-4">Dati Cliente</h2>
         <p className="text-gray-700">Cliente ID: {attivita.id_cliente}</p>
+        {/* We could fetch and display client name here if needed, but it's not in the Attivita interface currently used in state, 
+            though the API returns it. For now, we stick to what we have. */}
       </div>
 
       {/* Apparecchiatura */}
       <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-semibold mb-4">Dati Apparecchiatura</h2>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-semibold">Dati Apparecchiatura</h2>
+          {editing && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setIsNewEquipment(!isNewEquipment);
+                // Reset fields when toggling
+                if (!isNewEquipment) {
+                  setEditForm(prev => ({ ...prev, id_apparecchiatura: null, id_modello: null, seriale: "" }));
+                } else {
+                  // Restore original if cancelling? For now just reset.
+                  setEditForm(prev => ({ ...prev, id_apparecchiatura: attivita.id_apparecchiatura, id_modello: null, seriale: attivita.seriale || "" }));
+                }
+              }}
+            >
+              {isNewEquipment ? "Seleziona Esistente" : "Nuova Apparecchiatura"}
+            </Button>
+          )}
+        </div>
+
         {editing ? (
           <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Modello</label>
-              <input
-                type="text"
-                value={editForm.modello}
-                onChange={(e) => setEditForm({ ...editForm, modello: e.target.value })}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Seriale</label>
-              <input
-                type="text"
-                value={editForm.seriale}
-                onChange={(e) => setEditForm({ ...editForm, seriale: e.target.value })}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
-              />
-            </div>
-            <div>
+            {isNewEquipment ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Modello <span className="text-red-500">*</span>
+                  </label>
+                  <ModelSelector
+                    value={editForm.id_modello || undefined}
+                    onSelect={(id) => setEditForm({ ...editForm, id_modello: id })}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Seriale
+                  </label>
+                  <input
+                    type="text"
+                    value={editForm.seriale}
+                    onChange={(e) => setEditForm({ ...editForm, seriale: e.target.value })}
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
+                    placeholder="Inserisci numero seriale"
+                  />
+                </div>
+              </div>
+            ) : (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Apparecchiatura <span className="text-red-500">*</span>
+                </label>
+                <EquipmentSelector
+                  idCliente={attivita.id_cliente}
+                  value={editForm.id_apparecchiatura || undefined}
+                  onSelect={(id) => setEditForm({ ...editForm, id_apparecchiatura: id })}
+                />
+              </div>
+            )}
+
+            <div className="mt-4">
               <label className="block text-sm font-medium text-gray-700 mb-1">Codice Inventario Cliente</label>
               <input
                 type="text"

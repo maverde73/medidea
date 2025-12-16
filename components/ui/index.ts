@@ -43,3 +43,6 @@ export { Input } from "./input";
 export { Label } from "./label";
 export { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./select";
 export { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "./dialog";
+export { AttachmentManager } from "./AttachmentManager";
+export { ModelSelector } from "./ModelSelector";
+export { EquipmentSelector } from "./EquipmentSelector";

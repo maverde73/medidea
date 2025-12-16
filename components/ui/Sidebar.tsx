@@ -145,6 +145,12 @@ export function Sidebar({ className, isMobileOpen = false, onMobileClose }: Side
               label: 'Modalità Apertura',
               icon: Table,
               href: '/impostazioni/tabelle?tab=modalita'
+            },
+            {
+              id: 'modelli',
+              label: 'Anagrafica Modelli',
+              icon: Table,
+              href: '/impostazioni/modelli'
             }
           ]}
         />

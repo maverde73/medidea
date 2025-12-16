@@ -1,67 +1,89 @@
 import { NextRequest, NextResponse } from "next/server";
+import { withAuth } from "@/lib/middleware";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { createDatabaseClient } from "@/lib/db";
 
 /**
- * File upload endpoint
- * Handles multipart form data uploads to R2 storage
+ * POST /api/upload
+ * Handle file uploads to R2 and save metadata to D1
  */
-export async function POST(request: NextRequest) {
+export const POST = withAuth(async (request, { user }) => {
   try {
-    // In production, this will use the R2 binding from getRequestContext
-    // For now, return a mock response for development
-
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
+    const tipoRiferimento = formData.get("tipo_riferimento") as string | null;
+    const idRiferimento = formData.get("id_riferimento") as string | null;
+    const note = formData.get("note") as string | null;
 
     if (!file) {
       return NextResponse.json(
-        { error: "No file provided" },
+        { error: "Nessun file fornito" },
         { status: 400 }
       );
     }
 
-    // Validate file
-    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (!tipoRiferimento || !idRiferimento) {
+      return NextResponse.json(
+        { error: "Dati di riferimento mancanti" },
+        { status: 400 }
+      );
+    }
+
+    // Validate file size (e.g., 10MB)
+    const maxSize = 10 * 1024 * 1024;
     if (file.size > maxSize) {
       return NextResponse.json(
-        { error: "File too large. Maximum size is 10MB" },
+        { error: "File troppo grande. Dimensione massima 10MB" },
         { status: 400 }
       );
     }
 
-    // In development, return mock response
-    if (process.env.NODE_ENV === "development") {
-      return NextResponse.json(
-        {
-          message: "File upload endpoint ready",
-          note: "R2 storage will be available when deployed to Cloudflare",
-          file: {
-            name: file.name,
-            size: file.size,
-            type: file.type,
-          },
-          mockKey: `uploads/${Date.now()}_${file.name}`,
-        },
-        { status: 200 }
-      );
-    }
+    const { env } = getCloudflareContext();
 
-    // Production code would upload to R2 here
-    // const storage = createStorageClient(env);
-    // const key = storage.generateKey(file.name, 'uploads');
-    // const buffer = await file.arrayBuffer();
-    // await storage.upload(key, buffer, { contentType: file.type });
+    // Upload to R2
+    const timestamp = Date.now();
+    const randomSuffix = Math.random().toString(36).substring(2, 15);
+    const key = `uploads/${tipoRiferimento}/${idRiferimento}/${timestamp}-${randomSuffix}-${file.name}`;
 
-    return NextResponse.json(
-      { error: "Upload not implemented" },
-      { status: 501 }
+    await env.STORAGE.put(key, file.stream(), {
+      httpMetadata: {
+        contentType: file.type,
+      },
+    });
+
+    // Save metadata to D1
+    const db = createDatabaseClient(env);
+    const result = await db.query(
+      `INSERT INTO allegati (
+        tipo_riferimento, id_riferimento, nome_file_originale, 
+        chiave_r2, mime_type, dimensione_bytes, note,
+        created_at, updated_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now')) RETURNING *`,
+      [
+        tipoRiferimento,
+        parseInt(idRiferimento),
+        file.name,
+        key,
+        file.type,
+        file.size,
+        note || null
+      ]
     );
+
+    return NextResponse.json({
+      success: true,
+      data: result[0],
+      message: "File caricato con successo"
+    }, { status: 201 });
+
   } catch (error) {
+    console.error("Upload error:", error);
     return NextResponse.json(
       {
-        error: "Upload failed",
+        error: "Errore durante il caricamento",
         message: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 }
     );
   }
-}
+});

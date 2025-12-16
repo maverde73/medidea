@@ -2,13 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
-import { LoadingSpinner, ErrorAlert } from "@/components/ui";
+import { LoadingSpinner, ErrorAlert, AttachmentManager, ModelSelector } from "@/components/ui";
 import { Pencil, Trash2 } from "lucide-react";
 
 interface Apparecchiatura {
   id: number;
   id_cliente: number;
-  modello: string;
+  id_modello: number;
+  modello: string; // This comes from the JOIN in the API
   seriale: string | null;
   data_test_funzionali: string | null;
   data_test_elettrici: string | null;
@@ -30,7 +31,7 @@ export default function ApparecchiaturaDetailPage() {
   const [deleting, setDeleting] = useState(false);
   const [editing, setEditing] = useState(initialMode === "edit");
   const [editForm, setEditForm] = useState({
-    modello: "",
+    id_modello: 0,
     seriale: "",
     data_test_funzionali: "",
     data_test_elettrici: "",
@@ -58,7 +59,7 @@ export default function ApparecchiaturaDetailPage() {
         const data = await response.json() as { data: Apparecchiatura };
         setApparecchiatura(data.data);
         setEditForm({
-          modello: data.data.modello,
+          id_modello: data.data.id_modello,
           seriale: data.data.seriale || "",
           data_test_funzionali: data.data.data_test_funzionali || "",
           data_test_elettrici: data.data.data_test_elettrici || "",
@@ -98,7 +99,7 @@ export default function ApparecchiaturaDetailPage() {
   };
 
   const handleUpdate = async () => {
-    if (!editForm.modello.trim()) {
+    if (!editForm.id_modello) {
       setError("Il modello è obbligatorio");
       return;
     }
@@ -112,7 +113,11 @@ export default function ApparecchiaturaDetailPage() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(editForm),
+        body: JSON.stringify({
+          // Maintain the valid client ID (though usually not editable here, API requires it)
+          id_cliente: apparecchiatura?.id_cliente,
+          ...editForm
+        }),
       });
 
       if (response.ok) {
@@ -195,14 +200,13 @@ export default function ApparecchiaturaDetailPage() {
         {editing ? (
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <p className="block text-sm font-medium text-gray-700 mb-1">
                 Modello <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                value={editForm.modello}
-                onChange={(e) => setEditForm({ ...editForm, modello: e.target.value })}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
+              </p>
+              <ModelSelector
+                value={editForm.id_modello}
+                onSelect={(value) => setEditForm({ ...editForm, id_modello: value || 0 })}
+                error={!editForm.id_modello ? "Modello obbligatorio" : undefined}
               />
             </div>
             <div>
@@ -254,18 +258,38 @@ export default function ApparecchiaturaDetailPage() {
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <p className="text-sm text-gray-600">Data Test Funzionali</p>
-              <p className="text-gray-900 font-medium">
-                {formatDate(apparecchiatura.data_test_funzionali)}
-              </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm text-gray-600">Data Test Funzionali</p>
+                <p className="text-gray-900 font-medium">
+                  {formatDate(apparecchiatura.data_test_funzionali)}
+                </p>
+              </div>
+              <div className="border-t pt-4">
+                <AttachmentManager
+                  tipoRiferimento="apparecchiatura"
+                  idRiferimento={apparecchiatura.id}
+                  category="test_funzionali"
+                  label="Allegati Test Funzionali"
+                />
+              </div>
             </div>
-            <div>
-              <p className="text-sm text-gray-600">Data Test Elettrici</p>
-              <p className="text-gray-900 font-medium">
-                {formatDate(apparecchiatura.data_test_elettrici)}
-              </p>
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm text-gray-600">Data Test Elettrici</p>
+                <p className="text-gray-900 font-medium">
+                  {formatDate(apparecchiatura.data_test_elettrici)}
+                </p>
+              </div>
+              <div className="border-t pt-4">
+                <AttachmentManager
+                  tipoRiferimento="apparecchiatura"
+                  idRiferimento={apparecchiatura.id}
+                  category="test_elettrici"
+                  label="Allegati Test Elettrici"
+                />
+              </div>
             </div>
           </div>
         )}

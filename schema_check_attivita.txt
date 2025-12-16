@@ -1,0 +1,204 @@
+
+ ⛅️ wrangler 4.49.0 (update available 4.54.0)
+─────────────────────────────────────────────
+Resource location: local 
+
+Use --remote if you want to access the remote instance.
+
+🌀 Executing on local database medidea-db (a1de6fa4-c485-4b6d-bb9a-8f9bf34c3482) from .wrangler/state/v3/d1:
+🌀 To execute on your remote database, add a --remote flag to your wrangler command.
+🚣 1 command executed successfully.
+[
+  {
+    "results": [
+      {
+        "cid": 0,
+        "name": "id",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": "null",
+        "pk": 1
+      },
+      {
+        "cid": 1,
+        "name": "id_cliente",
+        "type": "INTEGER",
+        "notnull": 1,
+        "dflt_value": "null",
+        "pk": 0
+      },
+      {
+        "cid": 2,
+        "name": "modello",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": "null",
+        "pk": 0
+      },
+      {
+        "cid": 3,
+        "name": "seriale",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": "null",
+        "pk": 0
+      },
+      {
+        "cid": 4,
+        "name": "codice_inventario_cliente",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": "null",
+        "pk": 0
+      },
+      {
+        "cid": 5,
+        "name": "modalita_apertura_richiesta",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": "null",
+        "pk": 0
+      },
+      {
+        "cid": 6,
+        "name": "data_apertura_richiesta",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": "null",
+        "pk": 0
+      },
+      {
+        "cid": 7,
+        "name": "numero_preventivo",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": "null",
+        "pk": 0
+      },
+      {
+        "cid": 8,
+        "name": "data_preventivo",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": "null",
+        "pk": 0
+      },
+      {
+        "cid": 9,
+        "name": "numero_accettazione_preventivo",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": "null",
+        "pk": 0
+      },
+      {
+        "cid": 10,
+        "name": "data_accettazione_preventivo",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": "null",
+        "pk": 0
+      },
+      {
+        "cid": 11,
+        "name": "stato",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": "'APERTO'",
+        "pk": 0
+      },
+      {
+        "cid": 12,
+        "name": "data_chiusura",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": "null",
+        "pk": 0
+      },
+      {
+        "cid": 13,
+        "name": "note_generali",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": "null",
+        "pk": 0
+      },
+      {
+        "cid": 14,
+        "name": "created_at",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": "datetime('now')",
+        "pk": 0
+      },
+      {
+        "cid": 15,
+        "name": "updated_at",
+        "type": "TEXT",
+        "notnull": 1,
+        "dflt_value": "datetime('now')",
+        "pk": 0
+      },
+      {
+        "cid": 16,
+        "name": "data_presa_in_carico",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": "null",
+        "pk": 0
+      },
+      {
+        "cid": 17,
+        "name": "reparto",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": "null",
+        "pk": 0
+      },
+      {
+        "cid": 18,
+        "name": "tecnico",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": "null",
+        "pk": 0
+      },
+      {
+        "cid": 19,
+        "name": "urgenza",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": "null",
+        "pk": 0
+      },
+      {
+        "cid": 20,
+        "name": "descrizione_richiesta",
+        "type": "TEXT",
+        "notnull": 0,
+        "dflt_value": "null",
+        "pk": 0
+      },
+      {
+        "cid": 21,
+        "name": "id_tecnico",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": "null",
+        "pk": 0
+      },
+      {
+        "cid": 22,
+        "name": "id_apparecchiatura",
+        "type": "INTEGER",
+        "notnull": 0,
+        "dflt_value": "null",
+        "pk": 0
+      }
+    ],
+    "success": true,
+    "meta": {
+      "duration": 0
+    }
+  }
+]

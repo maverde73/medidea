@@ -31,47 +31,47 @@ export const GET = withAuth(async (request, { user }) => {
     const whereParams: any[] = [];
 
     if (filters.id_cliente) {
-      whereClauses.push("id_cliente = ?");
+      whereClauses.push("attivita.id_cliente = ?");
       whereParams.push(filters.id_cliente);
     }
 
     if (filters.stato) {
-      whereClauses.push("stato = ?");
+      whereClauses.push("attivita.stato = ?");
       whereParams.push(filters.stato);
     }
 
     if (filters.data_apertura_da) {
-      whereClauses.push("data_apertura_richiesta >= ?");
+      whereClauses.push("attivita.data_apertura_richiesta >= ?");
       whereParams.push(filters.data_apertura_da);
     }
 
     if (filters.data_apertura_a) {
-      whereClauses.push("data_apertura_richiesta <= ?");
+      whereClauses.push("attivita.data_apertura_richiesta <= ?");
       whereParams.push(filters.data_apertura_a);
     }
 
     if (filters.data_chiusura_da) {
-      whereClauses.push("data_chiusura >= ?");
+      whereClauses.push("attivita.data_chiusura >= ?");
       whereParams.push(filters.data_chiusura_da);
     }
 
     if (filters.data_chiusura_a) {
-      whereClauses.push("data_chiusura <= ?");
+      whereClauses.push("attivita.data_chiusura <= ?");
       whereParams.push(filters.data_chiusura_a);
     }
 
     if (filters.modello) {
-      whereClauses.push("modello LIKE ?");
+      whereClauses.push("m.nome LIKE ?");
       whereParams.push(`%${filters.modello}%`);
     }
 
     if (filters.descrizione_richiesta) {
-      whereClauses.push("descrizione_richiesta LIKE ?");
+      whereClauses.push("attivita.descrizione_richiesta LIKE ?");
       whereParams.push(`%${filters.descrizione_richiesta}%`);
     }
 
     if (filters.seriale) {
-      whereClauses.push("seriale LIKE ?");
+      whereClauses.push("e.seriale LIKE ?");
       whereParams.push(`%${filters.seriale}%`);
     }
 
@@ -81,7 +81,7 @@ export const GET = withAuth(async (request, { user }) => {
     }
 
     if (filters.urgenza) {
-      whereClauses.push("urgenza = ?");
+      whereClauses.push("attivita.urgenza = ?");
       whereParams.push(filters.urgenza);
     }
 
@@ -91,8 +91,11 @@ export const GET = withAuth(async (request, { user }) => {
 
     // Get total count
     const countResult = await db.queryFirst<{ count: number }>(
-      `SELECT COUNT(*) as count FROM attivita 
+      `SELECT COUNT(*) as count 
+       FROM attivita 
        LEFT JOIN clienti ON attivita.id_cliente = clienti.id
+       LEFT JOIN apparecchiature e ON attivita.id_apparecchiatura = e.id
+       LEFT JOIN modelli_apparecchiature m ON e.id_modello = m.id
        ${whereClause}`,
       whereParams
     );
@@ -101,13 +104,26 @@ export const GET = withAuth(async (request, { user }) => {
 
     // Get paginated results
     const offset = (filters.page - 1) * filters.limit;
-    const orderClause = `ORDER BY ${filters.sort_by} ${filters.sort_order}`;
+
+    // Handle sorting by model name
+    let orderBy: string = filters.sort_by;
+    if (orderBy === 'modello') orderBy = 'm.nome';
+    else orderBy = `attivita.${orderBy}`;
+
+    const orderClause = `ORDER BY ${orderBy} ${filters.sort_order}`;
 
     const attivita = await db.query(
-      `SELECT attivita.*, clienti.nome as nome_cliente, tecnici.nome as nome_tecnico, tecnici.cognome as cognome_tecnico
+      `SELECT attivita.*, 
+              clienti.nome as nome_cliente, 
+              tecnici.nome as nome_tecnico, 
+              tecnici.cognome as cognome_tecnico,
+              m.nome as modello,
+              e.seriale as seriale
        FROM attivita 
        LEFT JOIN clienti ON attivita.id_cliente = clienti.id
        LEFT JOIN tecnici ON attivita.id_tecnico = tecnici.id
+       LEFT JOIN apparecchiature e ON attivita.id_apparecchiatura = e.id
+       LEFT JOIN modelli_apparecchiature m ON e.id_modello = m.id
        ${whereClause} ${orderClause} LIMIT ? OFFSET ?`,
       [...whereParams, filters.limit, offset]
     );
@@ -175,11 +191,13 @@ export const POST = withAuth(async (request, { user }) => {
       );
     }
 
-    // Auto-create equipment if model is provided and it doesn't exist
-    if (validatedData.modello) {
+    let id_apparecchiatura = validatedData.id_apparecchiatura;
+
+    // Logic to handle equipment creation or linking
+    if (!id_apparecchiatura && validatedData.id_modello) {
       // Check if equipment exists for this client with same model and serial (if provided)
-      let equipmentQuery = "SELECT id FROM apparecchiature WHERE id_cliente = ? AND modello = ?";
-      const equipmentParams: any[] = [validatedData.id_cliente, validatedData.modello];
+      let equipmentQuery = "SELECT id FROM apparecchiature WHERE id_cliente = ? AND id_modello = ?";
+      const equipmentParams: any[] = [validatedData.id_cliente, validatedData.id_modello];
 
       if (validatedData.seriale) {
         equipmentQuery += " AND seriale = ?";
@@ -189,27 +207,28 @@ export const POST = withAuth(async (request, { user }) => {
         equipmentQuery += " AND seriale IS NULL";
       }
 
-      const existingEquipment = await db.queryFirst(equipmentQuery, equipmentParams);
+      const existingEquipment = await db.queryFirst<{ id: number }>(equipmentQuery, equipmentParams);
 
-      if (!existingEquipment) {
+      if (existingEquipment) {
+        id_apparecchiatura = existingEquipment.id;
+      } else {
         // Create new equipment
-        await db.execute(
+        const result = await db.execute(
           `INSERT INTO apparecchiature (
-            id_cliente, modello, seriale, created_at, updated_at
+            id_cliente, id_modello, seriale, created_at, updated_at
           ) VALUES (?, ?, ?, datetime('now'), datetime('now'))`,
           [
             validatedData.id_cliente,
-            validatedData.modello,
+            validatedData.id_modello,
             validatedData.seriale || null,
           ]
         );
+        id_apparecchiatura = result.meta.last_row_id;
       }
     }
 
     const {
       id_cliente,
-      modello,
-      seriale,
       codice_inventario_cliente,
       modalita_apertura_richiesta,
       data_apertura_richiesta,
@@ -226,22 +245,52 @@ export const POST = withAuth(async (request, { user }) => {
 
     const resultDb = await db.query(
       `INSERT INTO attivita (
-        id_cliente, modello, seriale, codice_inventario_cliente,
+        id_cliente, id_apparecchiatura, codice_inventario_cliente,
         modalita_apertura_richiesta, data_apertura_richiesta,
         numero_preventivo, data_preventivo,
         numero_accettazione_preventivo, data_accettazione_preventivo,
-        stato, data_chiusura, note_generali, descrizione_richiesta, id_tecnico,
+        stato, data_chiusura, note_generali, descrizione_richiesta, 
+        id_tecnico, tecnico, urgenza, data_presa_in_carico, reparto,
         created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now')) RETURNING *`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now')) RETURNING *`,
       [
-        validatedData.reparto || null,
+        id_cliente,
+        id_apparecchiatura || null,
+        codice_inventario_cliente || null,
+        modalita_apertura_richiesta || null,
+        data_apertura_richiesta || null,
+        numero_preventivo || null,
+        data_preventivo || null,
+        numero_accettazione_preventivo || null,
+        data_accettazione_preventivo || null,
+        stato || "APERTO",
+        data_chiusura || null,
+        note_generali || null,
+        descrizione_richiesta || null,
+        id_tecnico || null,
         validatedData.tecnico || null,
         validatedData.urgenza || null,
+        validatedData.data_presa_in_carico || null,
+        validatedData.reparto || null
       ]
     );
 
-    // The INSERT statement uses RETURNING *, so resultDb[0] is the created activity
-    const attivita = resultDb[0];
+    // Fetch the created activity with joins to get model name
+    const attivita = await db.queryFirst(
+      `SELECT attivita.*, 
+              clienti.nome as nome_cliente, 
+              tecnici.nome as nome_tecnico, 
+              tecnici.cognome as cognome_tecnico,
+              m.nome as modello,
+              e.seriale as seriale
+       FROM attivita 
+       LEFT JOIN clienti ON attivita.id_cliente = clienti.id
+       LEFT JOIN tecnici ON attivita.id_tecnico = tecnici.id
+       LEFT JOIN apparecchiature e ON attivita.id_apparecchiatura = e.id
+       LEFT JOIN modelli_apparecchiature m ON e.id_modello = m.id
+       WHERE attivita.id = ?`,
+      [resultDb[0].id]
+    );
 
     return NextResponse.json(
       {

@@ -8,6 +8,7 @@ import { AttivitaStatusBadge, ConfirmDialog, ListItemActions } from "@/component
 interface Attivita {
   id: number;
   id_cliente: number;
+  nome_cliente: string;
   modello: string | null;
   seriale: string | null;
   stato: string;
@@ -236,7 +237,7 @@ export default function AttivitaPage() {
                       {item.modello || "N/D"} - {item.seriale || "N/D"}
                     </h3>
                     <p className="text-sm text-gray-600 mb-2">
-                      Cliente ID: {item.id_cliente}
+                      Cliente: {item.nome_cliente || "N/D"}
                     </p>
                     {item.note_generali && (
                       <p className="text-gray-700 text-sm mt-2 line-clamp-2">

@@ -11,12 +11,20 @@ CREATE TABLE IF NOT EXISTS clienti (
   updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
+-- Tabella modelli_apparecchiature
+CREATE TABLE IF NOT EXISTS modelli_apparecchiature (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  nome TEXT NOT NULL UNIQUE,
+  descrizione TEXT,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
 -- Tabella attivita
 CREATE TABLE IF NOT EXISTS attivita (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   id_cliente INTEGER NOT NULL,
-  modello TEXT,
-  seriale TEXT,
+  id_apparecchiatura INTEGER,
   codice_inventario_cliente TEXT,
   modalita_apertura_richiesta TEXT,
   data_apertura_richiesta TEXT,
@@ -27,19 +35,24 @@ CREATE TABLE IF NOT EXISTS attivita (
   stato TEXT NOT NULL DEFAULT 'APERTO',
   data_chiusura TEXT,
   note_generali TEXT,
+  descrizione_richiesta TEXT,
+  data_presa_in_carico TEXT,
+  reparto TEXT,
   tecnico TEXT,
   id_tecnico INTEGER,
   urgenza TEXT,
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   updated_at TEXT NOT NULL DEFAULT (datetime('now')),
   FOREIGN KEY(id_cliente) REFERENCES clienti(id) ON DELETE RESTRICT,
-  FOREIGN KEY(id_tecnico) REFERENCES tecnici(id) ON DELETE SET NULL
+  FOREIGN KEY(id_tecnico) REFERENCES tecnici(id) ON DELETE SET NULL,
+  FOREIGN KEY(id_apparecchiatura) REFERENCES apparecchiature(id) ON DELETE SET NULL
 );
 
 -- Indici per attivita
 CREATE INDEX IF NOT EXISTS idx_attivita_cliente ON attivita(id_cliente);
 CREATE INDEX IF NOT EXISTS idx_attivita_stato ON attivita(stato);
 CREATE INDEX IF NOT EXISTS idx_attivita_data_apertura ON attivita(data_apertura_richiesta);
+CREATE INDEX IF NOT EXISTS idx_attivita_apparecchiatura ON attivita(id_apparecchiatura);
 
 -- Tabella interventi_attivita
 CREATE TABLE IF NOT EXISTS interventi_attivita (
@@ -61,19 +74,20 @@ CREATE INDEX IF NOT EXISTS idx_interventi_data ON interventi_attivita(data_inter
 CREATE TABLE IF NOT EXISTS apparecchiature (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   id_cliente INTEGER NOT NULL,
-  modello TEXT NOT NULL,
+  id_modello INTEGER NOT NULL,
   seriale TEXT,
   data_test_funzionali TEXT,
   data_test_elettrici TEXT,
   note TEXT,
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   updated_at TEXT NOT NULL DEFAULT (datetime('now')),
-  FOREIGN KEY(id_cliente) REFERENCES clienti(id) ON DELETE RESTRICT
+  FOREIGN KEY(id_cliente) REFERENCES clienti(id) ON DELETE RESTRICT,
+  FOREIGN KEY(id_modello) REFERENCES modelli_apparecchiature(id) ON DELETE RESTRICT
 );
 
 -- Indici per apparecchiature
 CREATE INDEX IF NOT EXISTS idx_apparecchiature_cliente ON apparecchiature(id_cliente);
-CREATE INDEX IF NOT EXISTS idx_apparecchiature_modello ON apparecchiature(modello);
+CREATE INDEX IF NOT EXISTS idx_apparecchiature_modello ON apparecchiature(id_modello);
 
 -- Tabella allegati
 CREATE TABLE IF NOT EXISTS allegati (

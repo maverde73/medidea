@@ -9,7 +9,7 @@
     "lint": "next lint",
     "pages:build": "opennextjs-cloudflare build && node scripts/patch-worker.js && cp .open-next/worker.js .open-next/assets/_worker.js && cp .open-next/original-worker.js .open-next/assets/original-worker.js && cp -r .open-next/cloudflare .open-next/assets/ && cp -r .open-next/middleware .open-next/assets/ && cp -r .open-next/server-functions .open-next/assets/ && cp -r .open-next/.build .open-next/assets/",
     "preview": "npm run pages:build && opennextjs-cloudflare preview",
-    "deploy": "npm run pages:build && opennextjs-cloudflare deploy",
+    "deploy": "npm run pages:build && npx wrangler pages deploy .open-next/assets --project-name=medidea",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed"

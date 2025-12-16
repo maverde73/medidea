@@ -9,7 +9,7 @@ import { z } from "zod";
  */
 export const CreateApparecchiaturaSchema = z.object({
   id_cliente: z.number().int().positive(),
-  modello: z.string().min(1, "Modello è obbligatorio"),
+  id_modello: z.number().int().positive("Modello obbligatorio"),
   seriale: z.string().optional(),
   data_test_funzionali: z.string().datetime().optional(),
   data_test_elettrici: z.string().datetime().optional(),
@@ -21,7 +21,7 @@ export const CreateApparecchiaturaSchema = z.object({
  */
 export const UpdateApparecchiaturaSchema = z.object({
   id_cliente: z.number().int().positive().optional(),
-  modello: z.string().min(1).optional(),
+  id_modello: z.number().int().positive().optional(),
   seriale: z.string().optional(),
   data_test_funzionali: z.string().datetime().optional(),
   data_test_elettrici: z.string().datetime().optional(),

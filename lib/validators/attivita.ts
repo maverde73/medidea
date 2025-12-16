@@ -21,6 +21,8 @@ export const CreateAttivitaSchema = z.object({
   id_cliente: z.number().int().positive({
     message: "ID cliente deve essere un numero positivo",
   }),
+  id_apparecchiatura: z.number().int().optional().nullable(),
+  id_modello: z.number().int().optional().nullable(),
   modello: z.string().optional().nullable(),
   seriale: z.string().optional().nullable(),
   codice_inventario_cliente: z.string().optional().nullable(),
@@ -47,6 +49,8 @@ export const CreateAttivitaSchema = z.object({
  */
 export const UpdateAttivitaSchema = z.object({
   id_cliente: z.number().int().positive().optional(),
+  id_apparecchiatura: z.number().int().optional().nullable(),
+  id_modello: z.number().int().optional().nullable(),
   modello: z.string().optional().nullable(),
   seriale: z.string().optional().nullable(),
   codice_inventario_cliente: z.string().optional().nullable(),
@@ -154,7 +158,7 @@ export const AttivitaFiltersSchema = z.object({
 
   // Ordinamento
   sort_by: z
-    .enum(["id", "data_apertura_richiesta", "data_chiusura", "created_at"])
+    .enum(["id", "data_apertura_richiesta", "data_chiusura", "created_at", "modello"])
     .default("created_at"),
   sort_order: z.enum(["asc", "desc"]).default("desc"),
 });
@@ -184,6 +188,7 @@ export type StatoTransition = z.infer<typeof StatoTransitionSchema>;
 export interface Attivita {
   id: number;
   id_cliente: number;
+  id_apparecchiatura: number | null;
   modello: string | null;
   seriale: string | null;
   codice_inventario_cliente: string | null;

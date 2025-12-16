@@ -52,14 +52,16 @@ export const GET = withAuth(async (request, { user }) => {
     const recentActivities = await db.query(
       `SELECT
         a.id,
-        a.modello,
-        a.seriale,
+        m.nome as modello,
+        eq.seriale,
         a.stato,
         a.data_apertura_richiesta,
         a.data_chiusura,
         c.nome as cliente_nome
        FROM attivita a
        LEFT JOIN clienti c ON a.id_cliente = c.id
+       LEFT JOIN apparecchiature eq ON a.id_apparecchiatura = eq.id
+       LEFT JOIN modelli_apparecchiature m ON eq.id_modello = m.id
        ORDER BY a.data_apertura_richiesta DESC
        LIMIT 10`
     );
