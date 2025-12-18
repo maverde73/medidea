@@ -1,0 +1,41 @@
+Numero intervento: come generare il codice?
+Data intervento
+Cliente, Indirizzo cliente
+Global Service: flag si* o no
+*Specificare cliente finale
+
+Reparto
+
+Sorgente Richiesta (Email, Telefono...)
+Data Richiesta
+
+N°Preventivo
+Data Preventivo
+
+Sorgente Ordine (Email...)
+Data Ordine
+
+N° Contratto Manutenzione
+Data Contratto Manutenzione
+
+Apparecchiature (una o più)
+Modello, Inventario, Seriale
+
+Guasto Segnalato: Es: Guasto Batteria/Pompa
+
+Modalità di intervento:Intervento in garanzia,Intervento in contratto,Intervento fuori contratto,Supporto casa madre,Supporto vendite
+Tipo Apparecchiature(multiselezione):Tavolo Operatorio,Stativo pensile,Lampada scialitica,Letto degenza,Defibrillatore,Arredi,Monitor,EM Generico,Elettrocardiografo,Ventilatore
+Tipo intervento(multiselezione):Meccanico,Elettronico,Componenti,Software,Aggiornamento,Altro,Formazione,Verifiche elettriche,Funzionali
+
+Descrizione intervento
+
+Ricambi (zero o più)
+Codice,Descrizione,Seriale(facoltativo)
+
+Ore di lavoro
+Ore viaggio
+
+Intervento chiuso: Si* o No
+Data Chiusura Intervento
+
+Tecnico

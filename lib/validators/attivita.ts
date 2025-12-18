@@ -41,6 +41,20 @@ export const CreateAttivitaSchema = z.object({
   urgenza: UrgenzaAttivita.optional().nullable(),
   stato: StatoAttivita.optional(),
   data_chiusura: z.string().optional().nullable(),
+  // New client requirement fields
+  numero_verbale: z.string().optional().nullable(),
+  global_service: z.number().int().min(0).max(1).optional().nullable(),
+  id_cliente_finale: z.number().int().optional().nullable(),
+  sorgente_ordine: z.string().optional().nullable(),
+  data_ordine: z.string().optional().nullable(),
+  numero_contratto: z.string().optional().nullable(),
+  data_contratto: z.string().optional().nullable(),
+  data_intervento: z.string().optional().nullable(),
+  ore_lavoro: z.number().optional().nullable(),
+  ore_viaggio: z.number().optional().nullable(),
+  modalita_intervento: z.string().optional().nullable(),
+  tipi_apparecchiatura_json: z.string().optional().nullable(),
+  tipi_intervento_json: z.string().optional().nullable(),
 });
 
 /**
@@ -69,6 +83,20 @@ export const UpdateAttivitaSchema = z.object({
   tecnico: z.string().optional().nullable(),
   id_tecnico: z.number().optional().nullable(),
   urgenza: UrgenzaAttivita.optional().nullable(),
+  // New client requirement fields
+  numero_verbale: z.string().optional().nullable(),
+  global_service: z.number().int().min(0).max(1).optional().nullable(),
+  id_cliente_finale: z.number().int().optional().nullable(),
+  sorgente_ordine: z.string().optional().nullable(),
+  data_ordine: z.string().optional().nullable(),
+  numero_contratto: z.string().optional().nullable(),
+  data_contratto: z.string().optional().nullable(),
+  data_intervento: z.string().optional().nullable(),
+  ore_lavoro: z.number().optional().nullable(),
+  ore_viaggio: z.number().optional().nullable(),
+  modalita_intervento: z.string().optional().nullable(),
+  tipi_apparecchiatura_json: z.string().optional().nullable(),
+  tipi_intervento_json: z.string().optional().nullable(),
 });
 
 /**

@@ -210,7 +210,7 @@ export default function NewAttivitaPage() {
             }}
             required
             label="Cliente"
-            showNewClientLink={false}
+            showNewClientLink={true}
           />
           {errors.id_cliente && (
             <p className="mt-1 text-sm text-red-600">
@@ -280,6 +280,7 @@ export default function NewAttivitaPage() {
                     value={selectedEquipmentId || undefined}
                     onSelect={(id) => setValue("id_apparecchiatura", id, { shouldValidate: true })}
                     error={errors.id_apparecchiatura?.message}
+                    showNewEquipmentLink={true}
                   />
                 </div>
               )}

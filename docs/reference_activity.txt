@@ -1,0 +1,56 @@
+                                                    Medidea Srls
+                                                 Via Canelli, 21 – 00166 Roma (RM)
+                                                        P.Iva: 17349711006
+                                                   amministrazione@medidea.it
+                                                       service@medidea.it
+          INTERVENTO N°          1212DL                                                     DEL 12/12/25
+
+         CLIENTE: CLINICA PIO XI                                   CLIENTE FINALE:
+                  VIA AURELIA 559 ROMA
+         INDIRIZZO:                                                INDIRIZZO:
+
+         GLOBAL SERVICE: SI*         NO
+
+         *SPECIFICARE CLIENTE FINALE
+
+          REPARTO RIANIMAZIONE
+
+          RICHIESTA: EMAIL                                          DEL: 03/12/25
+          PREVENTIVO: 266                                           DEL: 05/12/25
+          ORDINE: EMAIL                                             DEL:
+          CONTRATTO MANUTENZIONE N°                                 DEL:
+
+          MODELLO APPARECCHIATURA                                   INVENTARIO              NUMERO DI SERIE
+         POMPA PLUM 360                                                                     20967578
+         POMPA PLUM 360                                                                     20967911
+
+
+
+
+          GUASTO SEGNALATO
+                                      GUASTO BATTERIA/POMPA
+
+intervento in garanzia                 Tavolo operatorio                       Arredi              Meccanico              Software
+intervento in contratto                Stativo Pensile                        Monitor              Elettronico X   Aggiornamento
+intervento fuori contratto   X         Lampada Scialitica               EM Generico     X         Componenti X                Altro
+Supporto casa madre                    Letto degenza               Elettrocardiografo             Formazione        Verifiche elettr
+Supporto vendite                       Defibrillatore                     Ventilatore                                   Funzionali
+
+DESCRIZIONE DELL’INTERVENTO               ESEGUITA DIAGNOSI TECNICA, ESEGUITI TEST DI SISTEMA
+                                          E CONTROLLO FUNZIONI, SOSTITUZIONE BATTERIE E
+                                          TEST FUNZIONALI
+
+
+
+
+          COD. RICAMBI                           DESCRIZIONE                                SERIALE
+         BT-6CK                                  BATTERIA RICARICABILE PLUM360
+         BT-6CK                                  BATTERIA RICARICABILE PLUM360
+
+
+        ORE LAVORO:          2     ORE VIAGGIO:                 INTERVENTO CHIUSO: SI  NO 
+
+          NOME TECNICO: LUCA DATOLA                                 NOME REFERENTE:
+
+          FIRMA TECNICO:                                            FIRMA REFERENTE:
+

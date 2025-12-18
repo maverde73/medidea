@@ -5,6 +5,10 @@ import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { Trash2, Pencil } from "lucide-react";
 import { LoadingSpinner, ErrorAlert, AttivitaStatusBadge, FileList, FileUploader, ModelSelector, EquipmentSelector } from "@/components/ui";
 import { TechnicianSelect } from "@/components/tecnici/TechnicianSelect";
+import { InterventionTypeSelector } from "@/components/ui/InterventionTypeSelector";
+import { GlobalServiceToggle } from "@/components/ui/GlobalServiceToggle";
+import { MultiEquipmentSelector } from "@/components/ui/MultiEquipmentSelector";
+import { SparePartsManager } from "@/components/ui/SparePartsManager";
 import { Button } from "@/components/ui/button";
 
 interface Attivita {
@@ -30,6 +34,21 @@ interface Attivita {
   urgenza: string | null;
   created_at: string;
   updated_at: string;
+  // Client requirement fields
+  numero_verbale?: string | null;
+  global_service?: number | null;
+  id_cliente_finale?: number | null;
+  sorgente_ordine?: string | null;
+  data_ordine?: string | null;
+  numero_contratto?: string | null;
+  data_contratto?: string | null;
+  data_intervento?: string | null;
+  ore_lavoro?: number | null;
+  ore_viaggio?: number | null;
+  modalita_intervento?: string | null;
+  tipi_apparecchiatura_json?: string | null;
+  tipi_intervento_json?: string | null;
+  descrizione_richiesta?: string | null;
 }
 
 interface FileInfo {
@@ -101,6 +120,21 @@ export default function AttivitaDetailPage() {
     tecnico: "",
     id_tecnico: null as number | null,
     urgenza: "" as "" | "BASSA" | "MEDIA" | "ALTA",
+    // Client requirement fields
+    numero_verbale: "",
+    data_intervento: "",
+    descrizione_richiesta: "",
+    sorgente_ordine: "",
+    data_ordine: "",
+    numero_contratto: "",
+    data_contratto: "",
+    ore_lavoro: null as number | null,
+    ore_viaggio: null as number | null,
+    modalita_intervento: "",
+    tipi_apparecchiatura_json: "",
+    tipi_intervento_json: "",
+    global_service: null as number | null,
+    id_cliente_finale: null as number | null,
   });
 
   useEffect(() => {
@@ -123,27 +157,43 @@ export default function AttivitaDetailPage() {
 
       if (response.ok) {
         const data = await response.json() as { data: Attivita };
-        setAttivita(data.data);
+        const activity = data.data; // Renamed for clarity as per instruction
+        setAttivita(activity);
         setEditForm({
-          id_apparecchiatura: data.data.id_apparecchiatura || null,
-          id_modello: null, // Reset model selection
-          modello: data.data.modello || "",
-          seriale: data.data.seriale || "",
-          codice_inventario_cliente: data.data.codice_inventario_cliente || "",
-          stato: data.data.stato,
-          data_apertura_richiesta: data.data.data_apertura_richiesta || "",
-          modalita_apertura_richiesta: data.data.modalita_apertura_richiesta || "",
-          numero_preventivo: data.data.numero_preventivo || "",
-          data_preventivo: data.data.data_preventivo || "",
-          numero_accettazione_preventivo: data.data.numero_accettazione_preventivo || "",
-          data_accettazione_preventivo: data.data.data_accettazione_preventivo || "",
-          data_chiusura: data.data.data_chiusura || "",
-          note_generali: data.data.note_generali || "",
-          data_presa_in_carico: data.data.data_presa_in_carico || "",
-          reparto: data.data.reparto || "",
-          tecnico: data.data.tecnico || "",
-          id_tecnico: data.data.id_tecnico || null,
-          urgenza: (data.data.urgenza || "") as "" | "BASSA" | "MEDIA" | "ALTA",
+          id_apparecchiatura: activity.id_apparecchiatura,
+          id_modello: null, //activity.id_modello, NOTE: Model is now separate, fetched from apparecchiatura
+          modello: activity.modello || "",
+          seriale: activity.seriale || "",
+          codice_inventario_cliente: activity.codice_inventario_cliente || "",
+          stato: activity.stato,
+          data_apertura_richiesta: activity.data_apertura_richiesta || "",
+          modalita_apertura_richiesta: activity.modalita_apertura_richiesta || "",
+          numero_preventivo: activity.numero_preventivo || "",
+          data_preventivo: activity.data_preventivo || "",
+          numero_accettazione_preventivo: activity.numero_accettazione_preventivo || "",
+          data_accettazione_preventivo: activity.data_accettazione_preventivo || "",
+          data_chiusura: activity.data_chiusura || "",
+          note_generali: activity.note_generali || "",
+          data_presa_in_carico: activity.data_presa_in_carico || "",
+          reparto: activity.reparto || "",
+          tecnico: activity.tecnico || "",
+          id_tecnico: activity.id_tecnico,
+          urgenza: (activity.urgenza as "" | "BASSA" | "MEDIA" | "ALTA") || "",
+          // Client requirement fields
+          numero_verbale: activity.numero_verbale || "",
+          data_intervento: activity.data_intervento || "",
+          descrizione_richiesta: activity.descrizione_richiesta || "",
+          sorgente_ordine: activity.sorgente_ordine || "",
+          data_ordine: activity.data_ordine || "",
+          numero_contratto: activity.numero_contratto || "",
+          data_contratto: activity.data_contratto || "",
+          ore_lavoro: activity.ore_lavoro || null,
+          ore_viaggio: activity.ore_viaggio || null,
+          modalita_intervento: activity.modalita_intervento || "",
+          tipi_apparecchiatura_json: activity.tipi_apparecchiatura_json || "",
+          tipi_intervento_json: activity.tipi_intervento_json || "",
+          global_service: activity.global_service || null,
+          id_cliente_finale: activity.id_cliente_finale || null,
         });
       } else {
         setError("Attività non trovata");
@@ -479,6 +529,25 @@ export default function AttivitaDetailPage() {
         )}
       </div>
 
+      {/* NEW: Multi-Equipment Management */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-semibold mb-4">Apparecchiature Collegate</h2>
+        <MultiEquipmentSelector
+          idAttivita={parseInt(id)}
+          idCliente={attivita.id_cliente}
+          onUpdate={fetchAttivita}
+        />
+      </div>
+
+      {/* NEW: Spare Parts Management */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-semibold mb-4">Ricambi Utilizzati</h2>
+        <SparePartsManager
+          idAttivita={parseInt(id)}
+          onUpdate={fetchAttivita}
+        />
+      </div>
+
       {/* Stato */}
       <div className="bg-white rounded-lg shadow p-6">
         <h2 className="text-xl font-semibold mb-4">Stato Attività</h2>
@@ -733,6 +802,244 @@ export default function AttivitaDetailPage() {
           ) : (
             <p className="text-gray-500">Nessuna nota</p>
           )
+        )}
+      </div>
+
+      {/* NEW: Identificativi e Guasto Segnalato */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-semibold mb-4">Identificativi e Guasto</h2>
+        {editing ? (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Numero Verbale</label>
+                <input
+                  type="text"
+                  value={editForm.numero_verbale}
+                  onChange={(e) => setEditForm({ ...editForm, numero_verbale: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-lg"
+                  placeholder="es. 1212DL"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Data Intervento</label>
+                <input
+                  type="date"
+                  value={editForm.data_intervento}
+                  onChange={(e) => setEditForm({ ...editForm, data_intervento: e.target.value })}
+                  className="w-full px-3 py-2 border rounded-lg"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Guasto Segnalato</label>
+              <textarea
+                value={editForm.descrizione_richiesta}
+                onChange={(e) => setEditForm({ ...editForm, descrizione_richiesta: e.target.value })}
+                rows={3}
+                className="w-full px-3 py-2 border rounded-lg"
+                placeholder="Descrivi il guasto o la richiesta"
+              />
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {attivita.numero_verbale && (
+              <p><span className="font-medium">Numero Verbale:</span> {attivita.numero_verbale}</p>
+            )}
+            {attivita.data_intervento && (
+              <p><span className="font-medium">Data Intervento:</span> {new Date(attivita.data_intervento).toLocaleDateString()}</p>
+            )}
+            {attivita.descrizione_richiesta && (
+              <p><span className="font-medium">Guasto Segnalato:</span> {attivita.descrizione_richiesta}</p>
+            )}
+            {!attivita.numero_verbale && !attivita.data_intervento && !attivita.descrizione_richiesta && (
+              <p className="text-gray-500">Nessuna informazione</p>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* NEW: Ordine e Contratto */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-semibold mb-4">Ordine e Contratto Manutenzione</h2>
+        {editing ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">Sorgente Ordine</label>
+              <select
+                value={editForm.sorgente_ordine}
+                onChange={(e) => setEditForm({ ...editForm, sorgente_ordine: e.target.value })}
+                className="w-full px-3 py-2 border rounded-lg"
+              >
+                <option value="">Seleziona...</option>
+                {modalita.map((m) => (
+                  <option key={m.id} value={m.descrizione}>
+                    {m.descrizione}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Data Ordine</label>
+              <input
+                type="date"
+                value={editForm.data_ordine}
+                onChange={(e) => setEditForm({ ...editForm, data_ordine: e.target.value })}
+                className="w-full px-3 py-2 border rounded-lg"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">N° Contratto</label>
+              <input
+                type="text"
+                value={editForm.numero_contratto}
+                onChange={(e) => setEditForm({ ...editForm, numero_contratto: e.target.value })}
+                className="w-full px-3 py-2 border rounded-lg"
+                placeholder="es. CONTR-2025-001"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Data Contratto</label>
+              <input
+                type="date"
+                value={editForm.data_contratto}
+                onChange={(e) => setEditForm({ ...editForm, data_contratto: e.target.value })}
+                className="w-full px-3 py-2 border rounded-lg"
+              />
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            {attivita.sorgente_ordine && (
+              <p><span className="font-medium">Sorgente Ordine:</span> {attivita.sorgente_ordine}</p>
+            )}
+            {attivita.data_ordine && (
+              <p><span className="font-medium">Data Ordine:</span> {new Date(attivita.data_ordine).toLocaleDateString()}</p>
+            )}
+            {attivita.numero_contratto && (
+              <p><span className="font-medium">N° Contratto:</span> {attivita.numero_contratto}</p>
+            )}
+            {attivita.data_contratto && (
+              <p><span className="font-medium">Data Contratto:</span> {new Date(attivita.data_contratto).toLocaleDateString()}</p>
+            )}
+            {!attivita.sorgente_ordine && !attivita.data_ordine && !attivita.numero_contratto && !attivita.data_contratto && (
+              <p className="text-gray-500">Nessuna informazione</p>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* NEW: Tempistiche */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-semibold mb-4">Tempistiche</h2>
+        {editing ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">Ore Lavoro (opzionale)</label>
+              <input
+                type="number"
+                step="0.5"
+                value={editForm.ore_lavoro || ""}
+                onChange={(e) => setEditForm({ ...editForm, ore_lavoro: e.target.value ? parseFloat(e.target.value) : null })}
+                className="w-full px-3 py-2 border rounded-lg"
+                placeholder="es. 2.5"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Ore Viaggio (opzionale)</label>
+              <input
+                type="number"
+                step="0.5"
+                value={editForm.ore_viaggio || ""}
+                onChange={(e) => setEditForm({ ...editForm, ore_viaggio: e.target.value ? parseFloat(e.target.value) : null })}
+                className="w-full px-3 py-2 border rounded-lg"
+                placeholder="es. 0.5"
+              />
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            {attivita.ore_lavoro !== null && attivita.ore_lavoro !== undefined && (
+              <p><span className="font-medium">Ore Lavoro:</span> {attivita.ore_lavoro} h</p>
+            )}
+            {attivita.ore_viaggio !== null && attivita.ore_viaggio !== undefined && (
+              <p><span className="font-medium">Ore Viaggio:</span> {attivita.ore_viaggio} h</p>
+            )}
+            {(attivita.ore_lavoro === null || attivita.ore_lavoro === undefined) && (attivita.ore_viaggio === null || attivita.ore_viaggio === undefined) && (
+              <p className="text-gray-500">Nessuna informazione</p>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* NEW: Global Service */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-semibold mb-4">Global Service</h2>
+        {editing ? (
+          <GlobalServiceToggle
+            value={editForm.global_service}
+            onChange={(enabled, clienteFinaleId) => {
+              setEditForm({
+                ...editForm,
+                global_service: enabled ? 1 : 0,
+                id_cliente_finale: clienteFinaleId || null,
+              });
+            }}
+            currentClientId={attivita.id_cliente}
+          />
+        ) : (
+          <div className="space-y-2">
+            <p><span className="font-medium">Attivo:</span> {attivita.global_service ? "Sì" : "No"}</p>
+            {attivita.id_cliente_finale && (
+              <p><span className="font-medium">Cliente Finale ID:</span> {attivita.id_cliente_finale}</p>
+            )}
+            {!attivita.global_service && (
+              <p className="text-gray-500">Non in Global Service</p>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* NEW: Classificazione Intervento */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-semibold mb-4">Classificazione Intervento</h2>
+        {editing ? (
+          <div className="space-y-4">
+            <InterventionTypeSelector
+              type="modalita"
+              value={editForm.modalita_intervento}
+              onChange={(value) => setEditForm({ ...editForm, modalita_intervento: value })}
+              label="Modalità Intervento"
+            />
+
+            <InterventionTypeSelector
+              type="apparecchiatura"
+              value={editForm.tipi_apparecchiatura_json}
+              onChange={(value) => setEditForm({ ...editForm, tipi_apparecchiatura_json: value })}
+            />
+
+            <InterventionTypeSelector
+              type="intervento"
+              value={editForm.tipi_intervento_json}
+              onChange={(value) => setEditForm({ ...editForm, tipi_intervento_json: value })}
+            />
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {attivita.modalita_intervento && (
+              <p><span className="font-medium">Modalità:</span> {attivita.modalita_intervento}</p>
+            )}
+            {attivita.tipi_apparecchiatura_json && (
+              <p><span className="font-medium">Tipi Apparecchiatura:</span> {attivita.tipi_apparecchiatura_json}</p>
+            )}
+            {attivita.tipi_intervento_json && (
+              <p><span className="font-medium">Tipi Intervento:</span> {attivita.tipi_intervento_json}</p>
+            )}
+            {!attivita.modalita_intervento && !attivita.tipi_apparecchiatura_json && !attivita.tipi_intervento_json && (
+              <p className="text-gray-500">Nessuna classificazione</p>
+            )}
+          </div>
         )}
       </div>
 

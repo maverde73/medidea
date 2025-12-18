@@ -142,20 +142,8 @@ export function ModelSelector({ value, onSelect, error }: ModelSelectorProps) {
                         </div>
                         <div className="max-h-[300px] overflow-y-auto p-1">
                             {filteredModels.length === 0 && (
-                                <div className="py-6 text-center text-sm">
-                                    <p className="text-muted-foreground mb-2">Nessun modello trovato.</p>
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        className="w-full"
-                                        onClick={() => {
-                                            setOpen(false);
-                                            setDialogOpen(true);
-                                        }}
-                                    >
-                                        <Plus className="mr-2 h-4 w-4" />
-                                        Crea nuovo modello
-                                    </Button>
+                                <div className="py-4 text-center text-sm text-muted-foreground">
+                                    Nessun modello trovato.
                                 </div>
                             )}
                             {filteredModels.map((model) => (
@@ -179,6 +167,19 @@ export function ModelSelector({ value, onSelect, error }: ModelSelectorProps) {
                                     {model.nome}
                                 </div>
                             ))}
+
+                            <hr className="my-1" />
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setOpen(false);
+                                    setDialogOpen(true);
+                                }}
+                                className="w-full text-left py-2 pl-2 text-blue-600 hover:bg-blue-50 text-sm font-medium rounded-sm flex items-center"
+                            >
+                                <Plus className="mr-2 h-4 w-4" />
+                                Crea nuovo modello
+                            </button>
                         </div>
                     </div>
                 )}
