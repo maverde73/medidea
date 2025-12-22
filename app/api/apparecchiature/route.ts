@@ -95,13 +95,27 @@ export const POST = withAuth(async (request, { user }) => {
       );
     }
 
+    // Get modello name from id_modello
+    const modello = await db.queryFirst<{ nome: string }>(
+      "SELECT nome FROM modelli_apparecchiature WHERE id = ?",
+      [body.id_modello]
+    );
+
+    if (!modello) {
+      return NextResponse.json(
+        { error: "Modello non trovato" },
+        { status: 404 }
+      );
+    }
+
     const result = await db.execute(
       `INSERT INTO apparecchiature
-      (id_cliente, id_modello, seriale, data_test_funzionali, data_test_elettrici, note, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
+      (id_cliente, id_modello, modello, seriale, data_test_funzionali, data_test_elettrici, note, created_at, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`,
       [
         body.id_cliente,
         body.id_modello,
+        modello.nome,
         body.seriale || null,
         body.data_test_funzionali || null,
         body.data_test_elettrici || null,
