@@ -130,8 +130,8 @@ export function ClientSelector({
       });
 
       if (res.ok) {
-        const result = await res.json();
-        const created = result.data as Cliente;
+        const result = (await res.json()) as { data: Cliente };
+        const created = result.data;
         toast.success("Cliente creato con successo");
         setClients((prev) => [...prev, created].sort((a, b) => a.nome.localeCompare(b.nome)));
         onChange(created.id, created);

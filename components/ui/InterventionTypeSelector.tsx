@@ -65,7 +65,7 @@ export function InterventionTypeSelector({
     const loadOptions = async () => {
         try {
             const response = await fetch(apiEndpoint);
-            const data = await response.json();
+            const data = (await response.json()) as { success: boolean; data: InterventionType[] };
             if (data.success) {
                 setOptions(data.data);
             }

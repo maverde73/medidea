@@ -58,7 +58,7 @@ export function SparePartsManager({ idAttivita, onUpdate }: SparePartsManagerPro
     const loadParts = async () => {
         try {
             const response = await fetch(`/api/attivita/${idAttivita}/ricambi`);
-            const data = await response.json();
+            const data = (await response.json()) as { success: boolean; data: SparePart[] };
             if (data.success) {
                 setParts(data.data);
             }
@@ -72,7 +72,7 @@ export function SparePartsManager({ idAttivita, onUpdate }: SparePartsManagerPro
     const searchParts = async () => {
         try {
             const response = await fetch(`/api/ricambi?search=${encodeURIComponent(searchTerm)}`);
-            const data = await response.json();
+            const data = (await response.json()) as { success: boolean; data: any[] };
             if (data.success) {
                 setAvailableParts(data.data || []);
             }
@@ -100,7 +100,7 @@ export function SparePartsManager({ idAttivita, onUpdate }: SparePartsManagerPro
                     }),
                 });
 
-                const createData = await createResponse.json();
+                const createData = (await createResponse.json()) as { success: boolean; data: any };
                 if (createData.success && createData.data) {
                     // Now link to activity
                     await linkPart(createData.data.id);

@@ -13,6 +13,10 @@ node_modules/
 # OpenNext Cloudflare build output  
 /.open-next/
 
+/logs
+logs
+/.txt
+.txt
 # Production
 /build
 

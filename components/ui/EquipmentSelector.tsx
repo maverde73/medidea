@@ -109,8 +109,8 @@ export function EquipmentSelector({
             });
 
             if (res.ok) {
-                const result = await res.json();
-                const created = result.data as Equipment;
+                const result = (await res.json()) as { data: Equipment };
+                const created = result.data;
                 toast.success("Apparecchiatura creata con successo");
                 // Refresh equipment list
                 await fetchEquipment();

@@ -39,7 +39,7 @@ export function GlobalServiceToggle({
             const response = await fetch("/api/clienti", {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            const data = await response.json();
+            const data = (await response.json()) as { success: boolean; data: Client[] };
             if (data.success) {
                 // Filter out current client if provided
                 const filtered = currentClientId

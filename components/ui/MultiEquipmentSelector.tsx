@@ -53,7 +53,7 @@ export function MultiEquipmentSelector({
     const loadEquipment = async () => {
         try {
             const response = await fetch(`/api/attivita/${idAttivita}/apparecchiature`);
-            const data = await response.json();
+            const data = (await response.json()) as { success: boolean; data: any };
             if (data.success) {
                 setEquipment(data.data);
             }
@@ -67,7 +67,7 @@ export function MultiEquipmentSelector({
     const loadAvailableEquipment = async () => {
         try {
             const response = await fetch(`/api/apparecchiature?id_cliente=${idCliente}`);
-            const data = await response.json();
+            const data = (await response.json()) as { success: boolean; data: any[] };
             if (data.success) {
                 setAvailableEquipment(data.data || []);
             }
@@ -95,7 +95,7 @@ export function MultiEquipmentSelector({
                     }),
                 });
 
-                const createData = await createResponse.json();
+                const createData = (await createResponse.json()) as { success: boolean; data: any };
                 if (createData.success && createData.data) {
                     // Now link to activity
                     await linkEquipment(createData.data.id);
@@ -206,7 +206,7 @@ export function MultiEquipmentSelector({
                     <DialogHeader>
                         <DialogTitle>Aggiungi Apparecchiatura</DialogTitle>
                         <DialogDescription>
-                            Seleziona un'apparecchiatura esistente o creane una nuova
+                            Seleziona un&apos;apparecchiatura esistente o creane una nuova
                         </DialogDescription>
                     </DialogHeader>
 
@@ -233,7 +233,7 @@ export function MultiEquipmentSelector({
                                 <div>
                                     <Label>Modello</Label>
                                     <ModelSelector
-                                        value={newEquipment.id_modello}
+                                        value={newEquipment.id_modello ?? undefined}
                                         onSelect={(id) =>
                                             setNewEquipment({ ...newEquipment, id_modello: id })
                                         }

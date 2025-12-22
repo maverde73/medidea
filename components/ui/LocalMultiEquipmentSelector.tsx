@@ -54,7 +54,7 @@ export function LocalMultiEquipmentSelector({
     const loadAvailableEquipment = async () => {
         try {
             const response = await fetch(`/api/apparecchiature?id_cliente=${idCliente}`);
-            const data = await response.json();
+            const data = (await response.json()) as { success: boolean; data: any[] };
             if (data.success) {
                 setAvailableEquipment(data.data || []);
             }
@@ -192,7 +192,7 @@ export function LocalMultiEquipmentSelector({
                     <DialogHeader>
                         <DialogTitle>Aggiungi Apparecchiatura</DialogTitle>
                         <DialogDescription>
-                            Seleziona un'apparecchiatura esistente o creane una nuova
+                            Seleziona un&apos;apparecchiatura esistente o creane una nuova
                         </DialogDescription>
                     </DialogHeader>
 
@@ -219,9 +219,9 @@ export function LocalMultiEquipmentSelector({
                                 <div>
                                     <Label>Modello</Label>
                                     <ModelSelector
-                                        value={newEquipment.id_modello}
-                                        onSelect={(id, modelName) => {
-                                            setNewEquipment({ ...newEquipment, id_modello: id, modello_nome: modelName || "" });
+                                        value={newEquipment.id_modello ?? undefined}
+                                        onSelect={(id) => {
+                                            setNewEquipment({ ...newEquipment, id_modello: id, modello_nome: "" });
                                         }}
                                     />
                                 </div>

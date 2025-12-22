@@ -288,7 +288,7 @@ export default function NewAttivitaPage() {
               {/* Show generic error if validation fails on the group */}
               {errors.id_apparecchiatura && !errors.id_apparecchiatura.message && (
                 <p className="mt-1 text-sm text-red-600">
-                  Seleziona un'apparecchiatura o crea una nuova.
+                  Seleziona un&apos;apparecchiatura o crea una nuova.
                 </p>
               )}
 
