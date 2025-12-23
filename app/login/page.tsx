@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { apiFetch } from "@/lib/api-client";
+import { setAuthToken } from "@/lib/auth";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -16,9 +18,9 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await fetch("/api/auth/login", {
+      const response = await apiFetch("/api/auth/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        skipAuth: true, // Don't send token to login endpoint
         body: JSON.stringify({ email, password }),
       });
 
@@ -30,7 +32,7 @@ export default function LoginPage() {
       };
 
       if (response.ok && data.success) {
-        localStorage.setItem("token", data.token!);
+        setAuthToken(data.token!);
         localStorage.setItem("user", JSON.stringify(data.user));
         router.push("/attivita");
       } else {

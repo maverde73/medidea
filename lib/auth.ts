@@ -183,3 +183,74 @@ export function validatePassword(password: string): {
     errors,
   };
 }
+
+// ============================================
+// Client-side token management
+// ============================================
+
+/**
+ * Store JWT token in localStorage
+ * This function is SSR-safe and only executes in the browser
+ *
+ * @param token JWT token string
+ *
+ * @example
+ * // After successful login
+ * setAuthToken(data.token);
+ */
+export function setAuthToken(token: string): void {
+  if (typeof window !== "undefined") {
+    localStorage.setItem("token", token);
+  }
+}
+
+/**
+ * Retrieve JWT token from localStorage
+ * This function is SSR-safe and returns null during SSR
+ *
+ * @returns Token string or null if not found or during SSR
+ *
+ * @example
+ * const token = getAuthToken();
+ * if (token) {
+ *   // Use token
+ * }
+ */
+export function getAuthToken(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem("token");
+}
+
+/**
+ * Remove JWT token from localStorage
+ * This function is SSR-safe and only executes in the browser
+ * Typically called during logout or when token is invalid
+ *
+ * @example
+ * // During logout
+ * clearAuthToken();
+ * router.push("/login");
+ */
+export function clearAuthToken(): void {
+  if (typeof window !== "undefined") {
+    localStorage.removeItem("token");
+  }
+}
+
+/**
+ * Check if user is authenticated (has a token stored)
+ * This function is SSR-safe and returns false during SSR
+ *
+ * Note: This only checks if a token exists, not if it's valid.
+ * Token validation happens server-side via the withAuth middleware.
+ *
+ * @returns True if token exists in localStorage
+ *
+ * @example
+ * if (!isAuthenticated()) {
+ *   router.push("/login");
+ * }
+ */
+export function isAuthenticated(): boolean {
+  return getAuthToken() !== null;
+}

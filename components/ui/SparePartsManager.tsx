@@ -13,6 +13,7 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import { Trash2, Plus, Search } from "lucide-react";
+import { apiFetch } from "@/lib/api-client";
 
 interface SparePart {
     id: number;
@@ -57,7 +58,7 @@ export function SparePartsManager({ idAttivita, onUpdate }: SparePartsManagerPro
 
     const loadParts = async () => {
         try {
-            const response = await fetch(`/api/attivita/${idAttivita}/ricambi`);
+            const response = await apiFetch(`/api/attivita/${idAttivita}/ricambi`);
             const data = (await response.json()) as { success: boolean; data: SparePart[] };
             if (data.success) {
                 setParts(data.data);
@@ -71,7 +72,7 @@ export function SparePartsManager({ idAttivita, onUpdate }: SparePartsManagerPro
 
     const searchParts = async () => {
         try {
-            const response = await fetch(`/api/ricambi?search=${encodeURIComponent(searchTerm)}`);
+            const response = await apiFetch(`/api/ricambi?search=${encodeURIComponent(searchTerm)}`);
             const data = (await response.json()) as { success: boolean; data: any[] };
             if (data.success) {
                 setAvailableParts(data.data || []);
@@ -90,9 +91,8 @@ export function SparePartsManager({ idAttivita, onUpdate }: SparePartsManagerPro
             }
 
             try {
-                const createResponse = await fetch("/api/ricambi", {
+                const createResponse = await apiFetch("/api/ricambi", {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         codice: newPart.codice,
                         descrizione: newPart.descrizione,
@@ -120,9 +120,8 @@ export function SparePartsManager({ idAttivita, onUpdate }: SparePartsManagerPro
 
     const linkPart = async (partId: number) => {
         try {
-            const response = await fetch(`/api/attivita/${idAttivita}/ricambi`, {
+            const response = await apiFetch(`/api/attivita/${idAttivita}/ricambi`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     id_ricambio: partId,
                     quantita: quantity,
@@ -150,9 +149,8 @@ export function SparePartsManager({ idAttivita, onUpdate }: SparePartsManagerPro
         if (!confirm("Rimuovere questo ricambio dall'attività?")) return;
 
         try {
-            const response = await fetch(`/api/attivita/${idAttivita}/ricambi`, {
+            const response = await apiFetch(`/api/attivita/${idAttivita}/ricambi`, {
                 method: "DELETE",
-                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ id: partRowId }),
             });
 
