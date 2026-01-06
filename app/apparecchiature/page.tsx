@@ -4,10 +4,12 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Monitor, Search, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { ConfirmDialog, ListItemActions } from "@/components/ui";
+import { apiFetch } from "@/lib/api-client";
 
 interface Apparecchiatura {
   id: number;
   id_cliente: number;
+  nome_cliente: string;
   modello: string;
   seriale: string | null;
   data_test_funzionali: string | null;
@@ -15,7 +17,7 @@ interface Apparecchiatura {
   note: string | null;
 }
 
-type SortField = 'modello' | 'seriale' | 'data_test_funzionali' | 'data_test_elettrici' | 'id';
+type SortField = 'nome_cliente' | 'modello' | 'seriale' | 'data_test_funzionali' | 'data_test_elettrici' | 'id';
 type SortDirection = 'asc' | 'desc';
 
 export default function ApparecchiaturePage() {
@@ -43,15 +45,7 @@ export default function ApparecchiaturePage() {
 
   const fetchApparecchiature = async () => {
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        router.push("/login");
-        return;
-      }
-
-      const response = await fetch("/api/apparecchiature", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await apiFetch("/api/apparecchiature");
 
       if (response.ok) {
         const data = await response.json() as { data?: Apparecchiatura[] };
@@ -67,10 +61,8 @@ export default function ApparecchiaturePage() {
   const handleDelete = async (id: number) => {
     setDeleting(true);
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(`/api/apparecchiature/${id}`, {
+      const response = await apiFetch(`/api/apparecchiature/${id}`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (response.ok) {
@@ -90,6 +82,7 @@ export default function ApparecchiaturePage() {
   const filteredApparecchiature = apparecchiature.filter((item) =>
     item.modello.toLowerCase().includes(searchTerm.toLowerCase()) ||
     item.seriale?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item.nome_cliente.toLowerCase().includes(searchTerm.toLowerCase()) ||
     item.note?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -152,7 +145,7 @@ export default function ApparecchiaturePage() {
             <Search size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
-              placeholder="Cerca per modello, seriale o note..."
+              placeholder="Cerca per cliente, modello, seriale o note..."
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -169,6 +162,7 @@ export default function ApparecchiaturePage() {
               value={sortField}
               onChange={(e) => setSortField(e.target.value as SortField)}
             >
+              <option value="nome_cliente">Cliente</option>
               <option value="modello">Modello</option>
               <option value="seriale">Seriale</option>
               <option value="data_test_funzionali">Test Funzionali</option>
@@ -212,7 +206,7 @@ export default function ApparecchiaturePage() {
                 <p className="text-sm text-gray-600 mt-1">
                   Seriale: {item.seriale || "N/D"}
                 </p>
-                <p className="text-sm text-gray-600">Cliente ID: {item.id_cliente}</p>
+                <p className="text-sm text-gray-600">Cliente: {item.nome_cliente}</p>
               </div>
               <ListItemActions
                 onView={() => router.push(`/apparecchiature/${item.id}`)}
