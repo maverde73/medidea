@@ -64,6 +64,7 @@ interface FileInfo {
   data_caricamento: string;
   tipo_riferimento?: string;
   id_riferimento?: number;
+  categoria?: string | null;
 }
 
 export default function AttivitaDetailPage() {
@@ -840,6 +841,41 @@ export default function AttivitaDetailPage() {
             </div>
           </div>
         )}
+
+        {/* Allegato DDT Cliente */}
+        <div className="mt-4 border-t pt-4">
+          <h3 className="text-sm font-semibold text-gray-700 mb-2">Allegato DDT Cliente</h3>
+          {files.filter(f => f.categoria === 'ddt_cliente').length > 0 ? (
+            <FileList
+              files={files.filter(f => f.categoria === 'ddt_cliente')}
+              onDownload={handleDownload}
+              onDelete={handleFileDelete}
+            />
+          ) : (
+            <p className="text-gray-500 text-sm mb-2">Nessun allegato DDT Cliente</p>
+          )}
+          <div className="mt-2">
+            <FileUploader
+              accept={{ "application/pdf": [".pdf"] }}
+              maxSize={10 * 1024 * 1024}
+              uploadContext={{
+                tipo_riferimento: "attivita",
+                id_riferimento: parseInt(id),
+                categoria: "ddt_cliente"
+              }}
+              onUploadComplete={(file) => {
+                setFiles([...files, {
+                  id: file.id,
+                  nome_file_originale: file.nome_file_originale,
+                  chiave_r2: file.chiave_r2,
+                  dimensione: file.dimensione,
+                  data_caricamento: new Date().toISOString(),
+                  categoria: "ddt_cliente"
+                }]);
+              }}
+            />
+          </div>
+        </div>
       </div>
 
       {/* DDT Consegna */}
@@ -879,6 +915,41 @@ export default function AttivitaDetailPage() {
             </div>
           </div>
         )}
+
+        {/* Allegato DDT Consegna */}
+        <div className="mt-4 border-t pt-4">
+          <h3 className="text-sm font-semibold text-gray-700 mb-2">Allegato DDT Consegna</h3>
+          {files.filter(f => f.categoria === 'ddt_consegna').length > 0 ? (
+            <FileList
+              files={files.filter(f => f.categoria === 'ddt_consegna')}
+              onDownload={handleDownload}
+              onDelete={handleFileDelete}
+            />
+          ) : (
+            <p className="text-gray-500 text-sm mb-2">Nessun allegato DDT Consegna</p>
+          )}
+          <div className="mt-2">
+            <FileUploader
+              accept={{ "application/pdf": [".pdf"] }}
+              maxSize={10 * 1024 * 1024}
+              uploadContext={{
+                tipo_riferimento: "attivita",
+                id_riferimento: parseInt(id),
+                categoria: "ddt_consegna"
+              }}
+              onUploadComplete={(file) => {
+                setFiles([...files, {
+                  id: file.id,
+                  nome_file_originale: file.nome_file_originale,
+                  chiave_r2: file.chiave_r2,
+                  dimensione: file.dimensione,
+                  data_caricamento: new Date().toISOString(),
+                  categoria: "ddt_consegna"
+                }]);
+              }}
+            />
+          </div>
+        </div>
       </div>
 
       {/* Note */}

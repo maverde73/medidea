@@ -10,6 +10,7 @@ export interface FileInfo {
   data_caricamento: string;
   tipo_riferimento?: string;
   id_riferimento?: number;
+  categoria?: string | null;
 }
 
 export interface FileListProps {
@@ -139,6 +140,16 @@ export function FileList({
                 <span className="text-xs text-gray-500">
                   {formatDate(file.data_caricamento)}
                 </span>
+                {file.categoria && (
+                  <>
+                    <span className="text-xs text-gray-400">•</span>
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                      {file.categoria === 'ddt_cliente' && 'DDT Cliente'}
+                      {file.categoria === 'ddt_consegna' && 'DDT Consegna'}
+                      {file.categoria !== 'ddt_cliente' && file.categoria !== 'ddt_consegna' && file.categoria}
+                    </span>
+                  </>
+                )}
               </div>
             </div>
           </div>

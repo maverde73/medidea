@@ -18,6 +18,7 @@ export interface FileUploaderProps {
   uploadContext?: {
     tipo_riferimento: string;
     id_riferimento: number;
+    categoria?: string;
   };
 }
 
@@ -70,6 +71,9 @@ export function FileUploader({
         if (uploadContext) {
           formData.append("tipo_riferimento", uploadContext.tipo_riferimento);
           formData.append("id_riferimento", uploadContext.id_riferimento.toString());
+          if (uploadContext.categoria) {
+            formData.append("categoria", uploadContext.categoria);
+          }
         }
 
         const token = localStorage.getItem("token");

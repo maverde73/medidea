@@ -14,6 +14,7 @@ export const POST = withAuth(async (request, { user }) => {
     const tipoRiferimento = formData.get("tipo_riferimento") as string | null;
     const idRiferimento = formData.get("id_riferimento") as string | null;
     const note = formData.get("note") as string | null;
+    const categoria = formData.get("categoria") as string | null;
 
     if (!file) {
       return NextResponse.json(
@@ -55,10 +56,10 @@ export const POST = withAuth(async (request, { user }) => {
     const db = createDatabaseClient(env);
     const result = await db.query(
       `INSERT INTO allegati (
-        tipo_riferimento, id_riferimento, nome_file_originale, 
-        chiave_r2, mime_type, dimensione_bytes, note,
+        tipo_riferimento, id_riferimento, nome_file_originale,
+        chiave_r2, mime_type, dimensione_bytes, note, categoria,
         created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now')) RETURNING *`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now')) RETURNING *`,
       [
         tipoRiferimento,
         parseInt(idRiferimento),
@@ -66,7 +67,8 @@ export const POST = withAuth(async (request, { user }) => {
         key,
         file.type,
         file.size,
-        note || null
+        note || null,
+        categoria || null
       ]
     );
 
