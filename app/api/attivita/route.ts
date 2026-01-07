@@ -113,13 +113,23 @@ export const GET = withAuth(async (request, { user }) => {
     const orderClause = `ORDER BY ${orderBy} ${filters.sort_order}`;
 
     const attivita = await db.query(
-      `SELECT attivita.*, 
-              clienti.nome as nome_cliente, 
-              tecnici.nome as nome_tecnico, 
+      `SELECT attivita.id, attivita.id_cliente, attivita.id_apparecchiatura,
+              attivita.codice_inventario_cliente, attivita.modalita_apertura_richiesta,
+              attivita.data_apertura_richiesta, attivita.numero_preventivo,
+              attivita.data_preventivo, attivita.numero_accettazione_preventivo,
+              attivita.data_accettazione_preventivo, attivita.stato,
+              attivita.data_chiusura, attivita.note_generali,
+              attivita.descrizione_richiesta, attivita.data_presa_in_carico,
+              attivita.reparto, attivita.tecnico, attivita.id_tecnico,
+              attivita.urgenza, attivita.created_at, attivita.updated_at,
+              attivita.numero_ddt_cliente, attivita.data_ddt_cliente,
+              attivita.numero_ddt_consegna, attivita.data_ddt_consegna,
+              clienti.nome as nome_cliente,
+              tecnici.nome as nome_tecnico,
               tecnici.cognome as cognome_tecnico,
               m.nome as modello,
               e.seriale as seriale
-       FROM attivita 
+       FROM attivita
        LEFT JOIN clienti ON attivita.id_cliente = clienti.id
        LEFT JOIN tecnici ON attivita.id_tecnico = tecnici.id
        LEFT JOIN apparecchiature e ON attivita.id_apparecchiatura = e.id
@@ -249,10 +259,12 @@ export const POST = withAuth(async (request, { user }) => {
         modalita_apertura_richiesta, data_apertura_richiesta,
         numero_preventivo, data_preventivo,
         numero_accettazione_preventivo, data_accettazione_preventivo,
-        stato, data_chiusura, note_generali, descrizione_richiesta, 
+        stato, data_chiusura, note_generali, descrizione_richiesta,
         id_tecnico, tecnico, urgenza, data_presa_in_carico, reparto,
+        numero_ddt_cliente, data_ddt_cliente,
+        numero_ddt_consegna, data_ddt_consegna,
         created_at, updated_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now')) RETURNING *`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'), datetime('now')) RETURNING *`,
       [
         id_cliente,
         id_apparecchiatura || null,
@@ -271,7 +283,11 @@ export const POST = withAuth(async (request, { user }) => {
         validatedData.tecnico || null,
         validatedData.urgenza || null,
         validatedData.data_presa_in_carico || null,
-        validatedData.reparto || null
+        validatedData.reparto || null,
+        validatedData.numero_ddt_cliente || null,
+        validatedData.data_ddt_cliente || null,
+        validatedData.numero_ddt_consegna || null,
+        validatedData.data_ddt_consegna || null
       ]
     );
 

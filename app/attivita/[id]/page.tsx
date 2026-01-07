@@ -48,6 +48,11 @@ interface Attivita {
   modalita_intervento?: string | null;
   tipi_apparecchiatura_json?: string | null;
   tipi_intervento_json?: string | null;
+  // DDT (Documento Di Trasporto) fields
+  numero_ddt_cliente?: string | null;
+  data_ddt_cliente?: string | null;
+  numero_ddt_consegna?: string | null;
+  data_ddt_consegna?: string | null;
   descrizione_richiesta?: string | null;
 }
 
@@ -133,6 +138,11 @@ export default function AttivitaDetailPage() {
     modalita_intervento: "",
     tipi_apparecchiatura_json: "",
     tipi_intervento_json: "",
+    // DDT (Documento Di Trasporto) fields
+    numero_ddt_cliente: "",
+    data_ddt_cliente: "",
+    numero_ddt_consegna: "",
+    data_ddt_consegna: "",
     global_service: null as number | null,
     id_cliente_finale: null as number | null,
   });
@@ -192,6 +202,11 @@ export default function AttivitaDetailPage() {
           modalita_intervento: activity.modalita_intervento || "",
           tipi_apparecchiatura_json: activity.tipi_apparecchiatura_json || "",
           tipi_intervento_json: activity.tipi_intervento_json || "",
+          // DDT fields
+          numero_ddt_cliente: activity.numero_ddt_cliente || "",
+          data_ddt_cliente: activity.data_ddt_cliente || "",
+          numero_ddt_consegna: activity.numero_ddt_consegna || "",
+          data_ddt_consegna: activity.data_ddt_consegna || "",
           global_service: activity.global_service || null,
           id_cliente_finale: activity.id_cliente_finale || null,
         });
@@ -305,6 +320,11 @@ export default function AttivitaDetailPage() {
         tecnico: editForm.tecnico || null,
         id_tecnico: editForm.id_tecnico || null,
         urgenza: editForm.urgenza || null,
+        // DDT fields
+        numero_ddt_cliente: editForm.numero_ddt_cliente || null,
+        data_ddt_cliente: editForm.data_ddt_cliente || null,
+        numero_ddt_consegna: editForm.numero_ddt_consegna || null,
+        data_ddt_consegna: editForm.data_ddt_consegna || null,
         // Equipment logic
         id_modello: isNewEquipment ? editForm.id_modello : undefined,
         seriale: isNewEquipment ? editForm.seriale : undefined,
@@ -778,6 +798,84 @@ export default function AttivitaDetailPage() {
             <div>
               <p className="text-sm text-gray-600">Data</p>
               <p className="text-gray-900 font-medium">{formatDate(attivita.data_accettazione_preventivo)}</p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* DDT Cliente (Ritiro) */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-semibold mb-4">DDT Cliente (Ritiro)</h2>
+        {editing ? (
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Numero DDT Cliente</label>
+              <input
+                type="text"
+                value={editForm.numero_ddt_cliente}
+                onChange={(e) => setEditForm({ ...editForm, numero_ddt_cliente: e.target.value })}
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
+                placeholder="Es: DDT-2024-001"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Data DDT Cliente</label>
+              <input
+                type="date"
+                value={editForm.data_ddt_cliente}
+                onChange={(e) => setEditForm({ ...editForm, data_ddt_cliente: e.target.value })}
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
+              />
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm text-gray-600">Numero</p>
+              <p className="text-gray-900 font-medium">{attivita.numero_ddt_cliente || "N/D"}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">Data</p>
+              <p className="text-gray-900 font-medium">{formatDate(attivita.data_ddt_cliente || null)}</p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* DDT Consegna */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-semibold mb-4">DDT Consegna</h2>
+        {editing ? (
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Numero DDT Consegna</label>
+              <input
+                type="text"
+                value={editForm.numero_ddt_consegna}
+                onChange={(e) => setEditForm({ ...editForm, numero_ddt_consegna: e.target.value })}
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
+                placeholder="Es: DDT-2024-002"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Data DDT Consegna</label>
+              <input
+                type="date"
+                value={editForm.data_ddt_consegna}
+                onChange={(e) => setEditForm({ ...editForm, data_ddt_consegna: e.target.value })}
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
+              />
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm text-gray-600">Numero</p>
+              <p className="text-gray-900 font-medium">{attivita.numero_ddt_consegna || "N/D"}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-600">Data</p>
+              <p className="text-gray-900 font-medium">{formatDate(attivita.data_ddt_consegna || null)}</p>
             </div>
           </div>
         )}

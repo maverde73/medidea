@@ -41,6 +41,10 @@ CREATE TABLE IF NOT EXISTS attivita (
   tecnico TEXT,
   id_tecnico INTEGER,
   urgenza TEXT,
+  numero_ddt_cliente TEXT,
+  data_ddt_cliente TEXT,
+  numero_ddt_consegna TEXT,
+  data_ddt_consegna TEXT,
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   updated_at TEXT NOT NULL DEFAULT (datetime('now')),
   FOREIGN KEY(id_cliente) REFERENCES clienti(id) ON DELETE RESTRICT,
@@ -100,6 +104,7 @@ CREATE TABLE IF NOT EXISTS allegati (
   dimensione_bytes INTEGER,
   data_caricamento TEXT NOT NULL DEFAULT (datetime('now')),
   note TEXT,
+  categoria TEXT, -- 'ddt_cliente', 'ddt_consegna', 'altro'
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
@@ -107,6 +112,7 @@ CREATE TABLE IF NOT EXISTS allegati (
 -- Indici per allegati
 CREATE INDEX IF NOT EXISTS idx_allegati_riferimento ON allegati(tipo_riferimento, id_riferimento);
 CREATE INDEX IF NOT EXISTS idx_allegati_chiave_r2 ON allegati(chiave_r2);
+CREATE INDEX IF NOT EXISTS idx_allegati_categoria ON allegati(categoria);
 
 -- Tabella utenti
 CREATE TABLE IF NOT EXISTS utenti (

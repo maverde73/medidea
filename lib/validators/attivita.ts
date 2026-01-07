@@ -55,6 +55,11 @@ export const CreateAttivitaSchema = z.object({
   modalita_intervento: z.string().optional().nullable(),
   tipi_apparecchiatura_json: z.string().optional().nullable(),
   tipi_intervento_json: z.string().optional().nullable(),
+  // DDT (Documento Di Trasporto) fields
+  numero_ddt_cliente: z.string().optional().nullable(),
+  data_ddt_cliente: z.string().optional().nullable(),
+  numero_ddt_consegna: z.string().optional().nullable(),
+  data_ddt_consegna: z.string().optional().nullable(),
 });
 
 /**
@@ -97,6 +102,11 @@ export const UpdateAttivitaSchema = z.object({
   modalita_intervento: z.string().optional().nullable(),
   tipi_apparecchiatura_json: z.string().optional().nullable(),
   tipi_intervento_json: z.string().optional().nullable(),
+  // DDT (Documento Di Trasporto) fields
+  numero_ddt_cliente: z.string().optional().nullable(),
+  data_ddt_cliente: z.string().optional().nullable(),
+  numero_ddt_consegna: z.string().optional().nullable(),
+  data_ddt_consegna: z.string().optional().nullable(),
 });
 
 /**
@@ -236,4 +246,8 @@ export interface Attivita {
   reparto: string | null;
   tecnico: string | null;
   urgenza: string | null;
+  numero_ddt_cliente: string | null;
+  data_ddt_cliente: string | null;
+  numero_ddt_consegna: string | null;
+  data_ddt_consegna: string | null;
 }
