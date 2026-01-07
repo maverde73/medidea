@@ -29,6 +29,11 @@ interface ClientWithEquipment {
   contatti: string | null;
   equipment_count: number;
   activities_count: number;
+  activities_by_urgency: {
+    BASSA: number;
+    MEDIA: number;
+    ALTA: number;
+  };
   equipment_groups: EquipmentGroup[];
 }
 

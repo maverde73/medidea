@@ -27,6 +27,11 @@ interface ClientWithEquipment {
   contatti: string | null;
   equipment_count: number;
   activities_count: number;
+  activities_by_urgency: {
+    BASSA: number;
+    MEDIA: number;
+    ALTA: number;
+  };
   equipment_groups: EquipmentGroup[];
 }
 
@@ -41,7 +46,7 @@ export const GET = withAuth(async (request, { user }) => {
         c.id, c.nome as client_name, c.indirizzo, c.contatti,
         e.id as equipment_id, e.seriale, e.data_test_funzionali, e.data_test_elettrici, e.note as equipment_note,
         m.nome as equipment_model,
-        a.id as activity_id, a.stato, a.data_apertura_richiesta, a.data_chiusura
+        a.id as activity_id, a.stato, a.data_apertura_richiesta, a.data_chiusura, a.urgenza
       FROM clienti c
       INNER JOIN apparecchiature e ON c.id = e.id_cliente
       LEFT JOIN modelli_apparecchiature m ON e.id_modello = m.id
@@ -63,6 +68,11 @@ export const GET = withAuth(async (request, { user }) => {
           contatti: row.contatti,
           equipment_count: 0,
           activities_count: 0,
+          activities_by_urgency: {
+            BASSA: 0,
+            MEDIA: 0,
+            ALTA: 0
+          },
           equipment_groups: []
         });
       }
@@ -84,6 +94,12 @@ export const GET = withAuth(async (request, { user }) => {
         // Count activities (excluding null activity_id)
         if (row.activity_id !== null) {
           client.activities_count++;
+
+          // Count by urgency
+          const urgenza = row.urgenza as 'BASSA' | 'MEDIA' | 'ALTA' | null;
+          if (urgenza && (urgenza === 'BASSA' || urgenza === 'MEDIA' || urgenza === 'ALTA')) {
+            client.activities_by_urgency[urgenza]++;
+          }
         }
       }
 

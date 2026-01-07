@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronDown, ChevronRight, Users, Monitor, Activity } from "lucide-react";
+import { ChevronDown, ChevronRight, Users, Monitor, AlertCircle, AlertTriangle, Info } from "lucide-react";
 import { EquipmentGroupCard } from "./EquipmentGroupCard";
 
 interface EquipmentItem {
@@ -27,6 +27,11 @@ interface ClientWithEquipment {
   contatti: string | null;
   equipment_count: number;
   activities_count: number;
+  activities_by_urgency: {
+    BASSA: number;
+    MEDIA: number;
+    ALTA: number;
+  };
   equipment_groups: EquipmentGroup[];
 }
 
@@ -72,10 +77,40 @@ export function ClientHierarchyCard({ client }: ClientHierarchyCardProps) {
               <Monitor size={16} />
               <span>{client.equipment_count} {client.equipment_count === 1 ? "apparecchiatura" : "apparecchiature"}</span>
             </div>
-            <div className="flex items-center gap-1 text-sm text-gray-600">
-              <Activity size={16} />
-              <span>{client.activities_count} {client.activities_count === 1 ? "attività" : "attività"}</span>
-            </div>
+            {client.activities_count > 0 && (
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-600">Attività:</span>
+                <div className="flex items-center gap-1">
+                  {client.activities_by_urgency.BASSA > 0 && (
+                    <div
+                      className="flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 rounded-md cursor-help"
+                      title={`${client.activities_by_urgency.BASSA} attività a bassa urgenza`}
+                    >
+                      <Info size={14} />
+                      <span className="text-xs font-medium">{client.activities_by_urgency.BASSA}</span>
+                    </div>
+                  )}
+                  {client.activities_by_urgency.MEDIA > 0 && (
+                    <div
+                      className="flex items-center gap-1 px-2 py-1 bg-yellow-100 text-yellow-700 rounded-md cursor-help"
+                      title={`${client.activities_by_urgency.MEDIA} attività a media urgenza`}
+                    >
+                      <AlertTriangle size={14} />
+                      <span className="text-xs font-medium">{client.activities_by_urgency.MEDIA}</span>
+                    </div>
+                  )}
+                  {client.activities_by_urgency.ALTA > 0 && (
+                    <div
+                      className="flex items-center gap-1 px-2 py-1 bg-red-100 text-red-700 rounded-md cursor-help"
+                      title={`${client.activities_by_urgency.ALTA} attività ad alta urgenza`}
+                    >
+                      <AlertCircle size={14} />
+                      <span className="text-xs font-medium">{client.activities_by_urgency.ALTA}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </button>
