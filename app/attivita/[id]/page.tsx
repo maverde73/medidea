@@ -1186,26 +1186,65 @@ export default function AttivitaDetailPage() {
               type="apparecchiatura"
               value={editForm.tipi_apparecchiatura_json}
               onChange={(value) => setEditForm({ ...editForm, tipi_apparecchiatura_json: value })}
+              label="Tipi Apparecchiatura"
             />
 
             <InterventionTypeSelector
               type="intervento"
               value={editForm.tipi_intervento_json}
               onChange={(value) => setEditForm({ ...editForm, tipi_intervento_json: value })}
+              label="Tipi Intervento"
             />
           </div>
         ) : (
-          <div className="space-y-2">
+          <div className="space-y-4">
             {attivita.modalita_intervento && (
-              <p><span className="font-medium">Modalità:</span> {attivita.modalita_intervento}</p>
+              <div>
+                <p className="text-sm font-medium text-gray-700 mb-2">Modalità Intervento</p>
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                  {attivita.modalita_intervento}
+                </span>
+              </div>
             )}
-            {attivita.tipi_apparecchiatura_json && (
-              <p><span className="font-medium">Tipi Apparecchiatura:</span> {attivita.tipi_apparecchiatura_json}</p>
+            {attivita.tipi_apparecchiatura_json && attivita.tipi_apparecchiatura_json !== '[]' && attivita.tipi_apparecchiatura_json !== '' && (
+              <div>
+                <p className="text-sm font-medium text-gray-700 mb-2">Tipi Apparecchiatura</p>
+                <div className="flex flex-wrap gap-2">
+                  {(() => {
+                    try {
+                      const types = JSON.parse(attivita.tipi_apparecchiatura_json);
+                      return Array.isArray(types) && types.length > 0 ? types.map((type, index) => (
+                        <span key={index} className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                          {type}
+                        </span>
+                      )) : <span className="text-gray-500 text-sm">Nessuna selezione</span>;
+                    } catch {
+                      return <span className="text-gray-500 text-sm">{attivita.tipi_apparecchiatura_json}</span>;
+                    }
+                  })()}
+                </div>
+              </div>
             )}
-            {attivita.tipi_intervento_json && (
-              <p><span className="font-medium">Tipi Intervento:</span> {attivita.tipi_intervento_json}</p>
+            {attivita.tipi_intervento_json && attivita.tipi_intervento_json !== '[]' && attivita.tipi_intervento_json !== '' && (
+              <div>
+                <p className="text-sm font-medium text-gray-700 mb-2">Tipi Intervento</p>
+                <div className="flex flex-wrap gap-2">
+                  {(() => {
+                    try {
+                      const types = JSON.parse(attivita.tipi_intervento_json);
+                      return Array.isArray(types) && types.length > 0 ? types.map((type, index) => (
+                        <span key={index} className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
+                          {type}
+                        </span>
+                      )) : <span className="text-gray-500 text-sm">Nessuna selezione</span>;
+                    } catch {
+                      return <span className="text-gray-500 text-sm">{attivita.tipi_intervento_json}</span>;
+                    }
+                  })()}
+                </div>
+              </div>
             )}
-            {!attivita.modalita_intervento && !attivita.tipi_apparecchiatura_json && !attivita.tipi_intervento_json && (
+            {!attivita.modalita_intervento && (!attivita.tipi_apparecchiatura_json || attivita.tipi_apparecchiatura_json === '[]' || attivita.tipi_apparecchiatura_json === '') && (!attivita.tipi_intervento_json || attivita.tipi_intervento_json === '[]' || attivita.tipi_intervento_json === '') && (
               <p className="text-gray-500">Nessuna classificazione</p>
             )}
           </div>
