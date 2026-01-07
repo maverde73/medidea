@@ -76,4 +76,64 @@ test.describe('Form Creazione Attività', () => {
     // Wait for form to fully load
     await page.waitForTimeout(1000);
   });
+
+  test('should display DDT section in new attivita form', async ({ page }) => {
+    await page.goto('/attivita/new');
+
+    // Check DDT section heading
+    await expect(page.getByRole('heading', { name: /DDT - Documento Di Trasporto/i })).toBeVisible();
+
+    // Check DDT Cliente subsection
+    await expect(page.getByRole('heading', { name: /DDT Cliente \(Ritiro\)/i })).toBeVisible();
+    await expect(page.getByLabel(/Numero DDT Cliente/i)).toBeVisible();
+    await expect(page.getByLabel(/Data DDT Cliente/i)).toBeVisible();
+
+    // Check DDT Consegna subsection
+    await expect(page.getByRole('heading', { name: /DDT Consegna/i })).toBeVisible();
+    await expect(page.getByLabel(/Numero DDT Consegna/i)).toBeVisible();
+    await expect(page.getByLabel(/Data DDT Consegna/i)).toBeVisible();
+
+    // Check info message
+    await expect(page.getByText(/Potrai caricare i file DDT dopo aver salvato/i)).toBeVisible();
+  });
+
+  test('DDT fields should be optional', async ({ page }) => {
+    await page.goto('/attivita/new');
+
+    // DDT fields should be visible but not required
+    await expect(page.getByLabel(/Numero DDT Cliente/i)).toBeVisible();
+    await expect(page.getByLabel(/Data DDT Cliente/i)).toBeVisible();
+    await expect(page.getByLabel(/Numero DDT Consegna/i)).toBeVisible();
+    await expect(page.getByLabel(/Data DDT Consegna/i)).toBeVisible();
+
+    // Try to submit without filling DDT fields (will fail for other reasons but not DDT)
+    const submitButton = page.getByRole('button', { name: /crea attività/i });
+    await submitButton.click();
+
+    await page.waitForTimeout(500);
+
+    // Should not show DDT-specific validation errors
+    await expect(page.getByText(/DDT.*obbligatorio/i)).not.toBeVisible();
+  });
+
+  test('should accept DDT date and number formats', async ({ page }) => {
+    await page.goto('/attivita/new');
+
+    // Scroll to DDT section
+    await page.getByRole('heading', { name: /DDT - Documento Di Trasporto/i }).scrollIntoViewIfNeeded();
+
+    // Fill DDT Cliente fields
+    await page.getByLabel(/Numero DDT Cliente/i).fill('DDT-2024-001');
+    await page.getByLabel(/Data DDT Cliente/i).fill('2024-01-15');
+
+    // Fill DDT Consegna fields
+    await page.getByLabel(/Numero DDT Consegna/i).fill('DDT-2024-002');
+    await page.getByLabel(/Data DDT Consegna/i).fill('2024-01-20');
+
+    // Values should be retained
+    await expect(page.getByLabel(/Numero DDT Cliente/i)).toHaveValue('DDT-2024-001');
+    await expect(page.getByLabel(/Data DDT Cliente/i)).toHaveValue('2024-01-15');
+    await expect(page.getByLabel(/Numero DDT Consegna/i)).toHaveValue('DDT-2024-002');
+    await expect(page.getByLabel(/Data DDT Consegna/i)).toHaveValue('2024-01-20');
+  });
 });

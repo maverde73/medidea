@@ -325,6 +325,14 @@ Dopo l'implementazione, checklist di verifica:
 - [ ] Ore lavoro/viaggio sommabili per report
 - [ ] Export Excel include tutti i nuovi campi
 - [ ] PDF verbale generato con layout cliente
+- [ ] DDT Cliente: numero e data salvati correttamente
+- [ ] DDT Consegna: numero e data salvati correttamente
+- [ ] File DDT caricabili con categoria specifica
+- [ ] File DDT Cliente visualizzati nella sezione corretta
+- [ ] File DDT Consegna visualizzati nella sezione corretta
+- [ ] Badge categoria mostrano "DDT Cliente" e "DDT Consegna"
+- [ ] Campi DDT visibili sia in creazione che in modifica
+- [ ] Campi DDT inclusi nell'export/report PDF
 
 ---
 

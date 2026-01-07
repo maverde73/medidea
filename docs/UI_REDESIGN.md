@@ -276,6 +276,13 @@ const breakpoints = {
 - [ ] LocalStorage persist sidebar state
 - [ ] Nessun errore console
 - [ ] Build senza warning
+- [ ] Campi DDT visibili in form creazione attività
+- [ ] Campi DDT visibili in pagina dettaglio attività
+- [ ] Upload file DDT con categoria funzionante
+- [ ] File DDT filtrati correttamente per categoria
+- [ ] Badge categoria visualizzati nei file list
+- [ ] Download file DDT funzionante
+- [ ] Sezioni DDT Cliente e DDT Consegna separate
 
 ---
 

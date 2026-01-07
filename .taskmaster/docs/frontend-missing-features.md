@@ -505,6 +505,51 @@ Toast/notifications per:
   - Creazione attività completa
   - Upload e download PDF
   - Gestione interventi
+  - Compilazione campi DDT in creazione attività
+  - Upload file DDT con categoria corretta
+  - Visualizzazione file DDT filtrati per categoria
+  - Modifica campi DDT in attività esistente
+
+### 14.2 Test Cases DDT
+
+**Scenario 1: Creazione attività con DDT completo**
+1. Compilare form nuova attività
+2. Inserire numero DDT Cliente: "DDT-2024-001"
+3. Inserire data DDT Cliente: 15/01/2024
+4. Inserire numero DDT Consegna: "DDT-2024-002"
+5. Inserire data DDT Consegna: 20/01/2024
+6. Salvare attività
+7. Verificare che i campi DDT siano salvati
+8. Nella pagina dettaglio, caricare PDF nella sezione "DDT Cliente"
+9. Verificare che il file appaia solo nella sezione "DDT Cliente"
+10. Verificare badge "DDT Cliente" sul file
+11. Caricare PDF nella sezione "DDT Consegna"
+12. Verificare che il file appaia solo nella sezione "DDT Consegna"
+13. Verificare badge "DDT Consegna" sul file
+
+**Scenario 2: Modifica DDT attività esistente**
+1. Aprire attività esistente
+2. Click su "Modifica"
+3. Modificare numero DDT Cliente
+4. Salvare modifiche
+5. Verificare che la modifica sia persistita
+6. Ricaricare pagina e verificare che i dati DDT siano corretti
+
+**Scenario 3: Upload DDT senza campi**
+1. Creare attività senza compilare campi DDT
+2. Salvare attività
+3. Nella pagina dettaglio, verificare sezioni DDT vuote
+4. Upload file PDF in sezione DDT Cliente
+5. Verificare che file venga salvato con categoria corretta
+6. Verificare che non sia necessario compilare numero/data DDT per upload
+
+**Scenario 4: Download e eliminazione file DDT**
+1. Aprire attività con file DDT caricati
+2. Click su download file DDT Cliente
+3. Verificare download corretto
+4. Click su elimina file DDT Cliente (con conferma)
+5. Verificare che file sia rimosso solo dalla sezione corretta
+6. Verificare che file DDT Consegna rimanga intatto
 
 ---
 

@@ -47,6 +47,12 @@ const attivitaSchema = z.object({
   tecnico: z.string().optional().nullable(),
   id_tecnico: z.number().optional().nullable(),
   urgenza: z.enum(["BASSA", "MEDIA", "ALTA"]).optional().nullable(),
+
+  // DDT (Documento Di Trasporto)
+  numero_ddt_cliente: z.string().optional().nullable(),
+  data_ddt_cliente: z.string().optional().nullable(),
+  numero_ddt_consegna: z.string().optional().nullable(),
+  data_ddt_consegna: z.string().optional().nullable(),
 }).refine((data) => data.id_apparecchiatura || data.id_modello, {
   message: "Seleziona un'apparecchiatura esistente o specificane una nuova (modello)",
   path: ["id_apparecchiatura"], // Error will be attached to id_apparecchiatura
@@ -468,6 +474,77 @@ export default function NewAttivitaPage() {
           </div>
           <div className="mt-2 p-3 bg-blue-50 text-blue-800 text-sm rounded-lg">
             Potrai caricare il file di accettazione dopo aver salvato l&apos;attività.
+          </div>
+        </div>
+
+        {/* DDT (Documento Di Trasporto) */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">
+            DDT - Documento Di Trasporto
+          </h2>
+
+          {/* DDT Cliente (Ritiro) */}
+          <div className="mb-6">
+            <h3 className="text-lg font-medium text-gray-800 mb-3">
+              DDT Cliente (Ritiro)
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Numero DDT Cliente
+                </label>
+                <input
+                  type="text"
+                  {...register("numero_ddt_cliente")}
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
+                  placeholder="Es: DDT-2024-001"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Data DDT Cliente
+                </label>
+                <input
+                  type="date"
+                  {...register("data_ddt_cliente")}
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* DDT Consegna */}
+          <div className="mb-4">
+            <h3 className="text-lg font-medium text-gray-800 mb-3">
+              DDT Consegna
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Numero DDT Consegna
+                </label>
+                <input
+                  type="text"
+                  {...register("numero_ddt_consegna")}
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
+                  placeholder="Es: DDT-2024-002"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Data DDT Consegna
+                </label>
+                <input
+                  type="date"
+                  {...register("data_ddt_consegna")}
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-4 p-3 bg-blue-50 text-blue-800 text-sm rounded-lg">
+            Potrai caricare i file DDT dopo aver salvato l&apos;attività.
           </div>
         </div>
 
